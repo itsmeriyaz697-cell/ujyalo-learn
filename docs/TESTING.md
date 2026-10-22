@@ -106,7 +106,21 @@ Screenshots for both runs are in [`docs/screenshots`](./screenshots) (01–18).
 - Deep-link reloads for `/app/notes`, `/app/tutor`, `/app/settings`.
 - 375 px viewport: home and dashboard with no horizontal scroll.
 - Dark mode across dashboard and settings.
-- Keyboard: first Tab reaches the skip link.
+- Keyboard: first Tab reaches the skip link, ⌘K / Ctrl-K opens site search.
+
+### Production (https://ujyalo-learn.vercel.app)
+
+| Check | Result |
+| --- | --- |
+| Nine public routes return their own prerendered `<title>` and description | ✅ |
+| `<link rel="canonical">` and `og:url` are absolute and per-route | ✅ |
+| JSON-LD parses: `EducationalOrganization`, `WebSite`, `FAQPage`, `BreadcrumbList` | ✅ |
+| `sitemap.xml` lists 9 URLs, `robots.txt` disallows `/app`, `/api` and auth screens | ✅ |
+| Unknown URL returns a real **404** with a branded page (no soft-404) | ✅ |
+| `/app/*`, `/login`, `/signup`, `/onboarding` rewrite to the SPA shell with 200 | ✅ |
+| `/api/health` responds (`configured:false` until `AI_API_KEY` is added) | ✅ |
+| Full browser suite against production, `BASE_URL=https://ujyalo-learn.vercel.app npm run test:ui` | ✅ 42/42 |
+| `/og-image.png` serves 1200×630 at an absolute URL | ✅ |
 
 ---
 
@@ -120,7 +134,7 @@ Screenshots for both runs are in [`docs/screenshots`](./screenshots) (01–18).
 | 4 | Firestore reads/writes with rules | Needs a Firebase project; tested only against local demo storage |
 | 5 | Cross-user access denial | Needs two live accounts |
 | 6 | Real AI provider (OpenAI/Groq/Gemini) | No key in this environment; mock provider used instead |
-| 7 | Production deploy, custom domain, sitemap | Needs the owner’s Vercel account |
+| 7 | Custom domain + DNS | Deployed to `ujyalo-learn.vercel.app`; a custom domain needs the owner’s registrar |
 | 8 | PWA install + offline shell on a device | Needs a real browser/device |
 | 9 | Screen-reader pass | Needs NVDA/VoiceOver |
 

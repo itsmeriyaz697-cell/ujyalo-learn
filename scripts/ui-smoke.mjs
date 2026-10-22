@@ -36,6 +36,9 @@ page.on('console', (message) => {
   // Network failures for the AI endpoints are expected when no provider is
   // configured; the app surfaces them in the UI. Everything else is a bug.
   if (/Failed to load resource/.test(text) && /\/api\/(tutor|tools|quiz|flashcards|health)/.test(url)) return;
+  // Navigating to an unknown URL is supposed to be a real HTTP 404 now, and
+  // browsers log that as a failed resource. It is an assertion target, not a bug.
+  if (/Failed to load resource/.test(text) && /does-not-exist/.test(page.url())) return;
   consoleErrors.push(`console: ${text}`);
 });
 
