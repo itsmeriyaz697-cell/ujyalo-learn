@@ -213,7 +213,9 @@ Notes:
 
 ## Deploying to Vercel
 
-The repository is Vercel-ready (`vercel.json`, `/api` functions, Vite preset). There is **no deployment in this repository** — publishing requires your own Vercel account.
+> **Current status (22 Oct 2026):** the Vercel project **`ujyalo-learn`** is created and configured on the owner's account, but **no deployment exists yet** — the source still has to be pushed from Git or uploaded with the Vercel CLI. See [`docs/DEPLOY-VERCEL.md`](docs/DEPLOY-VERCEL.md) for the exact two-minute steps and the environment variables already set on the project.
+
+The repository is Vercel-ready (`vercel.json`, `/api` functions, Vite preset).
 
 ### Option A — Dashboard (recommended)
 
