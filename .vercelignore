@@ -1,0 +1,11 @@
+# Keep uploads small; Vercel installs dependencies and builds remotely.
+node_modules
+dist
+.git
+docs/screenshots
+*.tsbuildinfo
+.env
+.env.local
+.env.*.local
+coverage
+ujyalo-learn.zip
