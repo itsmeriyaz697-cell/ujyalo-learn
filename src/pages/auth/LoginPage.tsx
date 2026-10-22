@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Eye, EyeOff, LogIn } from 'lucide-react';
 import { Seo } from '@/components/seo/Seo';
 import { AuthShell } from '@/features/auth/AuthShell';
@@ -19,7 +19,11 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
-  const from = (location.state as { from?: string } | null)?.from ?? '/app';
+  const [searchParams] = useSearchParams();
+  // Only same-origin paths are accepted, so ?next= cannot be used as an open redirect.
+  const requested = searchParams.get('next') ?? '';
+  const safeNext = requested.startsWith('/') && !requested.startsWith('//') ? requested : '';
+  const from = (location.state as { from?: string } | null)?.from ?? safeNext ?? '/app';
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();

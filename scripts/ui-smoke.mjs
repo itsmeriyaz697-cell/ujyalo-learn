@@ -98,14 +98,48 @@ await page.keyboard.press('Escape');
 await page.waitForTimeout(150);
 check('command palette closes on Escape', (await page.getByRole('option').count()) === 0);
 
-// 404
-await visit('/this-page-does-not-exist');
-const notFoundText = await page.locator('body').innerText();
-check('unknown route shows a 404 page', /404|not found/i.test(notFoundText));
 
-// Login redirect for a protected route
+// ─── Signed-out protection ──────────────────────────────────────────────────
 await visit('/app');
+await page.waitForTimeout(600);
 check('protected route redirects to login', page.url().includes('/login'), page.url());
+await visit('/admin');
+await page.waitForTimeout(900);
+check('admin also redirects to login when signed out', page.url().includes('/login'), page.url());
+
+// ─── Learning library (public) ──────────────────────────────────────────────
+await visit('/courses');
+const coursesText = await page.locator('body').innerText();
+check('courses page lists the starter library', /learning paths|course/i.test(coursesText));
+check('courses page explains courses are study paths, not official material', /study paths|not just links/i.test(coursesText));
+await shot('19-courses');
+
+await visit('/courses/see-mathematics-core');
+const courseText = await page.locator('body').innerText();
+check('course detail renders its sessions', /Work through the sessions/i.test(courseText));
+check('course detail carries the honesty note', /not official curriculum material/i.test(courseText));
+await shot('20-course-detail');
+
+await visit('/resources');
+check('resources page lists guides', /resource/i.test(await page.locator('body').innerText()));
+await visit('/resources/how-to-use-active-recall');
+check('resource page shows attribution and licence', /Ujyalo Learn original/i.test(await page.locator('body').innerText()));
+await shot('21-resource');
+
+await visit('/grades/10');
+check('grade hub renders', /Grade 10 study hub/i.test(await page.locator('body').innerText()));
+await visit('/see-preparation');
+check('SEE hub renders', /SEE preparation/i.test(await page.locator('body').innerText()));
+await visit('/faq');
+// Answers live inside collapsed <details>, so read textContent, not innerText.
+await page.getByRole('heading', { name: /Questions students and parents ask/i }).isVisible();
+const faqHtml = await page.content();
+check(
+  'FAQ answers the official-curriculum question',
+  /National Examination Board/i.test(faqHtml) && /independent learning tool/i.test(faqHtml),
+);
+await visit('/content-policy');
+check('content policy is published', /copyright policy/i.test(await page.locator('body').innerText()));
 
 // ─── Sign up (local demo mode) ───────────────────────────────────────────────
 const email = `test.student.${Date.now()}@example.com`;
@@ -155,6 +189,45 @@ check('dashboard greets the student by name', /Aarati/i.test(dashText), dashText
 check('dashboard shows a demo-mode notice', /demo|this browser/i.test(dashText));
 check('dashboard shows empty states instead of fake data', /no |nothing|start|empty/i.test(dashText));
 await shot('04-dashboard');
+
+// ─── Admin panel (demo workspace: local role = owner) ───────────────────────
+await visit('/admin');
+await page.waitForTimeout(900); // role lookup resolves after mount
+const adminText = await page.locator('body').innerText();
+check('admin overview loads for the demo owner', /Overview/i.test(adminText));
+check('admin labels the demo workspace honestly', /stored in this browser only|Demo workspace/i.test(adminText));
+
+await visit('/admin/courses');
+check('admin course list renders', /Courses/i.test(await page.locator('body').innerText()));
+await visit('/admin/courses/new');
+await page.waitForTimeout(400);
+const publishButton = page.getByRole('button', { name: /^Publish$/ });
+check('publishing an empty course is blocked', await publishButton.isDisabled());
+check('the editor explains what is missing', /Before publishing/i.test(await page.locator('body').innerText()));
+
+await visit('/admin/resources/new');
+await page.getByLabel('Title', { exact: true }).fill('Temporary smoke resource');
+await page.getByLabel('Description', { exact: true }).fill('A description long enough to satisfy validation.');
+await page.getByLabel('Body', { exact: true }).fill('Body text for the smoke test, long enough to pass the minimum length check.');
+await page.getByRole('button', { name: 'Save draft' }).click();
+await page.waitForTimeout(900);
+await visit('/resources');
+check('a saved draft never appears publicly', !(await page.locator('body').innerText()).includes('Temporary smoke resource'));
+await visit('/resources/temporary-smoke-resource');
+check('a draft is not reachable by URL either', /404/.test(await page.locator('body').innerText()));
+
+await visit('/admin/audit');
+check('audit log records the saved draft', /Temporary smoke resource/i.test(await page.locator('body').innerText()));
+await shot('22-admin-audit');
+await visit('/admin/settings');
+check('settings page is reachable for an owner', /Site settings/i.test(await page.locator('body').innerText()));
+
+
+// 404
+await visit('/this-page-does-not-exist');
+const notFoundText = await page.locator('body').innerText();
+check('unknown route shows a 404 page', /404|not found/i.test(notFoundText));
+
 
 // ─── Tutor ──────────────────────────────────────────────────────────────────
 await visit('/app/tutor');

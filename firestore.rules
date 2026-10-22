@@ -196,6 +196,115 @@ service cloud.firestore {
       }
     }
 
+
+    // ══════════════════════════════════════════════════════════════════
+    //  Learning library (courses, resources, settings, audit, roles)
+    //
+    //  These documents are shared, not student-owned. Reads of published
+    //  content are public; every write requires a role document that says
+    //  owner/admin/editor. Roles are read through `get()` so the check is
+    //  made by the database, never by the browser.
+    // ══════════════════════════════════════════════════════════════════
+
+    function role() {
+      return signedIn() ? get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.role : 'guest';
+    }
+
+    function isEditor() {
+      return signedIn() && role() in ['owner', 'admin', 'editor'];
+    }
+
+    function isAdmin() {
+      return signedIn() && role() in ['owner', 'admin'];
+    }
+
+    function isSiteOwner() {
+      return signedIn() && role() == 'owner';
+    }
+
+    function isPublished() {
+      return resource.data.status == 'published';
+    }
+
+    function validSlug() {
+      return request.resource.data.slug is string
+        && request.resource.data.slug.matches('^[a-z0-9]+(-[a-z0-9]+)*$')
+        && request.resource.data.slug.size() >= 3
+        && request.resource.data.slug.size() <= 60;
+    }
+
+    function validCourse() {
+      return validSlug()
+        && request.resource.data.title is string
+        && request.resource.data.title.size() <= 160
+        && request.resource.data.summary is string
+        && request.resource.data.summary.size() <= 240
+        && request.resource.data.description is string
+        && request.resource.data.description.size() <= 4000
+        && request.resource.data.status in ['draft', 'published', 'archived']
+        && request.resource.data.gradeMin is int
+        && request.resource.data.gradeMax is int
+        && request.resource.data.gradeMin >= 1
+        && request.resource.data.gradeMax <= 12
+        && request.resource.data.lessons is list
+        && request.resource.data.lessons.size() <= 40;
+    }
+
+    function validResource() {
+      return validSlug()
+        && request.resource.data.title is string
+        && request.resource.data.title.size() <= 200
+        && request.resource.data.description is string
+        && request.resource.data.description.size() <= 400
+        && request.resource.data.status in ['draft', 'published', 'archived']
+        && request.resource.data.source is string
+        && request.resource.data.source.size() > 0
+        && request.resource.data.source.size() <= 200
+        && request.resource.data.license is string
+        && request.resource.data.license.size() > 0
+        && request.resource.data.license.size() <= 200
+        && request.resource.data.body is list
+        && request.resource.data.body.size() <= 60;
+    }
+
+    match /courses/{courseId} {
+      // Anyone may read a published course. Drafts need a role.
+      allow read: if isPublished() || isEditor();
+
+      allow create, update: if isEditor() && validCourse();
+      allow delete: if isAdmin();
+    }
+
+    match /resources/{resourceId} {
+      allow read: if isPublished() || isEditor();
+
+      // Attribution and licence are mandatory: no anonymous material.
+      allow create, update: if isEditor() && validResource();
+      allow delete: if isAdmin();
+    }
+
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /roles/{uid} {
+      // A signed-in user may read only their own role document.
+      allow get: if signedIn() && request.auth.uid == uid;
+      allow list: if isSiteOwner();
+      allow write: if isSiteOwner();
+    }
+
+    match /auditLogs/{eventId} {
+      allow read: if isAdmin();
+      // Editors may append. Nobody may edit or delete through the client.
+      allow create: if isEditor()
+        && request.resource.data.actorId == request.auth.uid
+        && request.resource.data.summary is string
+        && request.resource.data.summary.size() <= 300;
+      allow update, delete: if false;
+    }
+
     // Deny everything else by default.
     match /{document=**} {
       allow read, write: if false;

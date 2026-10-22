@@ -22,6 +22,7 @@ Founded and built by **Riyaz Chalise**.
 - [Data model and security rules](#data-model-and-security-rules)
 - [Security model](#security-model)
 - [SEO](#seo)
+- [Learning library and admin](#learning-library-and-admin)
 - [Testing](#testing)
 - [Known limitations](#known-limitations)
 - [Project structure](#project-structure)
@@ -36,7 +37,17 @@ Founded and built by **Riyaz Chalise**.
 
 | Page | What it does |
 | --- | --- |
-| Home | Hero, tutor preview, feature cards, how it works, subjects and grades, personalisation explainer, privacy/responsible-AI section, FAQ, footer with founder credit |
+| Home | Split hero with illustrated student, capability strip, honest product facts, “why Ujyalo Learn”, dashboard preview, features, how it works, subjects, personalisation, trust, FAQ, CTA |
+| Courses | Filterable directory of learning paths (subject, grade band, level, search) |
+| Course detail | Session list, outcomes, and a button per session that opens the tutor/quiz/flashcards with the topic pre-filled |
+| Resources | Attributed study guides with type/subject filters and real empty states |
+| Resource detail | Full guide, source, licence, last-updated date, no fake download button |
+| Grade hubs | `/grades/1` … `/grades/12` — subjects, matching courses and next-step links |
+| SEE preparation | Four-week plan, what works, and what we deliberately do not publish |
+| FAQ | Cost, accuracy, affiliation, privacy, parental consent |
+| Content policy | What we publish, what we refuse, attribution, corrections |
+| Accessibility | Commitments and known limitations |
+| Search | `/search?q=` over courses, guides and pages (noindex) |
 | Features | Detailed explanation of every study tool |
 | Subjects | All 9 subjects with grade and exam-category filters |
 | Pricing | Real free tier, clearly labelled future plans, no fake checkout |
@@ -59,6 +70,19 @@ Founded and built by **Riyaz Chalise**.
 | Progress | Score trend, per-subject averages and best scores, 14-day activity, strengths and focus areas only after enough attempts, achievements from real counts |
 | Study tools | Revision summary, formula helper, writing assistant (explains its changes), question explainer — all through the real AI backend |
 | Settings | Learning preferences, profile, theme, service status, data export, typed-confirmation account deletion |
+
+### Admin panel (`/admin`, role-gated)
+
+| Area | Details |
+| --- | --- |
+| Overview | Published/draft counts, recent activity, publishing checklist, current role, honest demo-mode banner |
+| Courses | Search, filter, create, edit, reorder sessions, validate, publish/unpublish/archive, delete with confirmation |
+| Resources | Same workflow plus **source and licence are mandatory** before publishing |
+| Audit log | Append-only record of publishing actions (admins read, editors append, nobody edits) |
+| Settings | Site name, tagline, contact email, maintenance notice, default language |
+
+Roles are enforced by Firestore rules (`roles/{uid}`), not by the UI. Setup and the
+manual owner bootstrap are in [docs/ADMIN.md](docs/ADMIN.md).
 
 The app ships with **7 tutoring modes** (`explain-simply`, `step-by-step`, `exam-prep`, `quiz-me`, `socratic`, `quick-answer`, `nepali`) and **4 study tools**, each with genuinely different system prompts (see `api/_lib/prompts.ts`).
 
@@ -283,6 +307,11 @@ Vercel → Project → Domains → add your domain, then:
 
 ## Data model and security rules
 
+**Student data** lives under `users/{uid}/…` (conversations, notes, quizzes,
+attempts, decks, goals, tasks, activity). **Library content** lives in
+top-level collections (`courses`, `resources`, `settings`, `roles`,
+`auditLogs`) — see [Learning library and admin](#learning-library-and-admin).
+
 ```
 users/{uid}
   displayName, email, photoURL, preferences{grade, curriculum, language, subjects[], goals[],
@@ -333,6 +362,56 @@ Deletes are owner-only. Account deletion in Settings removes every collection fo
 
 ---
 
+## Learning library and admin
+
+The public library is real content, not placeholder cards, and the admin panel is
+gated by database rules rather than a hidden link.
+
+### Content model
+
+`shared/content-seed.json` holds the starter library — 7 courses (41 sessions)
+and 6 original study guides. The same file feeds:
+
+- the running app (`src/features/content/seed.ts` imports it),
+- the build's sitemap and prerenderer, so every published course and guide has a
+  static HTML page with its own title and canonical,
+- the unit tests, which assert slugs are unique, attribution is present, and no
+  copy claims official status or invents statistics.
+
+### Where content lives
+
+| Mode | Store | Honesty |
+| --- | --- | --- |
+| No Firebase configured | `localContentStore` (browser) | Every admin screen shows a “demo workspace — this browser only” banner |
+| Firebase configured | `firestoreContentStore` | Shared library, rules-enforced writes, roles from `roles/{uid}` |
+
+Public pages read `publishedCourses` / `publishedResources` — never the admin
+list — so a draft can never leak to a signed-in owner by accident. Drafts are
+also unreachable by direct URL and excluded from the sitemap.
+
+### Security model for the library
+
+```text
+read  published course/resource  → anyone
+read  draft course/resource     → owner / admin / editor
+write course/resource           → editor+ (validated: slug, sizes, status, source, licence)
+delete course/resource          → admin+
+read  settings                  → anyone
+write settings                  → admin+
+read  roles/{uid}               → that user only
+write roles                     → owner only
+read  auditLogs                 → admin+
+append auditLogs                → editor+ (actor must be the caller)
+edit/delete auditLogs           → never
+```
+
+Full detail, the bootstrap procedure and a manual permission test checklist are in
+[docs/ADMIN.md](docs/ADMIN.md). What is deliberately not built is in
+[docs/ROADMAP.md](docs/ROADMAP.md) — uploads, role-management UI, slug redirects,
+payments, notifications and public leaderboards.
+
+---
+
 ## SEO
 
 Search engines get real HTML, not an empty `<div id="root">`.
@@ -370,9 +449,9 @@ curl -s https://your-domain/sitemap.xml | grep -c '<url>'
 
 | Suite | Command | Result |
 | --- | --- | --- |
-| Unit / integration logic | `npm test` | **75 / 75** |
+| Unit / integration logic | `npm test` | **87 / 87** |
 | API integration (real handlers + mock provider) | `npm run smoke:api` | **20 / 20** |
-| Browser UI, demo mode, mobile, a11y basics | `npm run test:ui` (needs Playwright) | **42 / 42** |
+| Browser UI, demo mode, mobile, a11y, library and admin | `npm run test:ui` (needs Playwright) | **62 / 62** |
 | Browser UI with AI enabled (mock provider) | `npm run test:ai` (needs Playwright) | **18 / 18** |
 
 `test:ui` expects the AI to be **unconfigured** (it asserts the honest “AI not configured” state), while `test:ai` expects the dev server to point at `scripts/mock-provider.mjs`. Run them against separate servers — that is why `docs/TESTING.md` lists them as two setups.
@@ -426,15 +505,16 @@ These need real credentials or a real device, and are **awaiting configuration**
 api/                 Vercel serverless functions + shared server libs
   _lib/              config, http, auth, rateLimit, provider, prompts, guard
 server/              dev-api.ts (same handlers, local development)
-shared/              constants, Zod schemas, labels shared by client + server
+shared/              constants, Zod schemas, labels, seo-pages.json, content-seed.json
 src/
   components/        ui kit, layout, marketing, markdown, seo
   config/            curriculum, subjects, modes, tools, pricing copy
   features/auth/     AuthProvider, RequireAuth, AuthShell
   features/data/     DataProvider (conversations, notes, quizzes, …)
+  features/content/  course + resource model, local/Firestore stores, ContentProvider
   hooks/             theme, online status, AI health
   lib/               quiz, streak, progress, planner, notes, format, errors
-  pages/             public pages, auth pages, app pages
+  pages/             public pages, auth pages, app pages, admin pages
   services/          auth/, data/, ai/ (client)
   styles/            design tokens + component layer + KaTeX theme
   types/             domain types
@@ -442,7 +522,7 @@ public/              icons, manifest, service worker, offline page, robots
 scripts/             SEO generator, icon/OG generators, secret + bundle checks,
                      mock provider, API smoke, browser smoke tests
 tests/               Vitest suites
-docs/                screenshots, testing notes
+docs/                screenshots, testing notes, ADMIN.md, ROADMAP.md, DEPLOY-VERCEL.md
 firestore.rules      production security rules
 firestore.indexes.json
 vercel.json

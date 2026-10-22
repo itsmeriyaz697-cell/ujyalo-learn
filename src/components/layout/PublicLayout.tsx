@@ -9,10 +9,11 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { cn } from '@/lib/utils';
 
 const NAV = [
-  { to: '/features', label: 'Features' },
+  { to: '/courses', label: 'Courses' },
   { to: '/subjects', label: 'Subjects' },
+  { to: '/resources', label: 'Resources' },
+  { to: '/see-preparation', label: 'SEE' },
   { to: '/pricing', label: 'Pricing' },
-  { to: '/help', label: 'Help' },
   { to: '/about', label: 'About' },
 ];
 
@@ -49,7 +50,7 @@ export function PublicLayout() {
             <Logo size={34} />
           </Link>
 
-          <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
+          <nav aria-label="Main" className="hidden items-center gap-0.5 lg:flex">
             {NAV.map((item) => (
               <NavLink
                 key={item.to}
@@ -70,10 +71,10 @@ export function PublicLayout() {
               </Button>
             ) : (
               <>
-                <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
+                <Button asChild variant="ghost" size="sm" className="hidden whitespace-nowrap sm:inline-flex">
                   <Link to="/login">Log in</Link>
                 </Button>
-                <Button asChild variant="primary" size="sm" className="hidden sm:inline-flex">
+                <Button asChild variant="primary" size="sm" className="hidden whitespace-nowrap sm:inline-flex">
                   <Link to="/signup">Start free</Link>
                 </Button>
               </>
@@ -148,10 +149,13 @@ export function PublicLayout() {
             </h2>
             <ul className="mt-3 space-y-2 text-sm">
               {[
-                { to: '/features', label: 'Features' },
+                { to: '/courses', label: 'Courses' },
+                { to: '/resources', label: 'Resources' },
                 { to: '/subjects', label: 'Subjects & grades' },
-                { to: '/pricing', label: 'Pricing' },
+                { to: '/see-preparation', label: 'SEE preparation' },
                 { to: '/app/tutor', label: 'AI tutor' },
+                { to: '/features', label: 'Features' },
+                { to: '/pricing', label: 'Pricing' },
               ].map((item) => (
                 <li key={item.to}>
                   <Link className="text-muted hover:underline" to={item.to}>
@@ -169,9 +173,12 @@ export function PublicLayout() {
               {[
                 { to: '/about', label: 'About' },
                 { to: '/contact', label: 'Contact' },
+                { to: '/faq', label: 'FAQ' },
+                { to: '/help', label: 'Help centre' },
+                { to: '/content-policy', label: 'Content policy' },
+                { to: '/accessibility', label: 'Accessibility' },
                 { to: '/privacy', label: 'Privacy Policy' },
                 { to: '/terms', label: 'Terms of Service' },
-                { to: '/help', label: 'Help & FAQ' },
               ].map((item) => (
                 <li key={item.to}>
                   <Link className="text-muted hover:underline" to={item.to}>

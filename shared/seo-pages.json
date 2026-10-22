@@ -62,6 +62,48 @@
       "description": "The rules for using Ujyalo Learn, including acceptable use, AI limitations, accounts for minors and parental consent.",
       "priority": "0.4",
       "changefreq": "yearly"
+    },
+    {
+      "path": "/courses",
+      "title": "Courses — guided learning paths for Grades 1–12 and SEE",
+      "description": "Short learning paths that combine tutor explanations, self-marking quizzes and flashcards. Every session links to a real tool, so progress is measured rather than declared.",
+      "priority": "0.9",
+      "changefreq": "weekly"
+    },
+    {
+      "path": "/resources",
+      "title": "Study guides and resources — written and attributed",
+      "description": "Short, original guides on revision, exam technique and study habits. Every resource states its source and licence, and we do not host textbooks we have no rights to.",
+      "priority": "0.8",
+      "changefreq": "weekly"
+    },
+    {
+      "path": "/see-preparation",
+      "title": "SEE preparation — habits that move marks",
+      "description": "How to prepare for SEE in Nepal without cramming: timed practice, a mistake log, a four-week plan and honest notes on what is and is not official exam material.",
+      "priority": "0.9",
+      "changefreq": "monthly"
+    },
+    {
+      "path": "/faq",
+      "title": "FAQ — is it free, is it official, who sees my data",
+      "description": "Straight answers about Ujyalo Learn: cost, accuracy limits, whether it is official curriculum, data privacy, and what a parent should know.",
+      "priority": "0.7",
+      "changefreq": "monthly"
+    },
+    {
+      "path": "/content-policy",
+      "title": "Content and copyright policy",
+      "description": "What Ujyalo Learn publishes, what it refuses to publish, how attribution and licensing work, and how to report an error or a rights issue.",
+      "priority": "0.4",
+      "changefreq": "yearly"
+    },
+    {
+      "path": "/accessibility",
+      "title": "Accessibility statement",
+      "description": "How Ujyalo Learn approaches keyboard access, contrast, reduced motion, small screens and language, plus the limitations we know about.",
+      "priority": "0.4",
+      "changefreq": "yearly"
     }
   ]
 }

@@ -77,7 +77,6 @@ export default function TutorPage() {
   const [messages, setMessages] = useState<UiMessage[]>([]);
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -88,6 +87,9 @@ export default function TutorPage() {
   const [deleting, setDeleting] = useState(false);
   const [mode, setMode] = useState<TutorModeId>(() => resolveMode(searchParams.get('mode')));
   const [subjectId, setSubjectId] = useState<string | null>(searchParams.get('subject'));
+  // Course lessons deep-link here with ?prompt=… so the student lands with the
+  // question already written and can edit it before sending.
+  const [input, setInput] = useState(() => (searchParams.get('prompt') ?? '').slice(0, 600));
 
   const abortRef = useRef<AbortController | null>(null);
   /**

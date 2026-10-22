@@ -29,6 +29,11 @@ interface Result {
 
 const PAGES: Result[] = [
   { id: 'p-home', title: 'Home', description: 'What Ujyalo Learn is and how it works', href: '/', group: 'Pages' },
+  { id: 'p-courses', title: 'Courses', description: 'Guided learning paths with real practice', href: '/courses', group: 'Pages' },
+  { id: 'p-resources', title: 'Resources', description: 'Study guides, revision plans and exam technique', href: '/resources', group: 'Pages' },
+  { id: 'p-see', title: 'SEE preparation', description: 'Four-week plan, timed practice and honest notes', href: '/see-preparation', group: 'Pages' },
+  { id: 'p-grades', title: 'Grade 10 hub', description: 'Subjects, courses and tools for Grade 10', href: '/grades/10', group: 'Pages' },
+  { id: 'p-faq', title: 'FAQ', description: 'Cost, accuracy, privacy and whether it is official', href: '/faq', group: 'Pages' },
   { id: 'p-features', title: 'Features', description: 'Tutor, quizzes, notes, planner and progress', href: '/features', group: 'Pages' },
   { id: 'p-subjects', title: 'Subjects & grades', description: 'Every subject from Grade 1 to SEE and beyond', href: '/subjects', group: 'Pages' },
   { id: 'p-pricing', title: 'Pricing', description: 'What is free today and what is planned', href: '/pricing', group: 'Pages' },

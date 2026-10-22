@@ -1,0 +1,615 @@
+{
+  "courses": [
+    {
+      "id": "seed-c-math-see",
+      "slug": "see-mathematics-core",
+      "title": "SEE Mathematics — core skills",
+      "summary": "Rebuild the arithmetic, algebra and geometry skills that SEE questions keep returning to.",
+      "description": "A six-session path through the maths that SEE papers lean on: fractions and percentages, algebraic manipulation, linear equations, mensuration, trigonometry basics and statistics. Each session ends with a short quiz so you can see which part still needs work.",
+      "subjectId": "mathematics",
+      "gradeMin": 9,
+      "gradeMax": 10,
+      "level": "see",
+      "status": "published",
+      "outcomes": [
+        "You can solve percentage and ratio problems without a calculator.",
+        "You can set up and solve a linear equation from a word problem."
+      ],
+      "lessons": [
+        {
+          "id": "l1",
+          "title": "Fractions, decimals and percentages",
+          "summary": "Convert between the three forms, then take a five-question check.",
+          "minutes": 25,
+          "action": "quiz"
+        },
+        {
+          "id": "l2",
+          "title": "Algebraic manipulation",
+          "summary": "Expand, factorise and simplify with the tutor walking the steps.",
+          "minutes": 30,
+          "action": "tutor",
+          "prompt": "Explain how to expand and factorise (x + 3)(x - 5), then give me two practice questions."
+        },
+        {
+          "id": "l3",
+          "title": "Linear equations from word problems",
+          "summary": "Turn a sentence into an equation and solve it.",
+          "minutes": 30,
+          "action": "tutor",
+          "prompt": "Show me how to translate a word problem into a linear equation, with three Nepali-context examples."
+        },
+        {
+          "id": "l4",
+          "title": "Mensuration: area and volume",
+          "summary": "Work through the formulas that appear most often, with units checked.",
+          "minutes": 25,
+          "action": "tutor",
+          "prompt": "List the mensuration formulas for area and volume I need for SEE Mathematics, with units and one worked example each."
+        },
+        {
+          "id": "l5",
+          "title": "Trigonometry basics",
+          "summary": "Sine, cosine and tangent on right triangles, plus heights and distances.",
+          "minutes": 30,
+          "action": "quiz"
+        },
+        {
+          "id": "l6",
+          "title": "Statistics: mean, median, mode",
+          "summary": "Compute each measure and know when each one misleads.",
+          "minutes": 20,
+          "action": "flashcards"
+        }
+      ],
+      "tags": [
+        "SEE",
+        "mathematics",
+        "exam skills"
+      ],
+      "createdAt": "2026-10-22T00:00:00.000Z",
+      "updatedAt": "2026-10-22T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "seed-c-science-see",
+      "slug": "see-science-concepts",
+      "title": "SEE Science — concepts that carry marks",
+      "summary": "Biology, chemistry and physics ideas that are easy to confuse, sorted out one at a time.",
+      "description": "Six sessions covering photosynthesis and respiration, chemical reactions and balancing, force and motion, electricity, the human body systems, and the difference between a definition and an explanation. The tutor explains; the quizzes check.",
+      "subjectId": "science",
+      "gradeMin": 9,
+      "gradeMax": 10,
+      "level": "see",
+      "status": "published",
+      "outcomes": [
+        "You can explain a process in order rather than listing words.",
+        "You can balance a simple chemical equation."
+      ],
+      "lessons": [
+        {
+          "id": "l1",
+          "title": "Photosynthesis vs respiration",
+          "summary": "Compare the two processes side by side, then test yourself.",
+          "minutes": 25,
+          "action": "tutor",
+          "prompt": "Compare photosynthesis and respiration for a Grade 9 student: inputs, outputs, where each happens, and how they depend on each other."
+        },
+        {
+          "id": "l2",
+          "title": "Balancing chemical equations",
+          "summary": "Practise until balancing is mechanical.",
+          "minutes": 25,
+          "action": "quiz"
+        },
+        {
+          "id": "l3",
+          "title": "Force, motion and Newton’s laws",
+          "summary": "Apply each law to a real situation.",
+          "minutes": 30,
+          "action": "tutor",
+          "prompt": "Explain Newton’s three laws with one everyday example each, then ask me two questions to check."
+        },
+        {
+          "id": "l4",
+          "title": "Circuits and Ohm’s law",
+          "summary": "Series and parallel, voltage and current.",
+          "minutes": 25,
+          "action": "quiz"
+        },
+        {
+          "id": "l5",
+          "title": "Human body systems",
+          "summary": "Digestive, respiratory and circulatory basics.",
+          "minutes": 30,
+          "action": "flashcards"
+        },
+        {
+          "id": "l6",
+          "title": "Definitions vs explanations",
+          "summary": "Write answers that earn method marks.",
+          "minutes": 20,
+          "action": "reading",
+          "body": "A definition states what something is. An explanation says why or how it happens, and usually links two ideas. In SEE science, \"define\" and \"explain\" are different instructions: a definition earns one mark, an explanation needs a mechanism. Practise turning each definition you memorise into one sentence that starts with \"because\"."
+        }
+      ],
+      "tags": [
+        "SEE",
+        "science"
+      ],
+      "createdAt": "2026-10-22T00:00:00.000Z",
+      "updatedAt": "2026-10-22T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "seed-c-english-writing",
+      "slug": "english-writing-clearly",
+      "title": "English — writing that reads clearly",
+      "summary": "Short, practical sessions on paragraphs, letters, essays and common grammar slips.",
+      "description": "Five sessions for students who understand English but lose marks on structure: paragraph shape, formal letters, guided essays, tense consistency and punctuation. The writing assistant reviews your draft and explains each change.",
+      "subjectId": "english",
+      "gradeMin": 6,
+      "gradeMax": 10,
+      "level": "school",
+      "status": "published",
+      "outcomes": [
+        "You can write a paragraph with a topic sentence and support.",
+        "You can keep tenses consistent across a paragraph."
+      ],
+      "lessons": [
+        {
+          "id": "l1",
+          "title": "The five-sentence paragraph",
+          "summary": "One idea, one topic sentence, evidence, link.",
+          "minutes": 20,
+          "action": "reading",
+          "body": "A solid paragraph does one job. Start with a topic sentence that states the idea. Add two sentences of evidence or example. Add one sentence that explains why the evidence supports the idea. Finish with a link to the next paragraph, or a short conclusion."
+        },
+        {
+          "id": "l2",
+          "title": "Formal letters and applications",
+          "summary": "Layout, tone and the sentences examiners expect.",
+          "minutes": 25,
+          "action": "tutor",
+          "prompt": "Show me the structure of a formal application letter for a school event, with a short model and three common mistakes."
+        },
+        {
+          "id": "l3",
+          "title": "Guided essays",
+          "summary": "Plan before you write.",
+          "minutes": 30,
+          "action": "tutor",
+          "prompt": "Give me a five-minute planning method for a guided essay, then a checklist I can use to review my own draft."
+        },
+        {
+          "id": "l4",
+          "title": "Tense consistency",
+          "summary": "Find and fix tense slips in your own writing.",
+          "minutes": 20,
+          "action": "quiz"
+        },
+        {
+          "id": "l5",
+          "title": "Punctuation that changes meaning",
+          "summary": "Commas, apostrophes and full stops.",
+          "minutes": 20,
+          "action": "flashcards"
+        }
+      ],
+      "tags": [
+        "writing",
+        "english"
+      ],
+      "createdAt": "2026-10-22T00:00:00.000Z",
+      "updatedAt": "2026-10-22T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "seed-c-math-foundation",
+      "slug": "mathematics-foundations",
+      "title": "Mathematics foundations (Grades 4–8)",
+      "summary": "Number sense, times tables, fractions and word problems — the base everything else sits on.",
+      "description": "Five gentle sessions for students in Grades 4–8 who want to stop guessing. Mental maths, place value, fractions, decimals and the habit of showing working.",
+      "subjectId": "mathematics",
+      "gradeMin": 4,
+      "gradeMax": 8,
+      "level": "foundation",
+      "status": "published",
+      "outcomes": [
+        "You can add and subtract fractions with different denominators.",
+        "You can explain your working line by line."
+      ],
+      "lessons": [
+        {
+          "id": "l1",
+          "title": "Place value and mental maths",
+          "summary": "Fast, accurate arithmetic without a calculator.",
+          "minutes": 20,
+          "action": "quiz"
+        },
+        {
+          "id": "l2",
+          "title": "Times tables you actually remember",
+          "summary": "Patterns instead of rote chanting.",
+          "minutes": 20,
+          "action": "tutor",
+          "prompt": "Teach me tricks to remember the times tables up to 12, with the pattern behind each trick."
+        },
+        {
+          "id": "l3",
+          "title": "Fractions with different denominators",
+          "summary": "Find a common denominator and add.",
+          "minutes": 25,
+          "action": "tutor",
+          "prompt": "Explain how to add fractions with different denominators for a Grade 6 student, with two worked examples."
+        },
+        {
+          "id": "l4",
+          "title": "Decimals and money",
+          "summary": "Convert, round and check answers make sense.",
+          "minutes": 20,
+          "action": "quiz"
+        },
+        {
+          "id": "l5",
+          "title": "Showing your working",
+          "summary": "Why method marks matter and how to lay work out.",
+          "minutes": 15,
+          "action": "reading",
+          "body": "Write one step per line, keep the equals signs aligned, and never erase a wrong attempt — cross it out lightly. If your final answer is wrong, a marker can still award method marks for a correct approach."
+        }
+      ],
+      "tags": [
+        "foundation",
+        "mathematics"
+      ],
+      "createdAt": "2026-10-22T00:00:00.000Z",
+      "updatedAt": "2026-10-22T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "seed-c-nepali-see",
+      "slug": "see-nepali-comprehension",
+      "title": "SEE Nepali — reading and writing",
+      "summary": "Comprehension strategy, summary writing and the grammar points that repeat.",
+      "description": "Four sessions to make Nepali paper reading time count: how to read a passage for the questions asked, how to summarise without copying, and the grammar items that appear every year. Explanations are available in Nepali.",
+      "subjectId": "nepali",
+      "gradeMin": 9,
+      "gradeMax": 10,
+      "level": "see",
+      "status": "published",
+      "outcomes": [
+        "You can answer comprehension questions in the order that saves time.",
+        "You can write a summary in your own words."
+      ],
+      "lessons": [
+        {
+          "id": "l1",
+          "title": "Reading a passage for the questions",
+          "summary": "Skim, then answer with evidence from the text.",
+          "minutes": 25,
+          "action": "tutor",
+          "prompt": "Explain a strategy for answering Nepali comprehension questions in SEE, step by step. Reply in Nepali and English."
+        },
+        {
+          "id": "l2",
+          "title": "Summary writing without copying",
+          "summary": "Compress without changing meaning.",
+          "minutes": 25,
+          "action": "tutor",
+          "prompt": "Show me how to write a short summary of a passage using my own words, with a before-and-after example."
+        },
+        {
+          "id": "l3",
+          "title": "Grammar that repeats",
+          "summary": "Case markers, verb forms and sentence types.",
+          "minutes": 20,
+          "action": "quiz"
+        },
+        {
+          "id": "l4",
+          "title": "Essay structure",
+          "summary": "Introduction, body and conclusion in Nepali.",
+          "minutes": 25,
+          "action": "flashcards"
+        }
+      ],
+      "tags": [
+        "SEE",
+        "nepali"
+      ],
+      "createdAt": "2026-10-22T00:00:00.000Z",
+      "updatedAt": "2026-10-22T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "seed-c-study-skills",
+      "slug": "study-skills-starter",
+      "title": "Study skills starter",
+      "summary": "Four sessions on how to study when nobody taught you how.",
+      "description": "Active recall, spaced repetition, planning a week that survives contact with real life, and how to use mistakes instead of fearing them. This path is subject-independent — it changes how you use everything else.",
+      "subjectId": "",
+      "gradeMin": 6,
+      "gradeMax": 12,
+      "level": "school",
+      "status": "published",
+      "outcomes": [
+        "You can plan a week with realistic study blocks.",
+        "You can turn a wrong answer into a note you will actually revise."
+      ],
+      "lessons": [
+        {
+          "id": "l1",
+          "title": "Active recall beats rereading",
+          "summary": "Test yourself before you feel ready.",
+          "minutes": 15,
+          "action": "reading",
+          "body": "Rereading feels productive because the page becomes familiar. That familiarity is not the same as remembering. Close the book and write down what you remember, then check. The gap between what you wrote and the page is what to study next."
+        },
+        {
+          "id": "l2",
+          "title": "Spaced repetition",
+          "summary": "Revise on a schedule instead of once.",
+          "minutes": 15,
+          "action": "flashcards"
+        },
+        {
+          "id": "l3",
+          "title": "Planning a week you can keep",
+          "summary": "Small blocks, fixed days, one rest day.",
+          "minutes": 20,
+          "action": "tutor",
+          "prompt": "Help me build a realistic weekly study plan for six subjects at home after school, with short blocks and breaks."
+        },
+        {
+          "id": "l4",
+          "title": "Using mistakes as material",
+          "summary": "Turn every wrong answer into a note.",
+          "minutes": 15,
+          "action": "notes"
+        }
+      ],
+      "tags": [
+        "study skills",
+        "all subjects"
+      ],
+      "createdAt": "2026-10-22T00:00:00.000Z",
+      "updatedAt": "2026-10-22T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "seed-c-computer-basics",
+      "slug": "computer-science-basics",
+      "title": "Computer Science basics",
+      "summary": "How a computer stores data, what an algorithm is, and writing your first small programs.",
+      "description": "Five sessions for Grade 9–10 computer science: number systems, flowcharts and pseudocode, variables and control flow, and debugging. Examples use plain language first, code second.",
+      "subjectId": "computer-science",
+      "gradeMin": 9,
+      "gradeMax": 10,
+      "level": "school",
+      "status": "published",
+      "outcomes": [
+        "You can convert between binary and decimal.",
+        "You can describe an algorithm as numbered steps before coding it."
+      ],
+      "lessons": [
+        {
+          "id": "l1",
+          "title": "Binary and number systems",
+          "summary": "Convert in both directions, then check yourself.",
+          "minutes": 25,
+          "action": "quiz"
+        },
+        {
+          "id": "l2",
+          "title": "Algorithms and flowcharts",
+          "summary": "Solve it on paper first.",
+          "minutes": 25,
+          "action": "tutor",
+          "prompt": "Explain how to write an algorithm and a flowchart for finding the largest of three numbers, with the steps numbered."
+        },
+        {
+          "id": "l3",
+          "title": "Variables and control flow",
+          "summary": "Sequence, selection and iteration.",
+          "minutes": 30,
+          "action": "tutor",
+          "prompt": "Explain variables, if/else and loops for a Grade 9 beginner, with one tiny program example in pseudocode."
+        },
+        {
+          "id": "l4",
+          "title": "Debugging habits",
+          "summary": "Read the error, find the line, change one thing.",
+          "minutes": 20,
+          "action": "reading",
+          "body": "Change one thing at a time. If two changes are made and the program starts working, you do not know which one fixed it — and you will repeat the broken pattern later."
+        },
+        {
+          "id": "l5",
+          "title": "Data and privacy",
+          "summary": "What your apps actually store about you.",
+          "minutes": 20,
+          "action": "flashcards"
+        }
+      ],
+      "tags": [
+        "computer science"
+      ],
+      "createdAt": "2026-10-22T00:00:00.000Z",
+      "updatedAt": "2026-10-22T00:00:00.000Z",
+      "updatedBy": "seed"
+    }
+  ],
+  "resources": [
+    {
+      "id": "seed-r-active-recall",
+      "slug": "how-to-use-active-recall",
+      "title": "How to use active recall (and why rereading fails)",
+      "description": "A 5-minute explanation plus a weekly routine you can start today.",
+      "type": "guide",
+      "subjectId": null,
+      "grade": null,
+      "status": "published",
+      "body": [
+        "Rereading a chapter makes the page feel familiar. Familiarity is not recall: on the exam you have to produce the answer with the book closed. Active recall means practising that exact situation.",
+        "Start by reading a short section, then close the book and write everything you remember on a blank page. Compare with the source. What you missed is your study list for tomorrow — nothing else needs to be reviewed.",
+        "A simple weekly routine: on Monday you write the questions. Tuesday to Thursday you answer two of them from memory each day. Friday you answer only the ones you got wrong. Weekend off.",
+        "Use the Flashcards tool to turn those questions into cards, and the Notes tool to keep the explanation you wrote in your own words. If you can explain it without looking, you know it."
+      ],
+      "fileUrl": null,
+      "source": "Ujyalo Learn",
+      "license": "Ujyalo Learn original",
+      "tags": [
+        "study skills",
+        "memory"
+      ],
+      "createdAt": "2026-10-22T00:00:00.000Z",
+      "updatedAt": "2026-10-22T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "seed-r-see-four-weeks",
+      "slug": "four-week-see-revision-plan",
+      "title": "A four-week SEE revision plan that fits real life",
+      "description": "What to do in each of the four weeks before SEE, with time set aside for rest.",
+      "type": "guide",
+      "subjectId": null,
+      "grade": 10,
+      "status": "published",
+      "body": [
+        "Week one — audit. For each subject, list the topics you can already explain and the topics you cannot. Keep the second list; it is your syllabus for the next three weeks. Do not start revising the topics you already know because they feel comfortable.",
+        "Week two — repair. Take your weakest two subjects and, for each weak topic, write a one-page explanation in your own words, then run three quiz questions. Anything you get wrong goes back on the list.",
+        "Week three — practise under time. Two timed practice sets per day, alternating strong and weak subjects. Mark them the same day, and log each mistake with one sentence saying why it happened.",
+        "Week four — consolidate. No new topics. Revise your mistake log, your one-page explanations and your flashcards. Sleep on a normal schedule; late-night cramming the week before an exam reliably produces worse recall on the day.",
+        "This plan is study advice, not a prediction of exam content. Ujyalo Learn does not publish official model questions — check your school and the National Examination Board for those."
+      ],
+      "fileUrl": null,
+      "source": "Ujyalo Learn",
+      "license": "Ujyalo Learn original",
+      "tags": [
+        "SEE",
+        "planning"
+      ],
+      "createdAt": "2026-10-22T00:00:00.000Z",
+      "updatedAt": "2026-10-22T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "seed-r-maths-showing-working",
+      "slug": "showing-working-in-maths",
+      "title": "How to show working so markers can award marks",
+      "description": "Layout habits that keep method marks even when the final answer is wrong.",
+      "type": "guide",
+      "subjectId": "mathematics",
+      "grade": null,
+      "status": "published",
+      "body": [
+        "One step per line. Aligning steps makes it possible for a marker to see that your method was right even if the arithmetic slipped.",
+        "Write the formula before you substitute numbers. \"Area = l × b = 6 × 4 = 24 cm²\" earns more than \"24\".",
+        "Keep units with every number that has one. Losing a unit is usually a lost mark, and writing it forces you to notice when the unit should change (for example cm² to m²).",
+        "Never erase an attempt. Cross it out lightly and continue. An erased useful step is gone forever; a crossed-out one can still be credited.",
+        "If you get stuck, write down what you know and what you are trying to find. A marker awards partial credit for a correct starting point far more often than students expect."
+      ],
+      "fileUrl": null,
+      "source": "Ujyalo Learn",
+      "license": "Ujyalo Learn original",
+      "tags": [
+        "mathematics",
+        "exam skills"
+      ],
+      "createdAt": "2026-10-22T00:00:00.000Z",
+      "updatedAt": "2026-10-22T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "seed-r-memory-cards",
+      "slug": "flashcards-that-actually-work",
+      "title": "Flashcards that actually work",
+      "description": "How to write a card that tests one thing, and when to retire it.",
+      "type": "guide",
+      "subjectId": null,
+      "grade": null,
+      "status": "published",
+      "body": [
+        "One card, one fact or one step. If a card needs the word \"and\", split it into two.",
+        "Ask a question the exam could ask. \"What is the unit of power?\" is a card. \"Power\" on the front is not.",
+        "Write the answer in your own words, then add one sentence explaining why it is true. Cards you cannot explain tend to be cards you memorise badly.",
+        "Retire a card after three correct answers on three different days. Keeping it forever wastes revision time you could give to a card you keep missing.",
+        "Use the Flashcards tool to generate a first draft from any topic, then edit every card. Generated cards are a starting point, not a finished deck."
+      ],
+      "fileUrl": null,
+      "source": "Ujyalo Learn",
+      "license": "Ujyalo Learn original",
+      "tags": [
+        "revision",
+        "flashcards"
+      ],
+      "createdAt": "2026-10-22T00:00:00.000Z",
+      "updatedAt": "2026-10-22T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "seed-r-asking-ai",
+      "slug": "asking-ai-for-help-without-copying",
+      "title": "Asking AI for help without copying answers",
+      "description": "How to prompt a tutor so you learn the method instead of collecting answers.",
+      "type": "guide",
+      "subjectId": null,
+      "grade": null,
+      "status": "published",
+      "body": [
+        "Say what you already understand. \"I know the formula but I get the unit wrong\" produces a much better explanation than \"help\".",
+        "Ask for the next step, not the whole answer. Then attempt it yourself before asking for the step after.",
+        "Ask it to ask you questions. The tutor has a Socratic mode that does this on purpose.",
+        "Check anything important against your textbook or teacher. AI can be confident and wrong, and the app labels every answer as AI-generated for that reason.",
+        "If an explanation does not land, say which word confused you. It is usually one word."
+      ],
+      "fileUrl": null,
+      "source": "Ujyalo Learn",
+      "license": "Ujyalo Learn original",
+      "tags": [
+        "study skills",
+        "AI"
+      ],
+      "createdAt": "2026-10-22T00:00:00.000Z",
+      "updatedAt": "2026-10-22T00:00:00.000Z",
+      "updatedBy": "seed"
+    },
+    {
+      "id": "seed-r-source-check",
+      "slug": "checking-a-source-before-you-trust-it",
+      "title": "Checking a source before you trust it",
+      "description": "Four questions that filter most misinformation in under a minute.",
+      "type": "guide",
+      "subjectId": null,
+      "grade": null,
+      "status": "published",
+      "body": [
+        "Who wrote this, and can you find that person or institution somewhere else?",
+        "When was it written? In fast-moving subjects a five-year-old page can be confidently out of date.",
+        "What would the opposite claim look like, and is it mentioned? A page that refuses to acknowledge any counter-evidence is usually arguing, not explaining.",
+        "Can you find the same fact stated independently in two places? If every version traces back to one page, you have one source, not several.",
+        "For exam material, the National Examination Board and your own school are the authority — not a study website, and not an AI."
+      ],
+      "fileUrl": null,
+      "source": "Ujyalo Learn",
+      "license": "Ujyalo Learn original",
+      "tags": [
+        "research",
+        "study skills"
+      ],
+      "createdAt": "2026-10-22T00:00:00.000Z",
+      "updatedAt": "2026-10-22T00:00:00.000Z",
+      "updatedBy": "seed"
+    }
+  ],
+  "settings": {
+    "siteName": "Ujyalo Learn",
+    "tagline": "Learn • Grow • Shine",
+    "contactEmail": "",
+    "maintenanceNotice": "",
+    "defaultLanguage": "en",
+    "updatedAt": "2026-10-22T00:00:00.000Z",
+    "updatedBy": "seed"
+  }
+}

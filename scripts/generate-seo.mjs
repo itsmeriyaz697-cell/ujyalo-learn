@@ -59,9 +59,54 @@ Disallow: /verify-email
 Disallow: /onboarding
 ${origin ? `\nSitemap: ${origin}/sitemap.xml\n` : ''}`;
 
-const { pages: PAGES } = JSON.parse(
+const { pages: LISTED_PAGES } = JSON.parse(
   fs.readFileSync(path.resolve(process.cwd(), 'shared/seo-pages.json'), 'utf8'),
 );
+
+// Twelve grade hubs share one template, so they are generated rather than
+// listed. They are real pages with real content, not keyword duplicates.
+const GRADE_PAGES = Array.from({ length: 12 }, (_, index) => {
+  const grade = index + 1;
+  return {
+    path: `/grades/${grade}`,
+    title: `Grade ${grade} — subjects, courses and study tools | Ujyalo Learn`,
+    description: `What to study in Grade ${grade} in Nepal: the subject list, published Ujyalo Learn courses that cover Grade ${grade}, and the study tools that help at this stage.`,
+    priority: grade === 10 ? '0.9' : '0.6',
+    changefreq: 'monthly',
+  };
+});
+
+/**
+ * Published starter content gets its own static page too, so a crawl of the
+ * site finds real course and resource URLs. Content published later through
+ * the admin panel is served by the SPA (see docs/CONTENT.md).
+ */
+const CONTENT_SEED = JSON.parse(
+  fs.readFileSync(path.resolve(process.cwd(), 'shared/content-seed.json'), 'utf8'),
+);
+
+const CONTENT_PAGES = [
+  ...CONTENT_SEED.courses
+    .filter((course) => course.status === 'published')
+    .map((course) => ({
+      path: `/courses/${course.slug}`,
+      title: `${course.title} — Ujyalo Learn`,
+      description: course.summary,
+      priority: '0.7',
+      changefreq: 'monthly',
+    })),
+  ...CONTENT_SEED.resources
+    .filter((resource) => resource.status === 'published')
+    .map((resource) => ({
+      path: `/resources/${resource.slug}`,
+      title: `${resource.title} — Ujyalo Learn`,
+      description: resource.description,
+      priority: '0.6',
+      changefreq: 'monthly',
+    })),
+];
+
+const PAGES = [...LISTED_PAGES, ...GRADE_PAGES, ...CONTENT_PAGES];
 
 if (!fs.existsSync(DIST)) {
   console.error('[seo] dist/ not found — run the build first.');

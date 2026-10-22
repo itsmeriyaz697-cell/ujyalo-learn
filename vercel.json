@@ -58,7 +58,7 @@
       ]
     },
     {
-      "source": "/(app|login|signup|forgot-password|onboarding)(.*)",
+      "source": "/(admin|app|search|login|signup|forgot-password|onboarding)(.*)",
       "headers": [
         {
           "key": "X-Robots-Tag",
@@ -94,6 +94,30 @@
     },
     {
       "source": "/verify-email",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/courses/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/resources/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/grades/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/search",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/admin/(.*)",
       "destination": "/index.html"
     }
   ]

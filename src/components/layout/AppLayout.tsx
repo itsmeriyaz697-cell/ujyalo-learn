@@ -12,6 +12,7 @@ import {
   LogOut,
   Menu,
   Settings,
+  ShieldCheck,
   Sparkles,
   TrendingUp,
   Wrench,
@@ -21,6 +22,7 @@ import { Logo } from '@/components/Logo';
 import { ThemeToggle } from './PublicLayout';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { useContent } from '@/features/content/ContentProvider';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { storageModeLabel } from '@/services/data';
 import { gradeLabel } from '@shared/labels';
@@ -54,6 +56,7 @@ const MOBILE_NAV: NavItem[] = [
 
 export function AppLayout() {
   const { user, profile, mode, signOut } = useAuth();
+  const { role } = useContent();
   const [menuOpen, setMenuOpen] = useState(false);
   const [userMenu, setUserMenu] = useState(false);
   const location = useLocation();
@@ -112,6 +115,16 @@ export function AppLayout() {
           ))}
         </nav>
         <div className="mt-2 border-t pt-3" style={{ borderColor: 'var(--border)' }}>
+          {role !== 'student' && (
+            <NavLink
+              to="/admin"
+              className={({ isActive }) => linkClass(isActive)}
+              style={({ isActive }) => ({ color: isActive ? 'var(--primary)' : 'var(--text-soft)' })}
+            >
+              <ShieldCheck className="h-[18px] w-[18px]" aria-hidden="true" />
+              Admin
+            </NavLink>
+          )}
           <NavLink to="/app/settings" className={({ isActive }) => linkClass(isActive)} style={({ isActive }) => ({ color: isActive ? 'var(--primary)' : 'var(--text-soft)' })}>
             <Settings className="h-[18px] w-[18px]" aria-hidden="true" />
             Settings
