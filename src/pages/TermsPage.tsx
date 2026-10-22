@@ -1,11 +1,13 @@
 import { Link } from 'react-router-dom';
 import { LegalPage } from '@/components/marketing/LegalPage';
+import { seoFor } from '@/config/seoPages';
 
 export default function TermsPage() {
   return (
     <LegalPage
       title="Terms of Service"
-      description="The rules for using Ujyalo Learn, including acceptable use, AI limitations, accounts and content ownership."
+      seoTitle={seoFor('/terms').title}
+      description={seoFor('/terms').description}
       path="/terms"
       updated="22 October 2026"
       intro={

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, BookOpen, GraduationCap, Info } from 'lucide-react';
 import { Seo } from '@/components/seo/Seo';
+import { seoFor } from '@/config/seoPages';
 import { Section, SectionHeading } from '@/components/marketing/Section';
 import { Button } from '@/components/ui/Button';
 import { CURRICULA, SUBJECTS, subjectsForGrade } from '@/config/curriculum';
@@ -14,11 +15,7 @@ export default function SubjectsPage() {
 
   return (
     <>
-      <Seo
-        title="Subjects & Grades"
-        description="Explore the subjects and grade levels supported by Ujyalo Learn: Mathematics, Science, English, Nepali, Social Studies, Computer Science and more for Grades 1–12."
-        path="/subjects"
-      />
+      <Seo {...seoFor('/subjects')} />
 
       <Section className="!pb-8">
         <SectionHeading

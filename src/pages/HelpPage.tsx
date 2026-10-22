@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { AlertTriangle, BookOpen, KeyRound, MessageSquareWarning, Settings2 } from 'lucide-react';
 import { Seo } from '@/components/seo/Seo';
+import { seoFor } from '@/config/seoPages';
 import { Section, SectionHeading, Faq } from '@/components/marketing/Section';
 import { Button } from '@/components/ui/Button';
 import { InlineAlert } from '@/components/ui/Feedback';
@@ -51,11 +52,7 @@ const FAQS = [
 export default function HelpPage() {
   return (
     <>
-      <Seo
-        title="Help & FAQ"
-        description="Answers about the AI tutor, quizzes, privacy, offline use and account management in Ujyalo Learn."
-        path="/help"
-      />
+      <Seo {...seoFor('/help')} />
 
       <Section className="!pb-6">
         <SectionHeading

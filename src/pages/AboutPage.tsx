@@ -1,30 +1,15 @@
 import { Link } from 'react-router-dom';
 import { BookOpen, HeartHandshake, Lightbulb, ShieldCheck, Target } from 'lucide-react';
 import { Seo } from '@/components/seo/Seo';
+import { seoFor } from '@/config/seoPages';
 import { Section, SectionHeading } from '@/components/marketing/Section';
 import { Button } from '@/components/ui/Button';
 import { InlineAlert } from '@/components/ui/Feedback';
-import { SITE } from '@/config/curriculum';
 
 export default function AboutPage() {
   return (
     <>
-      <Seo
-        title="About"
-        description="Ujyalo Learn is an independent, student-first AI learning platform founded by Riyaz Chalise to make personalised tutoring accessible in Nepal and beyond."
-        path="/about"
-        jsonLd={{
-          '@context': 'https://schema.org',
-          '@type': 'AboutPage',
-          name: 'About Ujyalo Learn',
-          url: `${SITE.url}/about`,
-          mainEntity: {
-            '@type': 'EducationalOrganization',
-            name: 'Ujyalo Learn',
-            founder: { '@type': 'Person', name: SITE.founder },
-          },
-        }}
-      />
+      <Seo {...seoFor('/about')} />
 
       <Section className="!pb-8">
         <SectionHeading

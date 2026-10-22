@@ -2,6 +2,7 @@ import { useMemo, useState, type FormEvent } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Check, Copy, Mail, MessageSquareWarning } from 'lucide-react';
 import { Seo } from '@/components/seo/Seo';
+import { seoFor } from '@/config/seoPages';
 import { Section, SectionHeading } from '@/components/marketing/Section';
 import { Button } from '@/components/ui/Button';
 import { Input, Select, Textarea } from '@/components/ui/Field';
@@ -55,11 +56,7 @@ export default function ContactPage() {
 
   return (
     <>
-      <Seo
-        title="Contact"
-        description="Contact the Ujyalo Learn team with questions, feedback, privacy requests or reports of incorrect AI content."
-        path="/contact"
-      />
+      <Seo {...seoFor('/contact')} />
 
       <Section className="!pb-8">
         <SectionHeading

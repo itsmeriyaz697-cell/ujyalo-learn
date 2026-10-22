@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { Menu, Moon, Sun, X } from 'lucide-react';
 import { Logo } from '@/components/Logo';
+import { SiteSearch } from '@/components/layout/SiteSearch';
 import { Button } from '@/components/ui/Button';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -61,6 +62,7 @@ export function PublicLayout() {
           </nav>
 
           <div className="flex items-center gap-1.5">
+            <SiteSearch />
             <ThemeToggle />
             {user ? (
               <Button asChild variant="primary" size="sm" className="hidden sm:inline-flex">

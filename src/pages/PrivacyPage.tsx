@@ -1,11 +1,13 @@
 import { Link } from 'react-router-dom';
 import { LegalPage } from '@/components/marketing/LegalPage';
+import { seoFor } from '@/config/seoPages';
 
 export default function PrivacyPage() {
   return (
     <LegalPage
       title="Privacy Policy"
-      description="How Ujyalo Learn collects, uses, stores and deletes student data — written to be readable by students and parents."
+      seoTitle={seoFor('/privacy').title}
+      description={seoFor('/privacy').description}
       path="/privacy"
       updated="22 October 2026"
       intro={

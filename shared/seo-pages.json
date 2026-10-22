@@ -1,0 +1,67 @@
+{
+  "pages": [
+    {
+      "path": "/",
+      "title": "Ujyalo Learn — AI Tutor for Grades 1–12 & SEE in Nepal",
+      "description": "Free AI tutor for students in Nepal: Grades 1–12 and SEE preparation. Ask questions in English or Nepali, generate quizzes, save notes and follow a study plan based on your real progress.",
+      "priority": "1.0",
+      "changefreq": "weekly"
+    },
+    {
+      "path": "/features",
+      "title": "Features — AI tutor, quizzes and study tools",
+      "description": "Seven tutoring modes, four quiz types with explanations, notes and flashcards, a study planner and progress tracking built from your own quiz attempts.",
+      "priority": "0.9",
+      "changefreq": "monthly"
+    },
+    {
+      "path": "/subjects",
+      "title": "Subjects and grades — Grades 1–12 and SEE",
+      "description": "Nine subjects across Grades 1–12 and SEE preparation: Mathematics, Science, English, Nepali, Social Studies, Computer Science, Optional Mathematics, Health and Economics.",
+      "priority": "0.9",
+      "changefreq": "monthly"
+    },
+    {
+      "path": "/pricing",
+      "title": "Pricing — free core plan, paid plans later",
+      "description": "Ujyalo Learn is free to use today, with fair-use limits on AI requests. Future plans are clearly marked as planned and no payment is taken on this site.",
+      "priority": "0.8",
+      "changefreq": "monthly"
+    },
+    {
+      "path": "/help",
+      "title": "Help and FAQ — getting started",
+      "description": "How to create an account, ask the tutor a question, generate a quiz, plan study time and fix common problems, plus a setup guide for the site owner.",
+      "priority": "0.7",
+      "changefreq": "monthly"
+    },
+    {
+      "path": "/about",
+      "title": "About — built for students in Nepal",
+      "description": "Why Ujyalo Learn exists, how it handles AI honestly, and the person behind it — founded and built by Riyaz Chalise for students in Nepal.",
+      "priority": "0.6",
+      "changefreq": "yearly"
+    },
+    {
+      "path": "/contact",
+      "title": "Contact Ujyalo Learn",
+      "description": "Reach the Ujyalo Learn team about support questions, privacy requests, reported content or account deletion.",
+      "priority": "0.5",
+      "changefreq": "yearly"
+    },
+    {
+      "path": "/privacy",
+      "title": "Privacy Policy — what we store and why",
+      "description": "What Ujyalo Learn collects, where it is stored, who can read it, how long it is kept, and how to export or delete your account and data.",
+      "priority": "0.4",
+      "changefreq": "yearly"
+    },
+    {
+      "path": "/terms",
+      "title": "Terms of Service",
+      "description": "The rules for using Ujyalo Learn, including acceptable use, AI limitations, accounts for minors and parental consent.",
+      "priority": "0.4",
+      "changefreq": "yearly"
+    }
+  ]
+}

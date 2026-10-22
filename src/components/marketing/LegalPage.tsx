@@ -9,6 +9,7 @@ export interface LegalSection {
 
 export function LegalPage({
   title,
+  seoTitle,
   description,
   path,
   updated,
@@ -16,6 +17,8 @@ export function LegalPage({
   sections,
 }: {
   title: string;
+  /** Full document title including the brand, matching the prerendered HTML. */
+  seoTitle: string;
   description: string;
   path: string;
   updated: string;
@@ -24,7 +27,7 @@ export function LegalPage({
 }) {
   return (
     <>
-      <Seo title={title} description={description} path={path} />
+      <Seo title={seoTitle} description={description} path={path} />
       <div className="container-page max-w-3xl py-12 sm:py-16">
         <p className="eyebrow">Ujyalo Learn</p>
         <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">{title}</h1>

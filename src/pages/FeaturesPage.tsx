@@ -14,6 +14,7 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { Seo } from '@/components/seo/Seo';
+import { seoFor } from '@/config/seoPages';
 import { Section, SectionHeading, FeatureCard } from '@/components/marketing/Section';
 import { Button } from '@/components/ui/Button';
 import { TUTOR_MODES } from '@/config/curriculum';
@@ -21,11 +22,7 @@ import { TUTOR_MODES } from '@/config/curriculum';
 export default function FeaturesPage() {
   return (
     <>
-      <Seo
-        title="Features"
-        description="AI tutoring with seven modes, practice quizzes, notes and flashcards, a study planner, and progress tracking built on your real activity."
-        path="/features"
-      />
+      <Seo {...seoFor('/features')} />
 
       <Section className="!pb-8">
         <SectionHeading

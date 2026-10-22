@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Check, Info } from 'lucide-react';
 import { Seo } from '@/components/seo/Seo';
+import { seoFor } from '@/config/seoPages';
 import { Section, SectionHeading } from '@/components/marketing/Section';
 import { Button } from '@/components/ui/Button';
 import { InlineAlert } from '@/components/ui/Feedback';
@@ -10,11 +11,7 @@ import { cn } from '@/lib/utils';
 export default function PricingPage() {
   return (
     <>
-      <Seo
-        title="Pricing"
-        description="Ujyalo Learn is free to use, with fair-use AI limits. Optional Plus and School plans are planned for later — no payments are taken today."
-        path="/pricing"
-      />
+      <Seo {...seoFor('/pricing')} />
 
       <Section className="!pb-8">
         <SectionHeading

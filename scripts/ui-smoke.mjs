@@ -49,7 +49,7 @@ async function visit(pathname) {
 
 // ─── Public pages ────────────────────────────────────────────────────────────
 const publicPages = [
-  ['/', 'Your Personal AI Tutor, Anytime.'],
+  ['/', 'Smart learning.'],
   ['/features', null],
   ['/subjects', null],
   ['/pricing', null],
@@ -82,6 +82,18 @@ check(
 );
 await visit('/about');
 check('about page credits the founder', (await page.content()).includes('Riyaz Chalise'));
+
+// ── Search (⌘K palette) ────────────────────────────────────────────────────
+await visit('/');
+await page.keyboard.press('Control+k');
+await page.waitForTimeout(250);
+await page.keyboard.type('quiz');
+await page.waitForTimeout(250);
+const searchHits = await page.getByRole('option').count();
+check('command palette opens with results', searchHits > 0, `${searchHits} results`);
+await page.keyboard.press('Escape');
+await page.waitForTimeout(150);
+check('command palette closes on Escape', (await page.getByRole('option').count()) === 0);
 
 // 404
 await visit('/this-page-does-not-exist');
