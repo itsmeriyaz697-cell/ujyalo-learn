@@ -44,15 +44,43 @@ td.line([(52, 80), (52, 95)], fill=(41, 71, 214, 255), width=2)
 img.paste(tile, (80, 70), tile)
 
 d.text((210, 84), "Ujyalo Learn", font=f_logo, fill="#FFFFFF")
-d.text((212, 136), "Your personal AI tutor, anytime", font=f_sub, fill="#92B0FF")
+d.text((212, 136), "Learn smarter. Shine brighter.", font=f_sub, fill="#92B0FF")
 
-d.text((80, 246), "Learn Smarter.", font=f_h1, fill="#FFFFFF")
-d.text((80, 326), "Shine Brighter.", font=f_h1, fill="#F7B733")
-d.text((80, 430), "Built for Grades 1–12, SEE preparation, and self-paced learning.", font=f_body, fill="#B8C4E0")
+# ── Hero art on the right, in the same rounded card as the home page ─────────
+hero = Image.open("public/hero-student.png").convert("RGB")
+card_w, card_h = 330, 442
+scale = max(card_w / hero.width, card_h / hero.height)
+hero = hero.resize((round(hero.width * scale), round(hero.height * scale)), Image.LANCZOS)
+hero = hero.crop(((hero.width - card_w) // 2, 0, (hero.width - card_w) // 2 + card_w, card_h)).convert("RGBA")
+
+mask = Image.new("L", (card_w, card_h), 0)
+ImageDraw.Draw(mask).rounded_rectangle([0, 0, card_w - 1, card_h - 1], radius=26, fill=255)
+card_x, card_y = W - card_w - 54, 96
+img.paste(hero, (card_x, card_y), mask)
+
+overlay = Image.new("RGBA", (card_w, card_h), (0, 0, 0, 0))
+od = ImageDraw.Draw(overlay)
+od.rounded_rectangle([0, 0, card_w - 1, card_h - 1], radius=26, outline=(255, 255, 255, 46), width=2)
+img.paste(overlay, (card_x, card_y), overlay)
+
+d = ImageDraw.Draw(img)
+pill = "AI-powered learning"
+pw = d.textlength(pill, font=f_tiny)
+px, py = card_x + card_w - pw - 46, card_y + 22
+d.rounded_rectangle([px, py, px + pw + 28, py + 34], radius=17, fill="#F7B733")
+d.text((px + 14, py + 9), pill, font=f_tiny, fill="#3B2A00")
+
+# ── Headline ────────────────────────────────────────────────────────────────
+d.text((80, 236), "Smart learning.", font=f_h1, fill="#FFFFFF")
+d.text((80, 316), "Brighter future.", font=f_h1, fill="#F7B733")
+d.rounded_rectangle([80, 396, 396, 403], radius=3, fill="#F7B733")
+
+d.text((80, 428), "An AI tutor, practice quizzes and a study plan —", font=f_body, fill="#B8C4E0")
+d.text((80, 464), "free for Grades 1–12 and SEE in Nepal.", font=f_body, fill="#B8C4E0")
 
 items = ["AI tutoring", "Quizzes", "Notes & flashcards", "Study planner"]
 x = 80
-y = 530
+y = 532
 for i, it in enumerate(items):
     d.text((x, y), it, font=f_small, fill="#A9BCEA")
     w = d.textlength(it, font=f_small)
