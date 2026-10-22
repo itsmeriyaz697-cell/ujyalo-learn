@@ -120,5 +120,12 @@
       "source": "/admin/(.*)",
       "destination": "/index.html"
     }
+  ],
+  "redirects": [
+    {
+      "source": "/privacy-policy",
+      "destination": "/privacy",
+      "permanent": true
+    }
   ]
 }
