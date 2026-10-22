@@ -38,6 +38,12 @@ const PAGES: Result[] = [
   { id: 'p-privacy', title: 'Privacy Policy', description: 'What data is stored and why', href: '/privacy', group: 'Pages' },
   { id: 'p-terms', title: 'Terms of Service', description: 'The rules for using the platform', href: '/terms', group: 'Pages' },
   { id: 'p-tutor', title: 'Open the AI tutor', description: 'Ask a question (sign-in required)', href: '/app/tutor', group: 'Pages' },
+  { id: 'p-quizzes', title: 'Practice quizzes', description: 'Generate a quiz and check your answers (sign-in required)', href: '/app/quizzes', group: 'Pages' },
+  { id: 'p-notes', title: 'Notes', description: 'Saved explanations, searchable (sign-in required)', href: '/app/notes', group: 'Pages' },
+  { id: 'p-flashcards', title: 'Flashcards', description: 'Build a deck and revise with active recall (sign-in required)', href: '/app/flashcards', group: 'Pages' },
+  { id: 'p-planner', title: 'Study planner', description: 'Plan study sessions around your week (sign-in required)', href: '/app/planner', group: 'Pages' },
+  { id: 'p-progress', title: 'Progress', description: 'See scores from your real quiz attempts (sign-in required)', href: '/app/progress', group: 'Pages' },
+  { id: 'p-dashboard', title: 'Dashboard', description: 'Your day at a glance (sign-in required)', href: '/app', group: 'Pages' },
   { id: 'p-login', title: 'Log in', description: 'Return to your dashboard', href: '/login', group: 'Pages' },
   { id: 'p-signup', title: 'Create a free account', description: 'Start learning in about a minute', href: '/signup', group: 'Pages' },
 ];

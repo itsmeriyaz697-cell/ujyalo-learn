@@ -355,7 +355,9 @@ curl -s https://your-domain/sitemap.xml | grep -c '<url>'
 | Unit / integration logic | `npm test` | **75 / 75** |
 | API integration (real handlers + mock provider) | `npm run smoke:api` | **20 / 20** |
 | Browser UI, demo mode, mobile, a11y basics | `npm run test:ui` (needs Playwright) | **42 / 42** |
-| Browser UI with AI enabled (mock provider) | `npm run test:ai` (needs Playwright) | **17 / 17** |
+| Browser UI with AI enabled (mock provider) | `npm run test:ai` (needs Playwright) | **18 / 18** |
+
+`test:ui` expects the AI to be **unconfigured** (it asserts the honest “AI not configured” state), while `test:ai` expects the dev server to point at `scripts/mock-provider.mjs`. Run them against separate servers — that is why `docs/TESTING.md` lists them as two setups.
 
 What the unit tests cover: answer normalisation (case, punctuation, articles, numeric formats, accepted variants), scoring and attempt building, streak edge cases (today/yesterday/gaps/duplicates), planner recommendations and overdue rescheduling, progress aggregation and insight thresholds, SSE parsing, Zod schemas + JSON repair, provider-config SSRF validation, rate limiter windows, admin allowlist, and the prompt contracts (mode differences, honesty rules, required sections).
 

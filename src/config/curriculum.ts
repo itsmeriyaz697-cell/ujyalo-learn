@@ -273,10 +273,10 @@ export type { TutorModeId } from '@shared/constants';
 
 /** Non-chat study tools, all backed by the same AI service. */
 export const STUDY_TOOLS = [
-  { id: 'revision-summary', label: 'Revision summary', description: 'Key concepts, definitions, formulas, examples, mistakes and practice.', path: '/app/tools/revision' },
-  { id: 'formula-helper', label: 'Formula helper', description: 'Understand what a formula means, its units and a worked example.', path: '/app/tools/formula' },
-  { id: 'writing-assistant', label: 'Writing assistant', description: 'Improve clarity and grammar while explaining each change.', path: '/app/tools/writing' },
-  { id: 'question-explainer', label: 'Question explainer', description: 'Paste a question and get a grade-appropriate explanation.', path: '/app/tools/explain' },
+  { id: 'revision-summary', label: 'Revision summary', description: 'Key concepts, definitions, formulas, examples, mistakes and practice.', path: '/app/tools/revision-summary' },
+  { id: 'formula-helper', label: 'Formula helper', description: 'Understand what a formula means, its units and a worked example.', path: '/app/tools/formula-helper' },
+  { id: 'writing-assistant', label: 'Writing assistant', description: 'Improve clarity and grammar while explaining each change.', path: '/app/tools/writing-assistant' },
+  { id: 'question-explainer', label: 'Question explainer', description: 'Paste a question and get a grade-appropriate explanation.', path: '/app/tools/question-explainer' },
 ];
 
 export const PRICING_TIERS = [

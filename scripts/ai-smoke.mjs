@@ -144,6 +144,11 @@ check('flashcard deck is generated and listed', /photosynthesis|mock flashcards/
 await shot('17-flashcards');
 
 // ─── Study tool ─────────────────────────────────────────────────────────────
+// Enter through the tools index so a broken link is caught, not just a bad route.
+await page.goto(`${BASE}/app/tools`, { waitUntil: 'networkidle' });
+await page.getByRole('link', { name: /Revision summary/i }).click();
+await page.waitForTimeout(600);
+check('tool cards link to real tool routes', page.url().endsWith('/app/tools/revision-summary'), page.url());
 await page.goto(`${BASE}/app/tools/revision-summary`, { waitUntil: 'networkidle' });
 await page.waitForTimeout(800);
 await page.getByRole('textbox').first().fill('Photosynthesis, grade 9, key definitions and common mistakes');

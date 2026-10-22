@@ -13,7 +13,7 @@ Everything below was executed. Anything that needs real credentials is listed se
 | Unit / integration logic | `npm test` | **75 / 75 passed** |
 | API integration (real handlers + mock provider) | `npm run smoke:api` | **20 / 20 passed** |
 | Browser UI, demo mode, mobile, a11y basics | `npm run test:ui` | **42 / 42 passed** |
-| Browser UI with AI enabled | `npm run test:ai` | **17 / 17 passed** |
+| Browser UI with AI enabled | `npm run test:ai` | **18 / 18 passed** |
 | Type check | `npm run typecheck` | clean |
 | Production build | `npm run build` | success |
 | Secret scan | `npm run check:secrets` | 125 files scanned, 0 findings |
@@ -81,7 +81,7 @@ Public pages (`/`, features, subjects, pricing, help, about, contact, privacy, t
 
 ## 5. Browser tests with AI enabled (`npm run test:ai`)
 
-Runs the app against `scripts/mock-provider.mjs`, so the full chain (browser → `/api/tutor` → provider adapter → SSE → UI) is exercised without a paid key:
+`npm run test:ui` must run against a server with **no** AI key (it asserts the honest “not configured” state); this suite runs against a server wired to `scripts/mock-provider.mjs`, so the full chain (browser → `/api/tutor` → provider adapter → SSE → UI) is exercised without a paid key:
 
 - account + onboarding
 - the “AI not configured” warning disappears once the provider is set
@@ -91,7 +91,7 @@ Runs the app against `scripts/mock-provider.mjs`, so the full chain (browser →
 - quiz generation navigates into the quiz, shows one question at a time, hides answers
 - answering all five questions scores the attempt and shows explanations
 - flashcard deck generation and listing
-- revision-summary tool generates content
+- the tools index links to real tool routes, and the revision-summary tool generates content
 - progress page reflects the recorded attempt and keeps “estimates / never mastery” wording
 - no uncaught page errors
 
