@@ -21,6 +21,7 @@ Founded and built by **Riyaz Chalise**.
 - [Deploying to Vercel](#deploying-to-vercel)
 - [Data model and security rules](#data-model-and-security-rules)
 - [Security model](#security-model)
+- [SEO](#seo)
 - [Testing](#testing)
 - [Known limitations](#known-limitations)
 - [Project structure](#project-structure)
@@ -314,6 +315,37 @@ Deletes are owner-only. Account deletion in Settings removes every collection fo
 
 ---
 
+## SEO
+
+Search engines get real HTML, not an empty `<div id="root">`.
+
+- **One source of truth.** `shared/seo-pages.json` holds the path, title,
+  description, `changefreq` and priority of every indexable page. The React app
+  reads it through `seoFor('/features')`, and the build reads the same file, so
+  the client and the prerendered HTML can never disagree.
+- **Static HTML per route.** `postbuild` (`scripts/generate-seo.mjs`) writes
+  `dist/index.html` plus `dist/<route>/index.html` for all nine public pages,
+  each with its own `<title>`, description, canonical, Open Graph, Twitter card,
+  a `<noscript>` summary and breadcrumb JSON-LD. Deep links return real content
+  with a 200, and the SPA hydrates over it.
+- **Structured data.** `EducationalOrganization` (founder, area served,
+  languages), `WebSite`, `FAQPage` (the six homepage questions) and a
+  `BreadcrumbList` per page. All facts are true; nothing is invented.
+- **Private routes are excluded.** `/app/*`, `/api/*` and the auth screens are
+  `Disallow`ed in `robots.txt` and never appear in `sitemap.xml`.
+- **No invented domain.** Canonical URLs, `og:url`, `og:image` and the sitemap
+  are only emitted when `VITE_SITE_URL` is a valid URL. Without it the build
+  warns and omits them rather than guessing.
+
+Check a deploy with:
+
+```bash
+curl -s https://your-domain/features | grep -E '<title>|canonical'
+curl -s https://your-domain/sitemap.xml | grep -c '<url>'
+```
+
+---
+
 ## Testing
 
 ### Automated (all passing locally)
@@ -322,7 +354,7 @@ Deletes are owner-only. Account deletion in Settings removes every collection fo
 | --- | --- | --- |
 | Unit / integration logic | `npm test` | **75 / 75** |
 | API integration (real handlers + mock provider) | `npm run smoke:api` | **20 / 20** |
-| Browser UI, demo mode, mobile, a11y basics | `npm run test:ui` (needs Playwright) | **40 / 40** |
+| Browser UI, demo mode, mobile, a11y basics | `npm run test:ui` (needs Playwright) | **42 / 42** |
 | Browser UI with AI enabled (mock provider) | `npm run test:ai` (needs Playwright) | **17 / 17** |
 
 What the unit tests cover: answer normalisation (case, punctuation, articles, numeric formats, accepted variants), scoring and attempt building, streak edge cases (today/yesterday/gaps/duplicates), planner recommendations and overdue rescheduling, progress aggregation and insight thresholds, SSE parsing, Zod schemas + JSON repair, provider-config SSRF validation, rate limiter windows, admin allowlist, and the prompt contracts (mode differences, honesty rules, required sections).

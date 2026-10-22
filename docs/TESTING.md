@@ -12,7 +12,7 @@ Everything below was executed. Anything that needs real credentials is listed se
 | --- | --- | --- |
 | Unit / integration logic | `npm test` | **75 / 75 passed** |
 | API integration (real handlers + mock provider) | `npm run smoke:api` | **20 / 20 passed** |
-| Browser UI, demo mode, mobile, a11y basics | `npm run test:ui` | **40 / 40 passed** |
+| Browser UI, demo mode, mobile, a11y basics | `npm run test:ui` | **42 / 42 passed** |
 | Browser UI with AI enabled | `npm run test:ai` | **17 / 17 passed** |
 | Type check | `npm run typecheck` | clean |
 | Production build | `npm run build` | success |
