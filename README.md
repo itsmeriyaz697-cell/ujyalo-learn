@@ -202,6 +202,24 @@ AI_PROVIDER_NAME=openai
 AI_ALLOWED_HOSTS=api.openai.com
 ```
 
+### Groq (what this deployment uses)
+
+```env
+AI_PROVIDER_NAME=groq
+AI_API_BASE_URL=https://api.groq.com/openai/v1
+AI_ALLOWED_HOSTS=api.groq.com
+AI_MODEL=openai/gpt-oss-120b
+AI_API_KEY=gsk_...            # server-side only
+AI_MAX_OUTPUT_TOKENS=4000
+```
+
+Which Groq model? Call `GET https://api.groq.com/openai/v1/models` with your key — that list, not a blog post, is the truth. At the time of writing this account offered **`openai/gpt-oss-120b`** (131k context, JSON mode, tools), `openai/gpt-oss-20b` (cheaper, same context), `qwen/qwen3.8-27b`, `allam-2-7b` and two prompt-guard models. `gpt-oss-120b` is the best default for tutoring: strong maths, follows the JSON schema for quizzes and flashcards, about 1.5 s for a short answer.
+
+Two things that bite with reasoning models like gpt-oss:
+
+- They stream `delta.reasoning` chunks before `delta.content`. The adapter ignores reasoning, so students never see it.
+- Reasoning tokens count against `max_completion_tokens`. At 2000 a full SEE guide got cut off mid-table; 4000 leaves room. `AI_MAX_OUTPUT_TOKENS` is the knob.
+
 Notes:
 
 - The key must exist **only** in server environment variables (or server-side secrets management). Never `VITE_AI_*`.

@@ -162,9 +162,29 @@ await page.getByPlaceholder(/Ask your question/i).fill('Explain fractions simply
 await page.getByRole('button', { name: 'Send message' }).click();
 await page.waitForTimeout(3500);
 const tutorText = await page.locator('body').innerText();
-const aiUnavailable = /not configured|isn’t configured|isn't configured|AI is not|setup|unavailable|owner/i.test(tutorText);
-check('tutor shows a clear "AI not configured" state (no fake answer)', aiUnavailable, tutorText.slice(-400));
-check('tutor never fabricates an answer when the AI is off', !/fraction.*equal parts/i.test(tutorText));
+
+// This suite runs against a server with no provider key. When a key *is*
+// configured (e.g. testing production where Groq is live), assert the opposite:
+// a real answer arrives and is labelled as AI-generated. Both branches are
+// explicit so the test never silently "passes" by skipping.
+const health = await page.evaluate(async () => {
+  try {
+    const res = await fetch('/api/health');
+    return await res.json();
+  } catch {
+    return { configured: false };
+  }
+});
+if (health.configured) {
+  await page.waitForTimeout(6000);
+  const live = await page.locator('body').innerText();
+  check('tutor returns a real answer from the configured provider', !/not configured|isn’t configured/i.test(live), live.slice(-300));
+  check('AI answers carry the AI-generated disclaimer', /AI-generated|AI can make mistakes/i.test(live));
+} else {
+  const aiUnavailable = /not configured|isn’t configured|isn't configured|AI is not|setup|unavailable|owner/i.test(tutorText);
+  check('tutor shows a clear "AI not configured" state (no fake answer)', aiUnavailable, tutorText.slice(-400));
+  check('tutor never fabricates an answer when the AI is off', !/fraction.*equal parts/i.test(tutorText));
+}
 await shot('05-tutor');
 
 // ─── Notes: create, search, favourite, delete ───────────────────────────────
