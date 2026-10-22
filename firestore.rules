@@ -1,0 +1,204 @@
+rules_version = '2';
+
+// Ujyalo Learn — Firestore security rules
+//
+// Principles:
+//  - Every record is owned by exactly one authenticated user.
+//  - Reads and writes are allowed only for the owner (request.auth.uid).
+//  - Documents in subcollections must carry ownerId == the owner on create,
+//    and cannot change owner on update.
+//  - Nothing is readable by administrators through the client SDK.
+//  - Anything not explicitly allowed is denied.
+//
+// Deploy with:  firebase deploy --only firestore:rules
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function ownerMatches(uid) {
+      return request.resource.data.ownerId == uid;
+    }
+
+    function ownerUnchanged() {
+      return request.resource.data.ownerId == resource.data.ownerId;
+    }
+
+    function textWithin(field, maxLength) {
+      return request.resource.data[field] is string
+        && request.resource.data[field].size() <= maxLength;
+    }
+
+    // ── Student profile ────────────────────────────────────────────────
+    match /users/{uid} {
+      allow read, delete: if isOwner(uid);
+
+      allow create, update: if isOwner(uid)
+        && request.resource.data.uid == uid
+        && request.resource.data.displayName is string
+        && request.resource.data.displayName.size() <= 80
+        && request.resource.data.email is string
+        && request.resource.data.email.size() <= 320
+        && request.resource.data.preferences is map
+        && request.resource.data.preferences.subjects.size() <= 12
+        && request.resource.data.preferences.goals.size() <= 12
+        && request.resource.data.onboardingComplete is bool;
+
+      // ── Conversations + messages ─────────────────────────────────────
+      match /conversations/{conversationId} {
+        allow read, delete: if isOwner(uid);
+
+        allow create: if isOwner(uid)
+          && ownerMatches(uid)
+          && textWithin('title', 200)
+          && request.resource.data.messageCount is int
+          && request.resource.data.messageCount >= 0;
+
+        allow update: if isOwner(uid)
+          && ownerUnchanged()
+          && textWithin('title', 200);
+
+        match /messages/{messageId} {
+          allow read, delete: if isOwner(uid);
+
+          allow create: if isOwner(uid)
+            && ownerMatches(uid)
+            && request.resource.data.conversationId == conversationId
+            && request.resource.data.role in ['user', 'assistant']
+            && textWithin('content', 20000);
+
+          allow update: if isOwner(uid)
+            && ownerUnchanged()
+            && request.resource.data.conversationId == conversationId
+            && textWithin('content', 20000);
+        }
+      }
+
+      // ── Notes ────────────────────────────────────────────────────────
+      match /notes/{noteId} {
+        allow read, delete: if isOwner(uid);
+
+        allow create: if isOwner(uid)
+          && ownerMatches(uid)
+          && textWithin('title', 200)
+          && textWithin('content', 20000)
+          && request.resource.data.source in ['ai', 'student'];
+
+        allow update: if isOwner(uid)
+          && ownerUnchanged()
+          && textWithin('title', 200)
+          && textWithin('content', 20000)
+          && request.resource.data.source in ['ai', 'student'];
+      }
+
+      // ── Quizzes ──────────────────────────────────────────────────────
+      match /quizzes/{quizId} {
+        allow read, delete: if isOwner(uid);
+
+        allow create: if isOwner(uid)
+          && ownerMatches(uid)
+          && textWithin('title', 200)
+          && request.resource.data.questions is list
+          && request.resource.data.questions.size() <= 20
+          && request.resource.data.source == 'ai';
+
+        allow update: if isOwner(uid)
+          && ownerUnchanged()
+          && textWithin('title', 200)
+          && request.resource.data.questions is list
+          && request.resource.data.questions.size() <= 20;
+      }
+
+      // ── Quiz attempts ────────────────────────────────────────────────
+      match /attempts/{attemptId} {
+        allow read, delete: if isOwner(uid);
+
+        allow create: if isOwner(uid)
+          && ownerMatches(uid)
+          && request.resource.data.total is int
+          && request.resource.data.total > 0
+          && request.resource.data.total <= 20
+          && request.resource.data.score is int
+          && request.resource.data.score >= 0
+          && request.resource.data.score <= request.resource.data.total
+          && textWithin('quizTitle', 200);
+
+        allow update: if isOwner(uid) && ownerUnchanged();
+      }
+
+      // ── Flashcard decks ──────────────────────────────────────────────
+      match /decks/{deckId} {
+        allow read, delete: if isOwner(uid);
+
+        allow create: if isOwner(uid)
+          && ownerMatches(uid)
+          && textWithin('title', 200)
+          && request.resource.data.cards is list
+          && request.resource.data.cards.size() <= 40;
+
+        allow update: if isOwner(uid)
+          && ownerUnchanged()
+          && textWithin('title', 200)
+          && request.resource.data.cards is list
+          && request.resource.data.cards.size() <= 40;
+      }
+
+      // ── Goals and tasks ──────────────────────────────────────────────
+      match /goals/{goalId} {
+        allow read, delete: if isOwner(uid);
+
+        allow create: if isOwner(uid)
+          && ownerMatches(uid)
+          && textWithin('title', 200);
+
+        allow update: if isOwner(uid)
+          && ownerUnchanged()
+          && textWithin('title', 200);
+      }
+
+      match /tasks/{taskId} {
+        allow read, delete: if isOwner(uid);
+
+        allow create: if isOwner(uid)
+          && ownerMatches(uid)
+          && textWithin('title', 200)
+          && request.resource.data.minutes is int
+          && request.resource.data.minutes >= 0
+          && request.resource.data.minutes <= 600
+          && request.resource.data.completed is bool;
+
+        allow update: if isOwner(uid)
+          && ownerUnchanged()
+          && textWithin('title', 200)
+          && request.resource.data.minutes is int
+          && request.resource.data.minutes >= 0
+          && request.resource.data.minutes <= 600
+          && request.resource.data.completed is bool;
+      }
+
+      // ── Activity log ─────────────────────────────────────────────────
+      match /activity/{eventId} {
+        allow read, delete: if isOwner(uid);
+
+        allow create: if isOwner(uid)
+          && ownerMatches(uid)
+          && request.resource.data.type in ['tutor', 'quiz', 'note', 'flashcard', 'task', 'goal']
+          && textWithin('label', 200);
+
+        allow update: if false;
+      }
+    }
+
+    // Deny everything else by default.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

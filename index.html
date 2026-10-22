@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Ujyalo Learn — Your Personal AI Tutor, Anytime</title>
+    <meta
+      name="description"
+      content="Ujyalo Learn is an AI-powered learning and tutoring platform for students in Nepal and beyond. Understand difficult concepts, practise questions and prepare for exams with a patient personal AI tutor."
+    />
+    <meta name="theme-color" content="#15245F" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0B1B3A" media="(prefers-color-scheme: dark)" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Ujyalo Learn" />
+    <meta property="og:title" content="Ujyalo Learn — Your Personal AI Tutor, Anytime" />
+    <meta
+      property="og:description"
+      content="Understand difficult concepts, practise questions and prepare for exams with a patient personal AI tutor. Built for Grades 1–12 and SEE preparation."
+    />
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Ujyalo Learn — Your Personal AI Tutor, Anytime" />
+    <meta name="twitter:description" content="Learn Smarter. Shine Brighter. An AI tutor for Grades 1–12 and SEE preparation." />
+    <meta name="twitter:image" content="/og-image.png" />
+    <script>
+      // Apply the saved theme before paint to prevent a flash of the wrong theme.
+      (function () {
+        try {
+          var stored = localStorage.getItem('ujyalo:theme');
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var dark = stored ? stored === 'dark' : prefersDark;
+          document.documentElement.classList.toggle('dark', dark);
+          document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>
+      <div style="font-family: system-ui, sans-serif; padding: 2rem; max-width: 40rem; margin: 0 auto">
+        <h1>Ujyalo Learn</h1>
+        <p>Ujyalo Learn needs JavaScript to run the AI tutor, quizzes and study tools. Please enable JavaScript in your browser.</p>
+      </div>
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

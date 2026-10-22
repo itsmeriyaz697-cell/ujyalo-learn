@@ -1,0 +1,18 @@
+# Ujyalo Learn — default robots file.
+# `npm run build` replaces this with a version that includes the sitemap
+# when VITE_SITE_URL is configured.
+
+User-agent: *
+Allow: /
+Disallow: /app
+Disallow: /app/
+Disallow: /api/
+Disallow: /login
+Disallow: /signup
+Disallow: /forgot-password
+Disallow: /onboarding
+
+# AI crawlers are welcome to read public pages only.
+User-agent: GPTBot
+Disallow: /app
+Disallow: /api/

@@ -1,0 +1,420 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────  Design tokens  ───────────────────────── */
+:root {
+  --bg: #f6f8fc;
+  --surface: #ffffff;
+  --surface-2: #f2f5fb;
+  --surface-3: #e9eefa;
+  --border: #dde5f2;
+  --border-strong: #c6d3e8;
+  --text: #0b1b3a;
+  --text-soft: #33425f;
+  --muted: #5b6b8c;
+  --primary: #2947d6;
+  --primary-soft: #e8eeff;
+  --primary-contrast: #ffffff;
+  --accent: #f7b733;
+  --accent-soft: #fff4d6;
+  --success: #0e7a4f;
+  --success-soft: #e2f6ec;
+  --danger: #b42318;
+  --danger-soft: #fee9e7;
+  --ring: #2947d6;
+}
+
+.dark {
+  --bg: #081226;
+  --surface: #0e1c38;
+  --surface-2: #132446;
+  --surface-3: #1a2e55;
+  --border: #22355c;
+  --border-strong: #2f4675;
+  --text: #eef3ff;
+  --text-soft: #c9d5ee;
+  --muted: #94a6c8;
+  --primary: #8fb0ff;
+  --primary-soft: #1b2f63;
+  --primary-contrast: #081226;
+  --accent: #ffd05a;
+  --accent-soft: #3a2f12;
+  --success: #6ee7b0;
+  --success-soft: #0d2f26;
+  --danger: #ffb4ab;
+  --danger-soft: #3d1614;
+  --ring: #8fb0ff;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  body {
+    @apply antialiased;
+    background-color: var(--bg);
+    color: var(--text);
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    min-height: 100dvh;
+  }
+  * {
+    border-color: var(--border);
+  }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--primary) 28%, transparent);
+  }
+  h1, h2, h3, h4 {
+    color: var(--text);
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  input, textarea, select, button {
+    font: inherit;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full px-4 sm:px-6 lg:px-8;
+    max-width: 76rem;
+  }
+
+  .surface {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+  }
+
+  .card {
+    @apply surface rounded-2xl;
+    box-shadow: 0 1px 2px rgba(11, 27, 58, 0.04);
+  }
+
+  .card-hover {
+    @apply transition-shadow duration-200;
+  }
+  .card-hover:hover {
+    box-shadow: 0 12px 30px -18px rgba(11, 27, 58, 0.45);
+    border-color: var(--border-strong);
+  }
+
+  .text-muted {
+    color: var(--muted);
+  }
+  .text-soft {
+    color: var(--text-soft);
+  }
+
+  .btn {
+    @apply inline-flex select-none items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors;
+    min-height: 2.75rem;
+  }
+  .btn:disabled {
+    @apply cursor-not-allowed opacity-55;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: var(--primary-contrast);
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--primary) 88%, black);
+  }
+  .dark .btn-primary:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--primary) 88%, white);
+  }
+  .btn-secondary {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border-strong);
+  }
+  .btn-secondary:hover:not(:disabled) {
+    background: var(--surface-2);
+  }
+  .btn-ghost {
+    color: var(--text-soft);
+    background: transparent;
+  }
+  .btn-ghost:hover:not(:disabled) {
+    background: var(--surface-2);
+    color: var(--text);
+  }
+  .btn-accent {
+    background: var(--accent);
+    color: #2b1d00;
+  }
+  .btn-accent:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--accent) 90%, black);
+  }
+  .btn-danger {
+    background: var(--danger);
+    color: #fff;
+  }
+  /* In dark mode --danger is a light red, so white text would be unreadable. */
+  .dark .btn-danger {
+    color: #2b0f0c;
+  }
+  .btn-sm {
+    @apply px-3 py-1.5 text-[13px];
+    min-height: 2.25rem;
+  }
+  .btn-lg {
+    @apply px-6 py-3 text-base;
+    min-height: 3.25rem;
+  }
+  .btn-icon {
+    @apply inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors;
+    color: var(--muted);
+  }
+  .btn-icon:hover {
+    background: var(--surface-2);
+    color: var(--text);
+  }
+
+  .input {
+    @apply w-full rounded-xl px-3.5 py-2.5 text-sm transition-colors;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border-strong);
+    min-height: 2.75rem;
+  }
+  .input::placeholder {
+    color: var(--muted);
+  }
+  .input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 22%, transparent);
+  }
+  .input:disabled {
+    background: var(--surface-2);
+    color: var(--muted);
+  }
+  textarea.input {
+    line-height: 1.55;
+  }
+  .label {
+    @apply mb-1.5 block text-sm font-medium;
+    color: var(--text-soft);
+  }
+  .hint {
+    @apply mt-1.5 text-xs;
+    color: var(--muted);
+  }
+  .field-error {
+    @apply mt-1.5 text-xs font-medium;
+    color: var(--danger);
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] font-medium transition-colors;
+    background: var(--surface-2);
+    color: var(--text-soft);
+    border: 1px solid var(--border);
+  }
+  .chip-active {
+    background: var(--primary-soft);
+    color: var(--primary);
+    border-color: color-mix(in srgb, var(--primary) 45%, transparent);
+  }
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide;
+  }
+  .badge-neutral {
+    background: var(--surface-2);
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .badge-brand {
+    background: var(--primary-soft);
+    color: var(--primary);
+  }
+  .badge-gold {
+    background: var(--accent-soft);
+    color: color-mix(in srgb, var(--accent) 70%, black);
+  }
+  .dark .badge-gold {
+    color: var(--accent);
+  }
+  .badge-success {
+    background: var(--success-soft);
+    color: var(--success);
+  }
+
+  .section-title {
+    @apply text-2xl font-bold tracking-tight sm:text-3xl;
+  }
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.14em];
+    color: var(--primary);
+  }
+
+  .divider {
+    border-top: 1px solid var(--border);
+  }
+
+  .nav-link {
+    @apply rounded-lg px-3 py-2 text-sm font-medium transition-colors;
+    color: var(--text-soft);
+  }
+  .nav-link:hover {
+    background: var(--surface-2);
+    color: var(--text);
+  }
+  .nav-link-active {
+    color: var(--primary);
+    background: var(--primary-soft);
+  }
+
+  .skeleton {
+    @apply animate-pulse rounded-lg;
+    background: var(--surface-3);
+  }
+
+  .prose-ujyalo {
+    color: var(--text-soft);
+    line-height: 1.7;
+    font-size: 0.95rem;
+    overflow-wrap: anywhere;
+  }
+  .prose-ujyalo > * + * {
+    margin-top: 0.85em;
+  }
+  .prose-ujyalo h1,
+  .prose-ujyalo h2,
+  .prose-ujyalo h3,
+  .prose-ujyalo h4 {
+    color: var(--text);
+    font-weight: 700;
+    line-height: 1.3;
+    margin-top: 1.4em;
+    margin-bottom: 0.35em;
+  }
+  .prose-ujyalo h1 { font-size: 1.35rem; }
+  .prose-ujyalo h2 { font-size: 1.2rem; }
+  .prose-ujyalo h3 { font-size: 1.05rem; }
+  .prose-ujyalo h4 { font-size: 0.98rem; }
+  .prose-ujyalo p { margin: 0.6em 0; }
+  .prose-ujyalo strong { color: var(--text); font-weight: 650; }
+  .prose-ujyalo em { color: var(--text); }
+  .prose-ujyalo ul,
+  .prose-ujyalo ol {
+    padding-left: 1.4rem;
+    margin: 0.6em 0;
+  }
+  .prose-ujyalo ul { list-style: disc; }
+  .prose-ujyalo ol { list-style: decimal; }
+  .prose-ujyalo li { margin: 0.25em 0; }
+  .prose-ujyalo li::marker { color: var(--muted); }
+  .prose-ujyalo a {
+    color: var(--primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .prose-ujyalo blockquote {
+    border-left: 3px solid var(--accent);
+    padding: 0.2rem 0 0.2rem 0.9rem;
+    color: var(--muted);
+  }
+  .prose-ujyalo code {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 0.1rem 0.3rem;
+    font-size: 0.86em;
+    color: var(--text);
+  }
+  .prose-ujyalo pre {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: 0.85rem 1rem;
+    overflow-x: auto;
+    font-size: 0.85rem;
+  }
+  .prose-ujyalo pre code {
+    background: transparent;
+    border: 0;
+    padding: 0;
+    font-size: inherit;
+  }
+  .prose-ujyalo table {
+    width: 100%;
+    border-collapse: collapse;
+    display: block;
+    overflow-x: auto;
+    font-size: 0.9em;
+    margin: 0.9em 0;
+  }
+  .prose-ujyalo th,
+  .prose-ujyalo td {
+    border: 1px solid var(--border);
+    padding: 0.45rem 0.6rem;
+    text-align: left;
+    vertical-align: top;
+  }
+  .prose-ujyalo th {
+    background: var(--surface-2);
+    color: var(--text);
+    font-weight: 650;
+  }
+  .prose-ujyalo hr {
+    border-top: 1px solid var(--border);
+    margin: 1.2em 0;
+  }
+  .prose-ujyalo .katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.2rem 0;
+  }
+
+  .scroll-thin {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+  }
+  .scroll-thin::-webkit-scrollbar { width: 8px; height: 8px; }
+  .scroll-thin::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 999px;
+  }
+
+  .hero-grid {
+    background-image:
+      radial-gradient(60% 55% at 78% 8%, color-mix(in srgb, var(--primary) 22%, transparent), transparent 70%),
+      radial-gradient(45% 45% at 10% 0%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%);
+  }
+
+  .app-shell {
+    min-height: 100dvh;
+  }
+
+  .skip-link {
+    @apply absolute left-3 top-3 z-[100] -translate-y-24 rounded-lg px-4 py-2 text-sm font-semibold;
+    background: var(--primary);
+    color: var(--primary-contrast);
+  }
+  .skip-link:focus {
+    transform: translateY(0);
+  }
+}
+
+/* KaTeX inherits theme colours */
+.katex {
+  color: var(--text);
+  font-size: 1.03em;
+}

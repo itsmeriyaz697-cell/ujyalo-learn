@@ -1,0 +1,55 @@
+{
+  "name": "Ujyalo Learn — Your Personal AI Tutor",
+  "short_name": "Ujyalo Learn",
+  "description": "Understand difficult concepts, practise questions and prepare for exams with a patient personal AI tutor.",
+  "id": "/",
+  "start_url": "/app",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f6f8fc",
+  "theme_color": "#15245F",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Ask the AI tutor",
+      "short_name": "AI Tutor",
+      "url": "/app/tutor",
+      "description": "Start a new tutoring conversation"
+    },
+    {
+      "name": "Practice quiz",
+      "short_name": "Quiz",
+      "url": "/app/quizzes",
+      "description": "Generate or continue a practice quiz"
+    },
+    {
+      "name": "Study planner",
+      "short_name": "Planner",
+      "url": "/app/planner",
+      "description": "See today's study tasks"
+    }
+  ]
+}

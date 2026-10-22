@@ -1,0 +1,16 @@
+node_modules
+dist
+dist-ssr
+.vercel
+.env
+.env.local
+.env.*.local
+*.local
+.DS_Store
+coverage
+*.log
+ujyalo-learn.zip
+
+# TypeScript incremental build info
+tsconfig.tsbuildinfo
+*.tsbuildinfo

@@ -1,0 +1,59 @@
+{
+  "name": "ujyalo-learn",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Ujyalo Learn \u2014 AI-powered learning and tutoring platform for students in Nepal (Grades 1\u201312 and SEE).",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k -n web,api -c cyan,magenta \"vite\" \"tsx server/dev-api.ts\"",
+    "dev:web": "vite",
+    "dev:api": "tsx server/dev-api.ts",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -b --noEmit",
+    "check:secrets": "node scripts/check-secrets.mjs",
+    "check:bundle": "node scripts/check-bundle.mjs",
+    "icons": "node scripts/generate-icons.mjs",
+    "postbuild": "node scripts/generate-seo.mjs",
+    "smoke:api": "node scripts/smoke-api.mjs",
+    "mock:provider": "node scripts/mock-provider.mjs",
+    "test:ui": "node scripts/ui-smoke.mjs",
+    "test:ai": "node scripts/ai-smoke.mjs"
+  },
+  "dependencies": {
+    "firebase": "^11.10.0",
+    "katex": "^0.16.22",
+    "lucide-react": "^0.468.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-markdown": "^9.0.3",
+    "react-router-dom": "^6.30.0",
+    "rehype-katex": "^7.0.1",
+    "remark-gfm": "^4.0.0",
+    "remark-math": "^6.0.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vercel/node": "^5.1.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^9.1.2",
+    "playwright": "^1.47.2",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "tsx": "^4.23.15",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7",
+    "vitest": "^3.2.7"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "author": "Riyaz Chalise",
+  "license": "UNLICENSED"
+}
