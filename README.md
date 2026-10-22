@@ -302,6 +302,8 @@ Vercel → Project → Domains → add your domain, then:
 - [ ] A tutor message streams and can be saved as a note
 - [ ] Quiz generation, flashcards and study tools respond
 - [ ] `/app` and `/login` carry `X-Robots-Tag: noindex`
+- [ ] `/googlec3d881d4bf552040.html` returns 200 with the verification line ([docs/SEO.md](docs/SEO.md))
+- [ ] `sitemap.xml` lists only public URLs; an unknown URL returns 404
 - [ ] Lighthouse pass on mobile (see Testing)
 
 ---
@@ -435,6 +437,11 @@ Search engines get real HTML, not an empty `<div id="root">`.
   are only emitted when `VITE_SITE_URL` is a valid URL. Without it the build
   warns and omits them rather than guessing.
 
+Search Console ownership is proved by `public/googlec3d881d4bf552040.html`,
+which Google fetches and compares byte-for-byte. A unit test and a browser check
+fail if it is renamed, edited or stops being served. The full walkthrough —
+verify, submit the sitemap, Bing import — is in [docs/SEO.md](docs/SEO.md).
+
 Check a deploy with:
 
 ```bash
@@ -450,9 +457,9 @@ curl -s https://your-domain/sitemap.xml | grep -c '<url>'
 
 | Suite | Command | Result |
 | --- | --- | --- |
-| Unit / integration logic | `npm test` | **87 / 87** |
+| Unit / integration logic | `npm test` | **93 / 93** |
 | API integration (real handlers + mock provider) | `npm run smoke:api` | **20 / 20** |
-| Browser UI, demo mode, mobile, a11y, library and admin | `npm run test:ui` (needs Playwright) | **62 / 62** |
+| Browser UI, demo mode, mobile, a11y, library and admin | `npm run test:ui` (needs Playwright) | **67 / 67** |
 | Browser UI with AI enabled (mock provider) | `npm run test:ai` (needs Playwright) | **18 / 18** |
 
 `test:ui` expects the AI to be **unconfigured** (it asserts the honest “AI not configured” state), while `test:ai` expects the dev server to point at `scripts/mock-provider.mjs`. Run them against separate servers — that is why `docs/TESTING.md` lists them as two setups.

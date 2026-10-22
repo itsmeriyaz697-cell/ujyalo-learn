@@ -99,6 +99,17 @@ await page.waitForTimeout(150);
 check('command palette closes on Escape', (await page.getByRole('option').count()) === 0);
 
 
+// ─── Search Console ownership file ─────────────────────────────────────────
+// Google compares this file byte-for-byte, so the deployed copy is asserted,
+// not assumed. A missing or rewritten file silently breaks verification.
+const verifyRes = await page.request.get(`${BASE}/googlec3d881d4bf552040.html`);
+const verifyBody = (await verifyRes.text()).trim();
+check(
+  'Google verification file is served verbatim at the site root',
+  verifyRes.status() === 200 && verifyBody === 'google-site-verification: googlec3d881d4bf552040.html',
+  `${verifyRes.status()} "${verifyBody.slice(0, 60)}"`,
+);
+
 // ─── Signed-out protection ──────────────────────────────────────────────────
 await visit('/app');
 await page.waitForTimeout(600);

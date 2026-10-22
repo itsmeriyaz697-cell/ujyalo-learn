@@ -21,7 +21,7 @@ pretends otherwise.
 | Item | State |
 | --- | --- |
 | Privacy-friendly analytics | Not installed. No tracking script, no cookies. Add a tool only with consent handling. |
-| Search-console verification | Owner action: docs/SEO.md walks through Google and Bing. |
+| Search-console verification | Verification file is committed and deployed. **Owner still presses Verify and submits the sitemap** — see [docs/SEO.md](./SEO.md). |
 | Sitemap submission | Owner action, same document. |
 
 ## Student features from the brief that are out of scope for now
