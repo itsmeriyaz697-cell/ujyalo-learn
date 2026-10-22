@@ -1,6 +1,8 @@
 # Deploying Ujyalo Learn to Vercel
 
-**Status on 22 Oct 2026:** the Vercel project is **created and configured**, but **no deployment exists yet**. The source code is ready in this repository (one commit on `main`), and this sandbox has no way to push it to your Git account or upload ~700 KB of source through the deployment API. One short step from you finishes it.
+**Status on 22 Oct 2026: LIVE.** Deployed from this workspace with the Vercel CLI to production.
+
+**Production URL → <https://ujyalo-learn.vercel.app>**
 
 | Item | Value |
 | --- | --- |
@@ -10,7 +12,10 @@
 | Framework | Vite |
 | Build command | `npm run build` |
 | Output directory | `dist` |
-| Status | ⏳ awaiting first deployment |
+| Live URL | **https://ujyalo-learn.vercel.app** |
+| Status | ✅ deployed (production) |
+| Deployment | `dpl_…` latest on `main`, build ~1 min |
+| Protection | Standard — public production URL, preview URLs require login |
 
 ## Environment variables already set on the project
 
@@ -24,6 +29,8 @@ These are non-secret defaults, chosen because your Vercel account already uses G
 | `AI_ALLOWED_HOSTS` | `api.groq.com` |
 | `AI_MAX_OUTPUT_TOKENS` | `2000` |
 
+`VITE_SITE_URL` is also set to `https://ujyalo-learn.vercel.app`, so canonical links, `og:url` and `sitemap.xml` use the real domain.
+
 Still missing (you must add these — I will not put keys in a repository or invent them):
 
 | Key | Where to get it |
@@ -33,13 +40,28 @@ Still missing (you must add these — I will not put keys in a repository or inv
 | `VITE_FIREBASE_AUTH_DOMAIN` | same |
 | `VITE_FIREBASE_PROJECT_ID` | same |
 | `VITE_FIREBASE_APP_ID` | same |
-| `VITE_SITE_URL` | set **after** the first deploy, to the real domain |
 | `AI_REQUIRE_AUTH` | `true` once Firebase is configured (recommended) |
 | `FIREBASE_PROJECT_ID`, `FIREBASE_WEB_API_KEY` | needed for server-side token checks |
 
 If you switch to OpenAI, change `AI_API_BASE_URL` to `https://api.openai.com/v1`, `AI_MODEL` to `gpt-4o-mini`, `AI_PROVIDER_NAME` to `openai`, and `AI_ALLOWED_HOSTS` to `api.openai.com`.
 
 ---
+
+## How it was deployed (already done)
+
+```bash
+npm i --no-save vercel
+vercel link --project ujyalo-learn
+vercel --prod          # ~1 minute, 3 deployments in total
+```
+
+One runtime bug surfaced and was fixed on the second deployment: because
+`package.json` declares `"type": "module"`, Vercel compiles `api/**/*.ts` to ESM
+and extensionless relative imports (`./_lib/config`) failed with
+`ERR_MODULE_NOT_FOUND`. Explicit `.js` specifiers are now used in `api/` and
+`shared/`, which works under `tsx`, Vite and the Vercel Node builder alike.
+
+### Re-deploying later
 
 ## Option A — GitHub (recommended, ~2 minutes)
 
@@ -81,12 +103,10 @@ If you create a Vercel access token (<https://vercel.com/account/tokens>, scope:
 
 ---
 
-## After the first successful deployment
+## Next steps on the live site
 
-1. **Copy the production URL** Vercel shows (e.g. `https://ujyalo-learn.vercel.app`).
-2. Set `VITE_SITE_URL` to that exact URL in Vercel → Settings → Environment Variables (Production), then **Redeploy**.
-   This enables canonical links, `og:url`, and generates `sitemap.xml`. Until it is set, those tags are omitted rather than pointing at a domain that is not live.
-3. **Firebase authorised domains** → Authentication → Settings → Authorized domains → add the Vercel domain.
+1. `https://ujyalo-learn.vercel.app/api/health` currently returns `configured: false` — add `AI_API_KEY` (Groq) to switch the AI features on.
+2. **Firebase authorised domains** → Authentication → Settings → Authorized domains → add the Vercel domain.
 4. **Publish Firestore rules** (from this repo):
    ```bash
    npm i -g firebase-tools
@@ -94,13 +114,23 @@ If you create a Vercel access token (<https://vercel.com/account/tokens>, scope:
    firebase use --add          # pick your project
    firebase deploy --only firestore:rules,firestore:indexes
    ```
-5. **Verify**:
+4. **Verify**:
    ```bash
    curl https://<your-domain>/api/health
    # { "ok": true, "configured": true, "provider": "groq", ... }
    ```
    `configured: false` means `AI_API_KEY` is missing or the provider settings do not match.
 6. Sign up on the live site and confirm the header no longer says *Local demo mode*.
+
+## Verified on production (22 Oct 2026)
+
+- Home, features, subjects, pricing, help, about, contact, privacy, terms → HTTP 200
+- Deep links (`/app/tutor`) → HTTP 200, SPA shell served
+- `/api/health` → `{"ok":true,"configured":false,...}` (key not yet added)
+- `/api/tutor` with an invalid mode → structured 503 `not_configured` (no key leak)
+- `robots.txt` + `sitemap.xml` generated for the real domain
+- Full browser suite against the live URL: **40/40 checks passed**
+  (`BASE_URL=https://ujyalo-learn.vercel.app npm run test:ui`)
 
 ## What works immediately after deploy (no extra keys)
 

@@ -213,7 +213,12 @@ Notes:
 
 ## Deploying to Vercel
 
-> **Current status (22 Oct 2026):** the Vercel project **`ujyalo-learn`** is created and configured on the owner's account, but **no deployment exists yet** — the source still has to be pushed from Git or uploaded with the Vercel CLI. See [`docs/DEPLOY-VERCEL.md`](docs/DEPLOY-VERCEL.md) for the exact two-minute steps and the environment variables already set on the project.
+> **Live:** **<https://ujyalo-learn.vercel.app>** — deployed 22 Oct 2026 with the Vercel CLI.
+>
+> Working now: every public page, PWA shell, onboarding, dashboard, notes, flashcards, planner, progress, settings and data export — with accounts in clearly labelled local demo mode.
+> Waiting on keys you add in Vercel: real accounts/cloud sync (`VITE_FIREBASE_*`) and all AI features (`AI_API_KEY`). Until then `/api/health` reports `configured: false` and the AI screens show setup help instead of inventing answers.
+>
+> Full details, env vars and re-deploy steps: [`docs/DEPLOY-VERCEL.md`](docs/DEPLOY-VERCEL.md).
 
 The repository is Vercel-ready (`vercel.json`, `/api` functions, Vite preset).
 
