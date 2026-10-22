@@ -69,7 +69,31 @@
   ],
   "rewrites": [
     {
-      "source": "/((?!api/|assets/|icons/|.*\\.[a-zA-Z0-9]+$).*)",
+      "source": "/app",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/app/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/onboarding",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/signup",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/forgot-password",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/verify-email",
       "destination": "/index.html"
     }
   ]
