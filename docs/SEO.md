@@ -91,6 +91,64 @@ invented domain.
 3. Without that, add the site and use the same HTML file method (Bing also
    accepts it) or a DNS TXT record.
 
+Bing is worth doing separately from Google: it also feeds **ChatGPT search and
+Copilot**, which is how a large share of "explain this topic" queries now start.
+
+### 2a. Submit URLs by hand (the 100-a-day quota)
+
+Bing's **Submit URLs** box is rate-limited per site — 100 in a day is typical for
+a new domain. The site has **41 indexable URLs**, so one paste uses 41 of 100.
+
+The list is in **`docs/urls-to-submit.txt`**: one bare URL per line, no headers,
+no comments, no blank lines. Paste the whole file into the box, submit, done.
+
+Order is deliberate — the home page and `/see-preparation` first, then the library hubs, then
+courses, guides and grade hubs. If your quota is ever smaller than the list, the
+pages most likely to earn traffic are the ones that get through.
+
+`docs/urls-to-submit.txt` is generated from the live sitemap and a test keeps it
+honest: 41 entries, no duplicates, absolute `https` on the production domain.
+
+### 2b. Submit with the API instead (no clicking)
+
+Bing's URL Submission API skips the web form entirely and returns a real error
+when something is wrong:
+
+```bash
+# 1. Bing Webmaster Tools -> Settings -> API Access -> Generate
+export BING_WEBMASTER_API_KEY=xxxxxxxx
+
+# 2. See exactly what would be sent, without sending anything
+npm run urls:print
+
+# 3. Send it
+npm run submit:bing
+```
+
+The script (`scripts/submit-urls.mjs`):
+
+- reads `sitemap.xml` **live**, so it can never submit a URL the site no longer
+  publishes, and picks up new courses as soon as they ship;
+- calls `GetUrlSubmissionQuota` first and trims the list to whatever is left
+  today, instead of failing at the last URL;
+- batches at 500 per request (Bing's cap) with a JSON body and
+  `Content-Type: application/json; charset=utf-8` — the header this API rejects
+  requests without;
+- exits non-zero on the first failed batch so CI or a cron job notices.
+
+Use the key from the environment. It is per-user and valid for every verified
+site, so it is effectively an account credential: do not commit it, and
+regenerating it breaks anything still using the old one.
+
+### 2c. What submission does and does not do
+
+It **queues a crawl**. It does not index anything, guarantee a ranking, or make
+new pages appear in a day. A page that gets submitted still has to be worth
+crawling: unique content, a real title, links from other pages, and no
+`noindex`. If a page is submitted and stays "Discovered – not indexed" for weeks,
+the problem is the content, not the submission. `docs/ROADMAP.md` tracks the
+content work that actually moves this.
+
 ---
 
 ## 3. What is already handled in code

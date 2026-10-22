@@ -20,7 +20,9 @@
     "smoke:api": "node scripts/smoke-api.mjs",
     "mock:provider": "node scripts/mock-provider.mjs",
     "test:ui": "node scripts/ui-smoke.mjs",
-    "test:ai": "node scripts/ai-smoke.mjs"
+    "test:ai": "node scripts/ai-smoke.mjs",
+    "submit:bing": "node scripts/submit-urls.mjs --submit",
+    "urls:print": "node scripts/submit-urls.mjs"
   },
   "dependencies": {
     "firebase": "^11.10.0",

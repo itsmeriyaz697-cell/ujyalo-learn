@@ -31,6 +31,35 @@ describe('Google site verification file', () => {
   });
 });
 
+describe('paste-ready URL list (docs/urls-to-submit.txt)', () => {
+  const file = path.resolve(process.cwd(), 'docs/urls-to-submit.txt');
+  const lines = readFileSync(file, 'utf8').split('\n').filter(Boolean);
+
+  it('contains only absolute https URLs, one per line', () => {
+    // Bing's submission box takes URLs and nothing else; a stray comment line
+    // makes the whole paste fail, so the file is deliberately bare.
+    for (const line of lines) {
+      expect(line).toMatch(/^https:\/\/[a-z0-9.-]+\.[a-z]{2,}(\/[^\s]*)?$/);
+    }
+  });
+
+  it('lists every public route exactly once', () => {
+    expect(new Set(lines).size).toBe(lines.length);
+    expect(lines.length).toBe(41); // 16 listed + 12 grades + 7 courses + 6 guides
+  });
+
+  it('points at the production domain, not localhost or a placeholder', () => {
+    for (const line of lines) {
+      expect(line.startsWith('https://ujyalo-learn.vercel.app')).toBe(true);
+    }
+  });
+
+  it('puts the highest-intent pages first, because quota is capped', () => {
+    expect(lines[0]).toBe('https://ujyalo-learn.vercel.app/');
+    expect(lines[1]).toBe('https://ujyalo-learn.vercel.app/see-preparation');
+  });
+});
+
 describe('sitemap and robots configuration', () => {
   it('never invents a domain when VITE_SITE_URL is absent', () => {
     const script = readFileSync(path.resolve(process.cwd(), 'scripts/generate-seo.mjs'), 'utf8');

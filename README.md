@@ -442,6 +442,9 @@ which Google fetches and compares byte-for-byte. A unit test and a browser check
 fail if it is renamed, edited or stops being served. The full walkthrough —
 verify, submit the sitemap, Bing import — is in [docs/SEO.md](docs/SEO.md).
 
+Ready-to-paste lists and one-command submission live in `docs/urls-to-submit.txt`
+and `scripts/submit-urls.mjs` (`npm run urls:print`, `npm run submit:bing`).
+
 Check a deploy with:
 
 ```bash
@@ -457,7 +460,7 @@ curl -s https://your-domain/sitemap.xml | grep -c '<url>'
 
 | Suite | Command | Result |
 | --- | --- | --- |
-| Unit / integration logic | `npm test` | **93 / 93** |
+| Unit / integration logic | `npm test` | **97 / 97** |
 | API integration (real handlers + mock provider) | `npm run smoke:api` | **20 / 20** |
 | Browser UI, demo mode, mobile, a11y, library and admin | `npm run test:ui` (needs Playwright) | **67 / 67** |
 | Browser UI with AI enabled (mock provider) | `npm run test:ai` (needs Playwright) | **18 / 18** |
