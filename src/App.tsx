@@ -23,6 +23,7 @@ const ResourcesPage = lazy(() => import('@/pages/ResourcesPage'));
 const ResourcePage = lazy(() => import('@/pages/ResourcePage'));
 const GradePage = lazy(() => import('@/pages/GradePage'));
 const SeePrepPage = lazy(() => import('@/pages/SeePrepPage'));
+const AiTutorPage = lazy(() => import('@/pages/AiTutorPage'));
 const FaqPage = lazy(() => import('@/pages/FaqPage'));
 const ContentPolicyPage = lazy(() => import('@/pages/ContentPolicyPage'));
 const AccessibilityPage = lazy(() => import('@/pages/AccessibilityPage'));
@@ -36,6 +37,7 @@ const AdminResources = lazy(() => import('@/pages/admin/AdminResources'));
 const AdminResourceEditor = lazy(() => import('@/pages/admin/AdminResourceEditor'));
 const AdminAudit = lazy(() => import('@/pages/admin/AdminAudit'));
 const AdminSettings = lazy(() => import('@/pages/admin/AdminSettings'));
+const AdminSeo = lazy(() => import('@/pages/admin/AdminSeo'));
 
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'));
 const SignupPage = lazy(() => import('@/pages/auth/SignupPage'));
@@ -93,6 +95,8 @@ export function App() {
             <Route path="resources/:slug" element={<ResourcePage />} />
             <Route path="grades/:grade" element={<GradePage />} />
             <Route path="see-preparation" element={<SeePrepPage />} />
+            <Route path="ai-tutor" element={<AiTutorPage />} />
+            <Route path="privacy-policy" element={<PrivacyPage />} />
             <Route path="faq" element={<FaqPage />} />
             <Route path="content-policy" element={<ContentPolicyPage />} />
             <Route path="accessibility" element={<AccessibilityPage />} />
@@ -133,6 +137,7 @@ export function App() {
             <Route path="resources" element={<AdminResources />} />
             <Route path="resources/new" element={<AdminResourceEditor />} />
             <Route path="resources/:id" element={<AdminResourceEditor />} />
+            <Route path="seo" element={<AdminSeo />} />
             <Route path="audit" element={<AdminAudit />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>

@@ -104,6 +104,13 @@
       "description": "How Ujyalo Learn approaches keyboard access, contrast, reduced motion, small screens and language, plus the limitations we know about.",
       "priority": "0.4",
       "changefreq": "yearly"
+    },
+    {
+      "path": "/ai-tutor",
+      "title": "AI tutor — seven ways to explain a topic",
+      "description": "Ask in English or Nepali and get an explanation written for your grade, in one of seven modes: simpler, step by step, exam-focused, Socratic, quick, or in Nepali.",
+      "priority": "0.9",
+      "changefreq": "monthly"
     }
   ]
 }

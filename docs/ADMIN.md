@@ -87,13 +87,40 @@ fake upload succeeded. `docs/ROADMAP.md` tracks it.
 
 ---
 
-## 4. What is stored where
+## 4. SEO overrides
+
+`/admin/seo` lists every public route with the title and description that ship
+in the build (`shared/seo-pages.json`). An editor can override any of them
+without a deploy:
+
+- the override is stored in `seoPages/{path}` and applied at runtime by the
+  `Seo` component, so the change is visible immediately in the browser;
+- it is **not** in the prerendered HTML until the next deploy — the page says so
+  plainly, because an editor should know the difference between “users see it”
+  and “crawlers see it”;
+- titles and descriptions are validated as plain text (no `<`, `>`, `{`, `}`
+  and length-capped), so metadata cannot be used to inject script;
+- social image overrides must be `https://`;
+- “Reset to default” writes an empty override, which falls back to the shipped
+  values rather than blanking the tag.
+
+| Collection | Read | Write |
+| --- | --- | --- |
+| `seoPages/{path}` | anyone (the values are already public in the page) | admins only, length- and type-checked |
+
+Course and guide pages do not need an override: their metadata is generated from
+the course or resource title and summary you already edit.
+
+---
+
+## 5. What is stored where
 
 | Collection | Contents | Read | Write |
 | --- | --- | --- | --- |
 | `courses/{id}` | course, lessons, status, slug | published: anyone; drafts: editors | editors; delete: admins |
 | `resources/{id}` | resource body, source, licence | same | same |
 | `settings/site` | site name, tagline, contact, maintenance banner | anyone | admins |
+| `seoPages/{path}` | SEO overrides | anyone | admins |
 | `roles/{uid}` | `{ role }` | own document only | owner |
 | `auditLogs/{id}` | actor, action, entity, summary, timestamp | admins | append by editors, never edited or deleted |
 | `users/{uid}/**` | student data | the student only | the student only |
@@ -103,7 +130,7 @@ only who changed which piece of content, and when.
 
 ---
 
-## 5. Deploying the rules
+## 6. Deploying the rules
 
 ```bash
 npm install --global firebase-tools   # once
@@ -118,7 +145,7 @@ on deploy; a newly created index takes a few minutes to build.
 
 ---
 
-## 6. Manually testing permissions (do this after any rules change)
+## 7. Manually testing permissions (do this after any rules change)
 
 Create three accounts (student, editor, owner), set the role documents, then run
 these from the browser console while signed in as each:

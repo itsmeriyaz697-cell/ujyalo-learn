@@ -6,6 +6,7 @@ import {
   Gauge,
   Info,
   ScrollText,
+  Search,
   Settings,
   ShieldAlert,
 } from 'lucide-react';
@@ -21,6 +22,7 @@ const TABS = [
   { to: '/admin', label: 'Overview', icon: Gauge, end: true },
   { to: '/admin/courses', label: 'Courses', icon: BookOpen, end: false },
   { to: '/admin/resources', label: 'Resources', icon: FileText, end: false },
+  { to: '/admin/seo', label: 'SEO', icon: Search, end: false },
   { to: '/admin/audit', label: 'Audit log', icon: ScrollText, end: false },
   { to: '/admin/settings', label: 'Settings', icon: Settings, end: false },
 ];

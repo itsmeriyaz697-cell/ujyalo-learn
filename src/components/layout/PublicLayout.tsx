@@ -13,6 +13,7 @@ const NAV = [
   { to: '/subjects', label: 'Subjects' },
   { to: '/resources', label: 'Resources' },
   { to: '/see-preparation', label: 'SEE' },
+  { to: '/ai-tutor', label: 'AI tutor' },
   { to: '/pricing', label: 'Pricing' },
   { to: '/about', label: 'About' },
 ];

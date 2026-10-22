@@ -1,6 +1,6 @@
 import { getFirebaseDb } from '@/services/firebase/client';
 import type { ContentStore } from './store';
-import type { AuditEvent, Course, Resource, SiteSettings } from './types';
+import type { AuditEvent, Course, Resource, SeoOverride, SiteSettings } from './types';
 import { DEFAULT_SETTINGS } from './seed';
 
 /**
@@ -103,6 +103,18 @@ export const firestoreContentStore: ContentStore = {
 
   async saveSettings(settings) {
     await putDoc('settings', 'site', settings);
+  },
+
+  async listSeoOverrides() {
+    const { collection, getDocs, limit, query } = await firestore();
+    const db = await getFirebaseDb();
+    const snap = await getDocs(query(collection(db, 'seoPages'), limit(200)));
+    return snap.docs.map((doc) => ({ path: doc.id, ...doc.data() }) as SeoOverride);
+  },
+
+  async saveSeoOverride(override) {
+    // Document id is the route path (slashes are legal in Firestore ids).
+    await putDoc('seoPages', override.path, override);
   },
 
   async listAudit(limitCount = 50) {

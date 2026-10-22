@@ -147,3 +147,28 @@ export function isValidSlug(slug: string): boolean {
 }
 
 export const isPublic = (item: { status: ContentStatus }): boolean => item.status === 'published';
+
+/**
+ * Editorial SEO overrides.
+ *
+ * Defaults live in shared/seo-pages.json. An override lets an editor improve a
+ * title or description without a deploy. Only fields that are set replace the
+ * default — an empty override never blanks a page.
+ */
+export interface SeoOverride {
+  /** The route this override applies to, e.g. "/courses". */
+  path: string;
+  title: string;
+  description: string;
+  /** Optional social image. Must be https. */
+  ogImage: string;
+  /** Hide the page from search engines. */
+  noindex: boolean;
+  updatedAt: string;
+  updatedBy: string;
+}
+
+export function isSafeSeoValue(value: string): boolean {
+  // No tags, no scripts, no control characters — metadata is text, not markup.
+  return !/[<>{}]/.test(value) && value.length <= 320;
+}

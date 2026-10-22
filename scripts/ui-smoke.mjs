@@ -222,6 +222,33 @@ await shot('22-admin-audit');
 await visit('/admin/settings');
 check('settings page is reachable for an owner', /Site settings/i.test(await page.locator('body').innerText()));
 
+// ─── SEO management ─────────────────────────────────────────────────────────
+await visit('/admin/seo');
+await page.waitForTimeout(500);
+check('SEO page lists every public route', /\/see-preparation/.test(await page.locator('body').innerText()));
+await page.getByRole('button', { name: 'Override' }).first().click();
+await page.waitForTimeout(250);
+await page.locator('input[id^="seo-title-"]').first().fill('<script>alert(1)</script>');
+await page.getByRole('button', { name: 'Save', exact: true }).click();
+await page.waitForTimeout(300);
+check('SEO fields reject markup', /plain text without/i.test(await page.locator('body').innerText()));
+await page.locator('input[id^="seo-title-"]').first().fill('Home — Ujyalo Learn');
+await page.getByRole('button', { name: 'Save', exact: true }).click();
+await page.waitForTimeout(900);
+await visit('/');
+await page.waitForTimeout(600);
+check('a saved SEO override changes the live title', (await page.title()).startsWith('Home — Ujyalo Learn'), await page.title());
+
+// Reset so later runs start from the shipped defaults.
+await visit('/admin/seo');
+await page.waitForTimeout(400);
+await page.getByRole('button', { name: /Edit override/ }).first().click();
+await page.getByRole('button', { name: /Reset to default/ }).click();
+await page.waitForTimeout(700);
+await visit('/');
+await page.waitForTimeout(500);
+check('resetting restores the default title', /AI Tutor for Grades/i.test(await page.title()), await page.title());
+
 
 // 404
 await visit('/this-page-does-not-exist');

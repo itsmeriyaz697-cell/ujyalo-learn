@@ -1,4 +1,4 @@
-import type { AuditEvent, Course, Resource, SiteSettings } from './types';
+import type { AuditEvent, Course, Resource, SeoOverride, SiteSettings } from './types';
 
 /**
  * Content storage contract.
@@ -26,6 +26,9 @@ export interface ContentStore {
 
   getSettings(): Promise<SiteSettings>;
   saveSettings(settings: SiteSettings): Promise<void>;
+
+  listSeoOverrides(): Promise<SeoOverride[]>;
+  saveSeoOverride(override: SeoOverride): Promise<void>;
 
   listAudit(limit?: number): Promise<AuditEvent[]>;
   logAudit(event: AuditEvent): Promise<void>;

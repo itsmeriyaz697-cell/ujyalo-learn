@@ -1,5 +1,5 @@
 import type { ContentStore } from './store';
-import type { AuditEvent, Course, Resource, SiteSettings } from './types';
+import type { AuditEvent, Course, Resource, SeoOverride, SiteSettings } from './types';
 import { DEFAULT_SETTINGS, SEED_COURSES, SEED_RESOURCES } from './seed';
 
 /**
@@ -15,6 +15,7 @@ const KEYS = {
   resources: 'ujyalo:content:resources:v1',
   settings: 'ujyalo:content:settings:v1',
   audit: 'ujyalo:content:audit:v1',
+  seo: 'ujyalo:content:seo:v1',
   seeded: 'ujyalo:content:seeded:v1',
 };
 
@@ -123,6 +124,18 @@ export const localContentStore: ContentStore = {
 
   async saveSettings(settings) {
     write(KEYS.settings, settings);
+  },
+
+  async listSeoOverrides() {
+    return read<SeoOverride[]>(KEYS.seo, []);
+  },
+
+  async saveSeoOverride(override) {
+    const all = read<SeoOverride[]>(KEYS.seo, []);
+    const next = all.some((item) => item.path === override.path)
+      ? all.map((item) => (item.path === override.path ? override : item))
+      : [...all, override];
+    write(KEYS.seo, next);
   },
 
   async listAudit(limit = 50) {

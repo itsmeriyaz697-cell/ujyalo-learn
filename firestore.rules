@@ -283,6 +283,18 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    match /seoPages/{pathKey} {
+      // Public metadata overrides. Read is open because the values are already
+      // visible in the page; writes are admin-only and length/type constrained.
+      allow read: if true;
+      allow write: if isAdmin()
+        && request.resource.data.title is string
+        && request.resource.data.title.size() <= 160
+        && request.resource.data.description is string
+        && request.resource.data.description.size() <= 320
+        && request.resource.data.noindex is bool;
+    }
+
     match /settings/{docId} {
       allow read: if true;
       allow write: if isAdmin();

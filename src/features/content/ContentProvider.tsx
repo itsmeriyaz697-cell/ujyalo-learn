@@ -15,8 +15,9 @@ import { makeId } from '@/lib/utils';
 import { firestoreContentStore } from './firestoreContentStore';
 import { localContentStore } from './localContentStore';
 import type { AdminRole, ContentStore } from './store';
-import type { AuditAction, AuditEvent, Course, Resource, SiteSettings } from './types';
+import type { AuditAction, AuditEvent, Course, Resource, SeoOverride, SiteSettings } from './types';
 import { DEFAULT_SETTINGS } from './seed';
+import { setSeoOverrides as publishSeoOverrides } from './seoOverrides';
 
 export const contentStore: ContentStore = isFirebaseConfigured ? firestoreContentStore : localContentStore;
 
@@ -41,6 +42,8 @@ interface ContentContextValue {
   saveResource: (resource: Resource) => Promise<void>;
   deleteResource: (id: string) => Promise<void>;
   saveSettings: (settings: SiteSettings) => Promise<void>;
+  seoOverrides: Record<string, SeoOverride>;
+  saveSeoOverride: (override: SeoOverride) => Promise<void>;
   recordAudit: (action: AuditAction, entity: AuditEvent['entity'], entityId: string, summary: string) => Promise<void>;
 }
 
@@ -60,6 +63,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
   const [resources, setResources] = useState<Resource[]>([]);
   const [settings, setSettings] = useState<SiteSettings>(DEFAULT_SETTINGS);
   const [audit, setAudit] = useState<AuditEvent[]>([]);
+  const [seoOverrides, setSeoOverridesState] = useState<Record<string, SeoOverride>>({});
   const [role, setRole] = useState<AdminRole>(isFirebaseConfigured ? 'student' : 'owner');
   const [roleLoading, setRoleLoading] = useState(isFirebaseConfigured);
   const [loading, setLoading] = useState(true);
@@ -77,15 +81,22 @@ export function ContentProvider({ children }: { children: ReactNode }) {
 
   const reload = useCallback(async () => {
     try {
-      const [nextCourses, nextResources, nextSettings] = await Promise.all([
+      const [nextCourses, nextResources, nextSettings, nextSeo] = await Promise.all([
         contentStore.listCourses({ includeDrafts: isAdmin }),
         contentStore.listResources({ includeDrafts: isAdmin }),
         contentStore.getSettings(),
+        contentStore.listSeoOverrides().catch(() => [] as SeoOverride[]),
       ]);
       if (!mounted.current) return;
       setCourses(nextCourses);
       setResources(nextResources);
       setSettings(nextSettings);
+      const registry = nextSeo.reduce<Record<string, SeoOverride>>((acc, item) => {
+        acc[item.path] = item;
+        return acc;
+      }, {});
+      setSeoOverridesState(registry);
+      publishSeoOverrides(registry);
       setError(null);
     } catch {
       if (mounted.current) {
@@ -240,6 +251,15 @@ export function ContentProvider({ children }: { children: ReactNode }) {
   const publishedCourses = useMemo(() => courses.filter((course) => course.status === 'published'), [courses]);
   const publishedResources = useMemo(() => resources.filter((item) => item.status === 'published'), [resources]);
 
+  const saveSeoOverride = useCallback(
+    async (override: SeoOverride) => {
+      await contentStore.saveSeoOverride(override);
+      await recordAudit('settings.update', 'settings', `seo:${override.path}`, `Updated SEO for ${override.path}`);
+      await reload();
+    },
+    [recordAudit, reload],
+  );
+
   const value: ContentContextValue = {
     mode: contentStore.mode,
     courses,
@@ -259,6 +279,8 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     saveResource,
     deleteResource,
     saveSettings,
+    seoOverrides,
+    saveSeoOverride,
     recordAudit,
   };
 

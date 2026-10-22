@@ -78,6 +78,7 @@ Founded and built by **Riyaz Chalise**.
 | Overview | Published/draft counts, recent activity, publishing checklist, current role, honest demo-mode banner |
 | Courses | Search, filter, create, edit, reorder sessions, validate, publish/unpublish/archive, delete with confirmation |
 | Resources | Same workflow plus **source and licence are mandatory** before publishing |
+| SEO | Per-route title, description and social image overrides, noindex toggle, live character counts, markup rejected |
 | Audit log | Append-only record of publishing actions (admins read, editors append, nobody edits) |
 | Settings | Site name, tagline, contact email, maintenance notice, default language |
 

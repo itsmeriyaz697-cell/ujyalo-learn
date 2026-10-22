@@ -1,5 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 import { SITE } from '@/config/curriculum';
+import {
+  getSeoOverride,
+  seoOverridesVersion,
+  subscribeSeoOverrides,
+} from '@/features/content/seoOverrides';
 
 interface SeoProps {
   title: string;
@@ -38,19 +43,29 @@ function setLink(rel: string, href: string) {
  * pages set noindex so student data can never be indexed.
  */
 export function Seo({ title, description, path = '/', image = '/og-image.png', noindex, jsonLd }: SeoProps) {
-  const fullTitle = title.includes(SITE.name) ? title : `${title} · ${SITE.name}`;
+  // Re-render when an editor saves an override in the admin panel.
+  useSyncExternalStore(subscribeSeoOverrides, seoOverridesVersion, seoOverridesVersion);
+  const override = getSeoOverride(path);
+
+  const effectiveTitle = override?.title || title;
+  const effectiveDescription = override?.description || description;
+  const effectiveImage = override?.ogImage || image;
+  const effectiveNoindex = noindex || Boolean(override?.noindex);
+
+  const fullTitle = effectiveTitle.includes(SITE.name) ? effectiveTitle : `${effectiveTitle} · ${SITE.name}`;
   const canonical = SITE.url ? `${SITE.url}${path === '/' ? '' : path}` : '';
   const jsonLdString = jsonLd ? JSON.stringify(jsonLd) : '';
 
   useEffect(() => {
     document.title = fullTitle;
-    setMeta('meta[name="description"]', 'name', 'description', description);
+    setMeta('meta[name="description"]', 'name', 'description', effectiveDescription);
     setMeta('meta[property="og:title"]', 'property', 'og:title', fullTitle);
-    setMeta('meta[property="og:description"]', 'property', 'og:description', description);
+    setMeta('meta[property="og:description"]', 'property', 'og:description', effectiveDescription);
     if (canonical) setMeta('meta[property="og:url"]', 'property', 'og:url', canonical);
-    setMeta('meta[property="og:image"]', 'property', 'og:image', image);
+    setMeta('meta[property="og:image"]', 'property', 'og:image', effectiveImage);
     setMeta('meta[name="twitter:title"]', 'name', 'twitter:title', fullTitle);
-    setMeta('meta[name="twitter:description"]', 'name', 'twitter:description', description);
+    setMeta('meta[name="twitter:description"]', 'name', 'twitter:description', effectiveDescription);
+    setMeta('meta[name="twitter:image"]', 'name', 'twitter:image', effectiveImage);
     if (canonical) setLink('canonical', canonical);
     else document.head.querySelector('link[rel="canonical"]')?.remove();
 
@@ -60,7 +75,7 @@ export function Seo({ title, description, path = '/', image = '/og-image.png', n
       robots.name = 'robots';
       document.head.appendChild(robots);
     }
-    robots.content = noindex ? 'noindex, nofollow' : 'index, follow';
+    robots.content = effectiveNoindex ? 'noindex, nofollow' : 'index, follow';
 
     let script: HTMLScriptElement | null = null;
     if (jsonLdString) {
@@ -72,7 +87,7 @@ export function Seo({ title, description, path = '/', image = '/og-image.png', n
     return () => {
       if (script) script.remove();
     };
-  }, [fullTitle, description, canonical, image, noindex, jsonLdString]);
+  }, [fullTitle, effectiveDescription, canonical, effectiveImage, effectiveNoindex, jsonLdString]);
 
   return null;
 }
