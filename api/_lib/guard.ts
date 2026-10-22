@@ -1,9 +1,9 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import type { AiRuntimeConfig } from './config';
-import { publicAiHealth } from './config';
-import { verifyFirebaseToken } from './auth';
-import { checkAndConsume, hashClient, limitKey } from './rateLimit';
-import { clientIp, sendError } from './http';
+import type { AiRuntimeConfig } from './config.js';
+import { publicAiHealth } from './config.js';
+import { verifyFirebaseToken } from './auth.js';
+import { checkAndConsume, hashClient, limitKey } from './rateLimit.js';
+import { clientIp, sendError } from './http.js';
 
 export interface GuardResult {
   uid: string | null;

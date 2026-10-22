@@ -4,8 +4,8 @@ import {
   STYLE_LABELS,
   gradeLabel,
   subjectLabel,
-} from '../../shared/labels';
-import type { StudyToolId, TutorModeId } from '../../shared/constants';
+} from '../../shared/labels.js';
+import type { StudyToolId, TutorModeId } from '../../shared/constants.js';
 
 /** The core tutor behaviour required by the product specification. */
 export const TUTOR_SYSTEM_PROMPT = `You are Ujyalo Learn's friendly, patient, and accurate educational tutor.

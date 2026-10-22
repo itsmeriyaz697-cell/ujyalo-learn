@@ -4,7 +4,7 @@ import {
   QUESTION_TYPES,
   STUDY_TOOL_IDS,
   TUTOR_MODE_IDS,
-} from './constants';
+} from './constants.js';
 
 /** ─────────────────────  AI tutor requests  ───────────────────── */
 

@@ -1,4 +1,4 @@
-import type { AiRuntimeConfig } from './config';
+import type { AiRuntimeConfig } from './config.js';
 
 /**
  * OpenAI-compatible chat-completions adapter.

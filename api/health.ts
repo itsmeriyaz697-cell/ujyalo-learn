@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { readAiConfig } from './_lib/config';
-import { healthPayload } from './_lib/guard';
-import { handleOptions, methodNotAllowed, sendJson } from './_lib/http';
+import { readAiConfig } from './_lib/config.js';
+import { healthPayload } from './_lib/guard.js';
+import { handleOptions, methodNotAllowed, sendJson } from './_lib/http.js';
 
 /**
  * Public service health. Exposes only whether the AI provider is configured,

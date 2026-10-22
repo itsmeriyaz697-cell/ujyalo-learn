@@ -14,3 +14,4 @@ ujyalo-learn.zip
 # TypeScript incremental build info
 tsconfig.tsbuildinfo
 *.tsbuildinfo
+.env*

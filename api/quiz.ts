@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { readAiConfig } from './_lib/config';
-import { guardAiRequest } from './_lib/guard';
+import { readAiConfig } from './_lib/config.js';
+import { guardAiRequest } from './_lib/guard.js';
 import {
   BodyTooLargeError,
   InvalidBodyError,
@@ -9,11 +9,11 @@ import {
   readJsonBody,
   sendError,
   sendJson,
-} from './_lib/http';
-import { ProviderError, completeChat } from './_lib/provider';
-import { buildQuizUserPrompt } from './_lib/prompts';
-import { describeProviderError } from './tutor';
-import { extractJsonObject, formatZodError, quizRequestSchema, validateGeneratedQuiz } from '../shared/schemas';
+} from './_lib/http.js';
+import { ProviderError, completeChat } from './_lib/provider.js';
+import { buildQuizUserPrompt } from './_lib/prompts.js';
+import { describeProviderError } from './tutor.js';
+import { extractJsonObject, formatZodError, quizRequestSchema, validateGeneratedQuiz } from '../shared/schemas.js';
 
 export const config = { maxDuration: 60 };
 
