@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -18,6 +18,33 @@ export function AnalyticsConsent() {
   const [choice, setChoice] = useState<'granted' | 'denied' | null | 'hidden'>(() =>
     readConsent() === null ? null : 'hidden',
   );
+  const barRef = useRef<HTMLDivElement | null>(null);
+
+  // The bar is fixed to the bottom of the viewport. Without this, it covered
+  // the last row of whatever page was open — on a phone that was the
+  // onboarding "Continue" button, so a first-time visitor could not get past
+  // step one until they answered a question about analytics. Reserve the same
+  // height in the page so every control can scroll clear of it.
+  useEffect(() => {
+    if (choice !== null) return;
+    const bar = barRef.current;
+    if (!bar) return;
+
+    const apply = () => {
+      document.body.style.paddingBottom = `${bar.offsetHeight}px`;
+    };
+    apply();
+
+    const observer = new ResizeObserver(apply);
+    observer.observe(bar);
+    window.addEventListener('resize', apply);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', apply);
+      document.body.style.paddingBottom = '';
+    };
+  }, [choice]);
 
   if (choice === 'hidden') return null;
 
@@ -28,6 +55,7 @@ export function AnalyticsConsent() {
 
   return (
     <div
+      ref={barRef}
       className="fixed inset-x-0 bottom-0 z-50 border-t px-3 py-2.5 shadow-lift sm:px-4 sm:py-3"
       style={{ background: 'var(--surface)', borderColor: 'var(--border)', paddingBottom: 'max(0.625rem, env(safe-area-inset-bottom))' }}
       role="region"

@@ -68,7 +68,26 @@ const guestPage = await guestContext.newPage();
 await guestPage.goto(`${BASE}/login`, { waitUntil: 'domcontentloaded' });
 await guestPage.waitForSelector('form', { timeout: 30000 });
 
+// Regression guard: the consent bar used to cover the bottom of the page,
+// which on a phone made the primary button unclickable.
 const guestButton = guestPage.getByRole('button', { name: /try it without an account/i }).first();
+await guestButton.scrollIntoViewIfNeeded().catch(() => {});
+const clickable = await guestButton
+  .evaluate((node) => {
+    const box = node.getBoundingClientRect();
+    const top = document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2);
+    return Boolean(top && (top === node || node.contains(top)));
+  })
+  .catch(() => false);
+record('nothing covers the main button on a phone screen', clickable);
+
+// Answer the consent question the way a cautious visitor would.
+const consent = guestPage.getByRole('region', { name: /analytics choice/i });
+if (await consent.isVisible().catch(() => false)) {
+  await guestPage.getByRole('button', { name: /no thanks/i }).click();
+  await consent.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
+  record('declining analytics dismisses the bar', !(await consent.isVisible().catch(() => false)));
+}
 record('a guest entry point is offered on the live login page', await guestButton.isVisible().catch(() => false));
 
 await guestButton.click();
