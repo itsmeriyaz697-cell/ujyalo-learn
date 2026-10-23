@@ -1,5 +1,6 @@
 import type { AuthUser, AuthService } from './types';
 import { getFirebaseAuth } from '@/services/firebase/client';
+import { assertDatabaseReady } from '@/services/firebase/preflight';
 
 function toUser(user: { uid: string; email: string | null; displayName: string | null; photoURL: string | null; emailVerified: boolean }): AuthUser {
   return {
@@ -36,6 +37,9 @@ export const firebaseAuthService: AuthService = {
   },
 
   async signUp(email, password, displayName) {
+    // Before consuming the email address: if Firestore is still locked, every
+    // later step fails and the student is left with an account they cannot use.
+    await assertDatabaseReady();
     const auth = await getFirebaseAuth();
     const { createUserWithEmailAndPassword, updateProfile, sendEmailVerification } = await import('firebase/auth');
     const credential = await createUserWithEmailAndPassword(auth, email, password);
@@ -56,6 +60,8 @@ export const firebaseAuthService: AuthService = {
   },
 
   async signInWithGoogle() {
+    // A first-time Google sign-in also creates an account, so the same guard applies.
+    await assertDatabaseReady();
     const auth = await getFirebaseAuth();
     const { GoogleAuthProvider, signInWithPopup } = await import('firebase/auth');
     const provider = new GoogleAuthProvider();

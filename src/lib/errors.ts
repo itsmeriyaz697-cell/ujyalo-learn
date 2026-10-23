@@ -18,12 +18,20 @@ const AUTH_ERRORS: Record<string, string> = {
     'This email is already used with a different sign-in method. Log in with that method instead.',
   'auth/requires-recent-login': 'Please log in again before making this change.',
   'auth/invalid-api-key': 'Firebase is not configured correctly. Please contact the site owner.',
+  // Raised by the preflight probe before an account is ever created.
+  'app/database-not-ready':
+    'This site is not finished setting up its database yet, so accounts cannot be created. ' +
+    'Please try again later — no account was created.',
+  'app/database-unreachable': 'Could not reach the server. Check your internet connection and try again.',
 };
 
 export function friendlyAuthError(error: unknown): string {
   if (typeof error === 'string') return error;
   const code = (error as { code?: string })?.code;
   if (code && AUTH_ERRORS[code]) return AUTH_ERRORS[code];
+  // Errors we raised ourselves already carry a message written for students;
+  // replacing them with the generic fallback hides the only useful detail.
+  if (code?.startsWith('app/')) return (error as Error).message;
   return 'Something went wrong signing in. Please try again.';
 }
 
