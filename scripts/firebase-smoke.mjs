@@ -70,6 +70,33 @@ fs.writeFileSync(
   ].join('\n'),
 );
 
+// A local OpenAI-compatible mock so the tutor path can be exercised without a
+// real provider (and without spending tokens).
+const MOCK_PORT = 9098;
+const mockProvider = spawn('node', ['scripts/mock-provider.mjs', String(MOCK_PORT)], {
+  cwd: ROOT,
+  stdio: 'ignore',
+  detached: true,
+});
+
+// The dev API, pointed at the mock provider, so the tutor really answers and
+// the answer really goes to Firestore.
+const apiServer = spawn('npx', ['tsx', 'server/dev-api.ts'], {
+  cwd: ROOT,
+  stdio: 'ignore',
+  detached: true,
+  env: {
+    ...process.env,
+    DEV_API_PORT: '8787',
+    AI_API_KEY: 'mock-key',
+    AI_API_BASE_URL: `http://127.0.0.1:${MOCK_PORT}/v1`,
+    AI_MODEL: 'mock-model',
+    AI_ALLOWED_HOSTS: '127.0.0.1',
+    // The mock speaks plain http on localhost; production requires https.
+    AI_DEV_ALLOW_INSECURE: 'true',
+  },
+});
+
 const server = spawn(
   'npx',
   ['vite', '--mode', 'emulator', '--port', String(PORT), '--strictPort', '--host', '127.0.0.1'],
@@ -100,6 +127,16 @@ async function waitForPort(port, timeoutMs = 60000) {
 function cleanup() {
   try {
     process.kill(-server.pid, 'SIGKILL');
+  } catch {
+    // Already gone.
+  }
+  try {
+    process.kill(-mockProvider.pid, 'SIGKILL');
+  } catch {
+    // Already gone.
+  }
+  try {
+    process.kill(-apiServer.pid, 'SIGKILL');
   } catch {
     // Already gone.
   }
@@ -295,6 +332,62 @@ try {
         /learning paths|course/i.test(await page.locator('body').innerText()),
       );
     }
+  }
+
+  // ── The tutor actually saves its answer ─────────────────────────────────
+  // This is the regression for the live error "Unsupported field value:
+  // undefined (found in field notice …)": every ordinary reply has no notice,
+  // so the write failed and the history was lost. It only shows up against a
+  // real Firestore, which is why it belongs here and not in a unit test.
+  {
+    const context = await browser.newContext({ viewport: { width: 1360, height: 900 } });
+    const page = await context.newPage();
+    const pageErrors = [];
+    page.on('pageerror', (error) => pageErrors.push(error.message));
+
+    await page.goto(`${BASE}/signup`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(2500);
+    const email = `tutor.${stamp}@example.test`;
+    await page.locator('input[autocomplete="name"]').fill('Tutor Tester');
+    await page.locator('input[type="email"]').fill(email);
+    const passwords = page.locator('input[type="password"]');
+    for (let i = 0; i < (await passwords.count()); i += 1) await passwords.nth(i).fill('StudyHard123');
+    await page.locator('input[type="checkbox"]').first().check();
+    await page.locator('form button[type="submit"]').click();
+    await page.waitForURL('**/onboarding', { timeout: 30000 });
+
+    await page.getByRole('button', { name: /skip/i }).first().click();
+    await page.waitForURL('**/app', { timeout: 30000 });
+
+    await page.goto(`${BASE}/app/tutor`, { waitUntil: 'domcontentloaded' });
+    const box = page.locator('#tutor-input');
+    await box.waitFor({ timeout: 30000 });
+    await box.fill('What is a fraction?');
+    await box.press('Enter');
+
+    // The mock provider answers quickly; wait for the reply to land.
+    await page.waitForFunction(
+      () => !document.querySelector('[aria-busy="true"]') && document.body.innerText.includes('fraction'),
+      null,
+      { timeout: 60000 },
+    ).catch(() => {});
+    await page.waitForTimeout(3000);
+    const body = await page.locator('body').innerText();
+    check('the tutor answers in the app', /part of a whole|momo/i.test(body), body.slice(0, 80).replace(/\n/g, ' '));
+    check('no "unsupported field value" error reaches the student', !/unsupported field value/i.test(body));
+    check('saving the answer raised no page error', pageErrors.length === 0, pageErrors[0]?.slice(0, 120) ?? '');
+
+    // The real proof: it is in Firestore, not just on screen.
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(6000);
+    const afterReload = await page.locator('body').innerText();
+    check(
+      'the tutor answer survives a reload (it was written, not just rendered)',
+      /part of a whole|momo/i.test(afterReload),
+      afterReload.slice(0, 80).replace(/\n/g, ' '),
+    );
+
+    await context.close();
   }
 
   // ── The front door: no sign-up form between a visitor and the tutor ──────

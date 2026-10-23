@@ -254,16 +254,23 @@ export default function TutorPage() {
         flush();
         const finalText = result.text || accumulated;
 
-        await appendMessage({
-          id: assistantId,
-          conversationId: conversation.id,
-          ownerId: user.uid,
-          role: 'assistant',
-          content: finalText,
-          mode: conversation.mode,
-          createdAt: new Date().toISOString(),
-          notice: result.notice,
-        });
+        // The answer is on screen either way, so a failed write must not be
+        // reported as if the model had failed: say plainly that it was not
+        // saved, and keep the text so the student can copy it.
+        try {
+          await appendMessage({
+            id: assistantId,
+            conversationId: conversation.id,
+            ownerId: user.uid,
+            role: 'assistant',
+            content: finalText,
+            mode: conversation.mode,
+            createdAt: new Date().toISOString(),
+            notice: result.notice,
+          });
+        } catch {
+          setNotice('This answer could not be saved to your history. Copy anything you need before leaving the page.');
+        }
 
         setMessages((current) =>
           current.map((message) =>

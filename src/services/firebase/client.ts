@@ -85,7 +85,17 @@ export async function getFirebaseAuth(): Promise<Auth> {
 export async function getFirebaseDb(): Promise<Firestore> {
   if (!dbPromise) {
     dbPromise = Promise.all([getFirebaseApp(), import('firebase/firestore')]).then(([app, mod]) => {
-      const db = mod.getFirestore(app);
+      // `ignoreUndefinedProperties` is the SDK's own answer to the "Unsupported
+      // field value: undefined" error. Writes are already sanitised by
+      // data/sanitize.ts; this makes the guarantee hold for anything added
+      // later that forgets to call it.
+      let db;
+      try {
+        db = mod.initializeFirestore(app, { ignoreUndefinedProperties: true });
+      } catch {
+        // Already initialised (hot reload, or another module got there first).
+        db = mod.getFirestore(app);
+      }
       if (USE_EMULATOR) {
         mod.connectFirestoreEmulator(db, EMULATOR_HOST, 8080);
       }

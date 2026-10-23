@@ -11,6 +11,7 @@ import type {
   StudyTask,
 } from '@/types/domain';
 import { getFirebaseDb } from '@/services/firebase/client';
+import { toFirestore } from './sanitize';
 import type { DataStore } from './types';
 
 /**
@@ -41,7 +42,8 @@ async function readCollection<T>(uid: string, name: SubCollection, max = 300): P
 async function setDocData(uid: string, name: SubCollection, id: string, data: object) {
   const { doc, setDoc } = await firestore();
   const db = await getFirebaseDb();
-  await setDoc(doc(db, 'users', uid, name, id), data);
+  // Optional fields are frequently undefined; Firestore rejects those.
+  await setDoc(doc(db, 'users', uid, name, id), toFirestore(data));
 }
 
 async function deleteDocById(uid: string, name: SubCollection, id: string) {
@@ -64,7 +66,7 @@ export const firestoreStore: DataStore = {
   async saveProfile(profile) {
     const { setDoc, doc } = await firestore();
     const db = await getFirebaseDb();
-    await setDoc(doc(db, 'users', profile.uid), profile, { merge: true });
+    await setDoc(doc(db, 'users', profile.uid), toFirestore(profile), { merge: true });
   },
 
   async deleteUserData(uid) {
@@ -150,7 +152,10 @@ export const firestoreStore: DataStore = {
   async addMessage(message) {
     const { setDoc, doc } = await firestore();
     const db = await getFirebaseDb();
-    await setDoc(doc(db, 'users', message.ownerId, 'conversations', message.conversationId, 'messages', message.id), message);
+    await setDoc(
+      doc(db, 'users', message.ownerId, 'conversations', message.conversationId, 'messages', message.id),
+      toFirestore(message),
+    );
   },
 
   async listNotes(uid) {
