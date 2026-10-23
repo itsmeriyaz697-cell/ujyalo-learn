@@ -2,7 +2,7 @@
   "name": "ujyalo-learn",
   "private": true,
   "version": "1.0.0",
-  "description": "Ujyalo Learn \u2014 AI-powered learning and tutoring platform for students in Nepal (Grades 1\u201312 and SEE).",
+  "description": "Ujyalo Learn — AI-powered learning and tutoring platform for students in Nepal (Grades 1–12 and SEE).",
   "type": "module",
   "scripts": {
     "dev": "concurrently -k -n web,api -c cyan,magenta \"vite\" \"tsx server/dev-api.ts\"",
@@ -47,7 +47,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
-    "@eslint/js": "^10.0.1",
+    "@eslint/js": "^9.39.5",
     "@types/node": "^22.10.2",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
