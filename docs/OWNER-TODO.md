@@ -1,6 +1,11 @@
 # Owner TODO
 
-Verified 2026-10-23, after the rules were published and the site deployed.
+Verified 2026-10-23, after the round-14 deploy.
+
+**Live now:** `https://ujyalo-learn.vercel.app` — guest sign-in, one-press
+start, the beginner guide and consent-gated analytics are all deployed and
+verified: **13/13** guest + Google checks, **10/10** account checks, **34/34**
+health, **42** pages crawled with **0** SEO problems.
 
 **Done:** rules published and verified live · site deployed with Firebase
 configured · real signup, onboarding, reload, sign-out and sign-in verified

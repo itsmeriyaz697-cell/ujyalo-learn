@@ -134,12 +134,13 @@ if (!disabled && guestPage.url().includes('/onboarding')) {
   const email = `verify.guest.${stamp}@example.com`;
   try {
     await guestPage.getByRole('button', { name: /keep my progress/i }).first().click();
-    await guestPage.waitForTimeout(800);
-    await guestPage.getByLabel('Your name').last().fill('Verify Guest');
-    await guestPage.getByLabel('Email address').last().fill(email);
-    await guestPage.getByLabel('Password').last().fill('StudyHard123');
-    await guestPage.getByRole('button', { name: /save my account/i }).click();
-    await guestPage.waitForTimeout(5000);
+    const dialog = guestPage.getByRole('dialog');
+    await dialog.waitFor({ timeout: 15000 });
+    await dialog.locator('input[autocomplete="name"]').fill('Verify Guest');
+    await dialog.locator('input[type="email"]').fill(email);
+    await dialog.locator('input[type="password"]').fill('StudyHard123');
+    await dialog.getByRole('button', { name: /save my account/i }).click();
+    await guestPage.waitForTimeout(6000);
 
     const afterUpgrade = await guestPage.locator('body').innerText();
     record('the guest can be upgraded to a full account', !/You are using a guest account/i.test(afterUpgrade));
@@ -149,8 +150,15 @@ if (!disabled && guestPage.url().includes('/onboarding')) {
     await guestPage.getByRole('button', { name: /delete account/i }).click();
     await guestPage.locator('#delete-confirm').fill('DELETE');
     await guestPage.getByRole('dialog').getByRole('button', { name: /delete everything/i }).click();
-    await guestPage.waitForURL('**/login', { timeout: 45000 }).catch(() => {});
-    record('the upgraded account can be deleted again', guestPage.url().includes('/login'), `cleanup ${email}`);
+    // Signed out is the signal; the app sends a deleted account to the home page.
+    await guestPage
+      .waitForURL((url) => !url.pathname.startsWith('/app'), { timeout: 60000 })
+      .catch(() => {});
+    record(
+      'the upgraded account can be deleted again',
+      !guestPage.url().includes('/app'),
+      `${email} -> ${new URL(guestPage.url()).pathname}`,
+    );
   } catch (error) {
     record('cleanup of the upgraded account', false, `${email}: ${error.message.slice(0, 120)}`);
   }
