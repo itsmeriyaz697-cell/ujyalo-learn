@@ -46,13 +46,17 @@ record(
 record('no Content-Security-Policy violation on the login page', cspViolations.length === 0, cspViolations[0] ?? '');
 
 if (popup) {
-  // The popup URL matters: accounts.google.com means the SDK loaded; an error
-  // page on our own origin means the script was blocked or the provider is off.
+  // Firebase opens its own auth handler first, which then redirects to
+  // accounts.google.com. Either URL is healthy; what must NOT happen is an
+  // error page, which is what a blocked script or disabled provider produces.
   const url = popup.url();
+  const healthy = url.startsWith('https://accounts.google.com') || url.includes('/__/auth/handler');
+  record('the popup reaches Google sign-in (not an error page)', healthy, url.slice(0, 90));
+  const popupText = await popup.locator('body').innerText().catch(() => '');
   record(
-    'the popup is the real Google consent screen',
-    url.startsWith('https://accounts.google.com'),
-    url.slice(0, 90),
+    'the popup shows no auth error',
+    !/operation-not-allowed|not enabled|unauthorized domain|error/i.test(popupText),
+    popupText.slice(0, 120).replace(/\n/g, ' '),
   );
   await popup.close().catch(() => {});
 }

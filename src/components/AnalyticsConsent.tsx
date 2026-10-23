@@ -15,9 +15,7 @@ import { readConsent, setConsent } from '@/lib/analytics';
 export function AnalyticsConsent() {
   // Read once, on first render: the app is client-rendered, so this cannot
   // disagree with the HTML. `null` means "not decided yet" — show the bar.
-  const [choice, setChoice] = useState<'granted' | 'denied' | null | 'hidden'>(() =>
-    readConsent() === null ? null : 'hidden',
-  );
+  const [choice, setChoice] = useState<'granted' | 'denied' | null>(() => readConsent());
   const barRef = useRef<HTMLDivElement | null>(null);
 
   // The bar is fixed to the bottom of the viewport. Without this, it covered
@@ -46,7 +44,8 @@ export function AnalyticsConsent() {
     };
   }, [choice]);
 
-  if (choice === 'hidden') return null;
+  // Anything other than "not decided yet" means the visitor has answered.
+  if (choice !== null) return null;
 
   function decide(value: 'granted' | 'denied') {
     setConsent(value);
