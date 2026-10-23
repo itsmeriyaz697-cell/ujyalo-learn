@@ -1,67 +1,33 @@
 # Owner TODO
 
-Everything below needs your account. Nothing here can be done from the repo or
-by an agent — each item either requires your Google/Microsoft/GitHub login, or
-requires a decision only you can make.
+Verified 2026-10-23, after the rules were published and the site deployed.
 
-Verified 2026-10-23 against production and your live Firebase project.
+**Done:** rules published and verified live · site deployed with Firebase
+configured · real signup, onboarding, reload, sign-out and sign-in verified
+against production (10/10) · account deletion verified and fixed · favicon fixed
+· SEO audit 0 problems · health 34/34.
 
+**What is left needs your account, and it is now one step plus a button.**
 ---
 
-## A. Blocking — auth does not work until these are done (~5 minutes)
+## A. Blocking — the last step (~2 minutes)
 
-### A1. Publish the Firestore rules
+The library is empty, so `/courses` says it is being set up. Importing it needs
+an owner, and the first owner can only be created by hand.
 
-**Option 1 — console (30 seconds).** **Firestore Database → Rules** → select all
-→ paste the contents of `firestore.rules` → **Publish**.
+1. Sign up (or log in) on **https://ujyalo-learn.vercel.app**
+2. Open **https://ujyalo-learn.vercel.app/admin** — the page prints your account
+   ID with a **Copy** button, because you are not an owner yet
+3. In Firebase → **Firestore Database → Start collection** → collection id
+   `roles` → document id = the ID you copied → add field `role` (string) =
+   `owner` → save
+4. Reload **/admin** — the header now shows you as Owner, and a card offers
+   **Import starter library**
+5. Press it. It reports how many records were written.
 
-**Option 2 — from a terminal, no console.** Needs Node installed.
-
-```bash
-unzip ujyalo-learn.zip -d ujyalo-learn
-cd ujyalo-learn
-npx firebase-tools@latest login                          # opens a browser; approve it
-npx firebase-tools@latest deploy --only firestore:rules,firestore:indexes --project ujyalo-learn
-```
-
-The deploy prints `✔ Deploy complete!`. Rules deploys do not need Java — only
-the local emulator does.
-
-| If you see | It means |
-| --- | --- |
-| `Could not find a firestore.rules file` | you are not inside the unzipped folder |
-| `Failed to get Firebase project` | `login` did not finish, or a different Google account |
-| `403 The caller does not have permission` | that Google account does not own `ujyalo-learn` |
-| `command not found: npx` | install Node first, or use Option 1 |
-
-Until then every read and write returns `PERMISSION_DENIED`. Signup creates the
-account and then strands the student on onboarding with "your preferences could
-not be saved".
-
-- [ ] Published
-- Verify: `node scripts/check-firebase.mjs --live` should stop reporting a problem.
-
-### A2. Make yourself the owner
-Sign up on the site first, then **Firestore → Start collection → `roles`**:
-- Document ID: **your uid** (Authentication → Users)
-- Field: `role` (string) = `owner`
-
-There is deliberately no default admin password.
-
-- [ ] `roles/{your-uid}` exists with `role: "owner"`
-- Check: `/admin` header shows your email and "Owner".
-
-### A3. Import the starter library
-Open **`/admin`** → **Import starter library**. One click, no service-account
-key, writes 7 courses + 6 guides + site settings through your session.
-
-- [ ] Import reports 14 records written
-- Check: `/courses` lists them.
-
-**When A1–A3 are done, tell me. I deploy and verify signup → sign-out →
-sign-in on a second browser, which is the only way to prove accounts sync.**
-
----
+- [ ] Owner created
+- [ ] Library imported (expect 14 records)
+- [ ] `/courses` lists the 7 courses and 6 guides
 
 ## B. Do this week (~30 minutes)
 
@@ -161,23 +127,23 @@ and against Google's spam policy. It needs you, or teachers you work with.
 | Item | State |
 | --- | --- |
 | Firebase project + web app | created |
-| Email/Password sign-in | **enabled** (verified) |
+| Email/Password sign-in | enabled (verified) |
 | Authorized domains | `localhost`, `.firebaseapp.com`, `.web.app`, `.vercel.app` |
-| Google sign-in | appears enabled — the probe reached Google's token parser instead of being refused |
-| Six `VITE_FIREBASE_*` values | set in Vercel for Production + Preview |
-| `firestore.rules` | written, **72/72 emulator tests**, mutation-tested |
-| Seeding | now a button — no service-account key needed |
-| App in Firebase mode | **tested end to end, 15/15** against the emulator |
-| Site deployed | `ujyalo-learn.vercel.app`, health 34/34 |
-| SEO audit | 0 problems once the pending build ships |
-| Favicon | fixed, waiting on the deploy |
+| Six `VITE_FIREBASE_*` values | set in Vercel (Production + Preview) |
+| `firestore.rules` | **published and verified live**; 72/72 emulator tests, mutation-tested |
+| Site deployed with Firebase | `ujyalo-learn.vercel.app`, health 34/34 |
+| Real signup on production | verified 10/10, including delete-your-account |
+| Account deletion | was impossible (typing DELETE closed the dialog) — fixed |
+| Onboarding escape | a student could not sign out mid-setup — fixed |
+| Seeding | a button in `/admin`, no service-account key needed |
+| Favicon | fixed: `/favicon.ico` 404 was the cause of the generic globe |
+| SEO audit | 0 problems on the live site |
 
 ---
 
 ## Order that works
 
-1. **A1 → A2 → A3** (5 min) → tell me → I deploy and verify auth on the live site
-2. **B1** (2 min) → contact page stops saying it is unfinished
-3. **B2 → B3** (~20 min) → CI and monitoring actually exist
-4. **C1 → C2** (~20 min) → pages become eligible for indexing
-5. **D2** (weeks) → the only thing that produces durable traffic
+1. **A** (2 min) → owner + import → the site is complete and usable
+2. **B1** contact email, **B2** GitHub repo, **B3** monitoring
+3. **C** Search Console and Bing → pages become eligible for indexing
+4. **D** content → the only durable traffic source
