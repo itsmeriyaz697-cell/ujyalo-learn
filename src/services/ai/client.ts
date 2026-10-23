@@ -116,7 +116,7 @@ export async function sendTutorMessage(options: SendTutorOptions): Promise<Tutor
     let buffer = '';
     let text = '';
     let notice: string | undefined;
-    let authWarning = false;
+    const authWarning = false;
 
     try {
       for (;;) {

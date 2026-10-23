@@ -18,8 +18,12 @@
   --primary-contrast: #ffffff;
   --accent: #f7b733;
   --accent-soft: #fff4d6;
+  /* Readable accent text on --accent-soft: 4.88:1 (WCAG AA). */
+  --accent-text: color-mix(in srgb, #f7b733 55%, black);
   --success: #0e7a4f;
   --success-soft: #e2f6ec;
+  /* Text/icons placed ON --success. */
+  --success-contrast: #ffffff;
   --danger: #b42318;
   --danger-soft: #fee9e7;
   --ring: #2947d6;
@@ -40,8 +44,11 @@
   --primary-contrast: #081226;
   --accent: #ffd05a;
   --accent-soft: #3a2f12;
+  /* On a dark surface the accent text must go lighter, not darker. */
+  --accent-text: #ffd98f;
   --success: #6ee7b0;
   --success-soft: #0d2f26;
+  --success-contrast: #081226;
   --danger: #ffb4ab;
   --danger-soft: #3d1614;
   --ring: #8fb0ff;
@@ -246,10 +253,7 @@
   }
   .badge-gold {
     background: var(--accent-soft);
-    color: color-mix(in srgb, var(--accent) 70%, black);
-  }
-  .dark .badge-gold {
-    color: var(--accent);
+    color: var(--accent-text);
   }
   .badge-success {
     background: var(--success-soft);

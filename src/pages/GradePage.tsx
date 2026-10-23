@@ -19,9 +19,13 @@ export default function GradePage() {
   const { grade = '' } = useParams();
   const value = Number(grade);
 
+  // Hooks must run before any early return. When this sat below the guard,
+  // going from /grades/13 (not found) to /grades/10 changed the hook order on
+  // the same component instance and React threw.
+  const { publishedCourses: courses, loading } = useContent();
+
   if (!Number.isInteger(value) || value < 1 || value > 12) return <NotFoundPage />;
 
-  const { publishedCourses: courses, loading } = useContent();
   const relevant = courses.filter((course) => course.gradeMin <= value && course.gradeMax >= value);
 
   const stage =

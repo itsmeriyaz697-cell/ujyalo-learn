@@ -102,7 +102,7 @@ export function InlineAlert({
 }) {
   const styles = {
     info: { bg: 'var(--primary-soft)', fg: 'var(--primary)', border: 'color-mix(in srgb, var(--primary) 30%, transparent)' },
-    warning: { bg: 'var(--accent-soft)', fg: 'color-mix(in srgb, var(--accent) 72%, black)', border: 'color-mix(in srgb, var(--accent) 45%, transparent)' },
+    warning: { bg: 'var(--accent-soft)', fg: 'var(--accent-text)', border: 'color-mix(in srgb, var(--accent) 45%, transparent)' },
     success: { bg: 'var(--success-soft)', fg: 'var(--success)', border: 'color-mix(in srgb, var(--success) 30%, transparent)' },
     danger: { bg: 'var(--danger-soft)', fg: 'var(--danger)', border: 'color-mix(in srgb, var(--danger) 30%, transparent)' },
   }[tone];
@@ -115,7 +115,7 @@ export function InlineAlert({
     >
       <div className="min-w-0 flex-1">
         {title && <p className="font-semibold">{title}</p>}
-        {children && <div className="mt-0.5 leading-relaxed opacity-90">{children}</div>}
+        {children && <div className="mt-0.5 leading-relaxed">{children}</div>}
       </div>
       {action}
     </div>

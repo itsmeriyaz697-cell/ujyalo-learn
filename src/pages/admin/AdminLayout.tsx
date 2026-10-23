@@ -95,11 +95,11 @@ export default function AdminLayout() {
               className={({ isActive }) =>
                 cn(
                   'inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors',
-                  isActive ? 'text-white' : 'hover:bg-[var(--surface-2)]',
+                  isActive ? '' : 'hover:bg-[var(--surface-2)]',
                 )
               }
               style={({ isActive }: { isActive: boolean }) =>
-                isActive ? { background: 'var(--primary)' } : { color: 'var(--text-soft)' }
+                isActive ? { background: 'var(--primary)', color: 'var(--primary-contrast)' } : { color: 'var(--text-soft)' }
               }
             >
               <tab.icon className="h-3.5 w-3.5" aria-hidden="true" />

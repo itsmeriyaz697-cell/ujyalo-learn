@@ -210,7 +210,9 @@ export default function PlannerPage() {
           background: task.completed ? 'var(--success)' : 'transparent',
         }}
       >
-        {task.completed && <Check className="h-3.5 w-3.5 text-white" aria-hidden="true" />}
+        {task.completed && (
+          <Check className="h-3.5 w-3.5" style={{ color: 'var(--success-contrast)' }} aria-hidden="true" />
+        )}
       </button>
       <div className="min-w-0 flex-1">
         <p

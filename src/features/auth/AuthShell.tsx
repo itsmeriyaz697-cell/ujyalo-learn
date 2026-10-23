@@ -65,7 +65,7 @@ export function AuthShell({
           <p className="mt-1 text-sm text-muted">{subtitle}</p>
 
           {mode === 'local' && (
-            <div className="mt-4 flex items-start gap-2 rounded-xl border px-3 py-2.5 text-[12px] leading-relaxed" style={{ borderColor: 'color-mix(in srgb, var(--accent) 45%, transparent)', background: 'var(--accent-soft)', color: 'color-mix(in srgb, var(--accent) 70%, black)' }}>
+            <div className="mt-4 flex items-start gap-2 rounded-xl border px-3 py-2.5 text-[12px] leading-relaxed" style={{ borderColor: 'color-mix(in srgb, var(--accent) 45%, transparent)', background: 'var(--accent-soft)', color: 'var(--accent-text)' }}>
               <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
               <p>
                 <strong>Demo mode.</strong> Firebase is not configured, so accounts stay in this browser only and are not

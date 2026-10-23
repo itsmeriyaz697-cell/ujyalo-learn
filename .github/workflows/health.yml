@@ -1,0 +1,129 @@
+name: Production health
+
+# Runs while nobody is watching: every six hours, plus on demand.
+#
+# This is the "automated monitoring" layer. It does NOT need any paid service:
+# GitHub Actions is free for public repositories, and this job only reads the
+# public site. It fails loudly (a red run + an email from GitHub) when the site
+# or its SEO surface breaks.
+#
+# To get notifications beyond GitHub's own email, add a Slack/Discord webhook as
+# a repository secret and uncomment the notify step at the bottom.
+on:
+  schedule:
+    # Every 6 hours, offset from the hour to avoid the top-of-hour runner queue.
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/health-check.mjs'
+      - '.github/workflows/health.yml'
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  health:
+    name: Check the live site
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Health check
+        id: health
+        continue-on-error: true
+        run: node scripts/health-check.mjs --json > health.json
+
+      - name: Print the human-readable report
+        if: always()
+        run: node scripts/health-check.mjs || true
+
+      - name: Keep the report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: health-report-${{ github.run_number }}
+          path: health.json
+          retention-days: 30
+
+      # Open (or update) a single issue instead of failing silently. Deduplicated
+      # by title so a week of failures does not create seven issues.
+      - name: Raise an issue on failure
+        if: steps.health.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let report = {};
+            try { report = JSON.parse(fs.readFileSync('health.json', 'utf8')); } catch {}
+            const failed = (report.results || []).filter((r) => !r.ok && r.severity === 'critical');
+            const lines = failed.map((f) => `- **${f.name}** — ${f.detail}`);
+            const body = [
+              `Automated health check failed at ${new Date().toISOString()}.`,
+              '',
+              '### Failed checks',
+              ...(lines.length ? lines : ['- (no structured detail; see the workflow log)']),
+              '',
+              '### Suggested recovery',
+              '1. Open the failing URL in a browser to confirm.',
+              '2. Check the Vercel dashboard for a failed deployment.',
+              '3. If a deploy is at fault, roll back to the previous one (docs/DEPLOYMENT.md).',
+              '4. If `/api/health` reports `configured: false`, an environment variable was lost.',
+              '',
+              `Run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+            ].join('\n');
+
+            const title = 'Production health check failing';
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo, state: 'open', labels: 'monitoring',
+            });
+            const match = existing.data.find((i) => i.title === title);
+            if (match) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo, issue_number: match.number, body,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo, title, body, labels: ['monitoring'],
+              });
+            }
+
+      - name: Close the issue when healthy again
+        if: steps.health.outcome == 'success'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = 'Production health check failing';
+            const open = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo, state: 'open', labels: 'monitoring',
+            });
+            const match = open.data.find((i) => i.title === title);
+            if (match) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: match.number,
+                body: `Recovered at ${new Date().toISOString()}. Closing.`,
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner, repo: context.repo.repo, issue_number: match.number, state: 'closed',
+              });
+            }
+
+      - name: Fail the run if the site is unhealthy
+        if: steps.health.outcome == 'failure'
+        run: exit 1
+
+      # Optional: uncomment after adding a webhook secret.
+      # - name: Notify Slack
+      #   if: failure()
+      #   run: curl -sS -X POST -H 'Content-type: application/json' \
+      #        --data "{\"text\":\"Ujyalo Learn health check failed: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" \
+      #        "${{ secrets.SLACK_WEBHOOK_URL }}"

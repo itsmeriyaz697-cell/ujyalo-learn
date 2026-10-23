@@ -1,0 +1,162 @@
+name: CI
+
+# Runs on every push and pull request. A failing gate blocks the build, and
+# Vercel should be configured to only promote a deployment when this passes
+# (see docs/DEPLOYMENT.md).
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  static:
+    name: Lint, types and unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # npm ci installs exactly the lockfile, so CI cannot drift from review.
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Unit and integration tests
+        run: npm test
+
+      - name: Check no secrets are committed
+        run: npm run check:secrets
+
+  build:
+    name: Production build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: static
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci --no-audit --no-fund
+
+      # postbuild runs generate-seo.mjs and check-prerender.mjs, so this step
+      # fails if the sitemap, metadata, JSON-LD or prerendered HTML regress.
+      - name: Build
+        run: npm run build
+        env:
+          VITE_SITE_URL: https://ujyalo-learn.vercel.app
+
+      - name: Verify the client bundle carries no server secrets
+        run: npm run check:bundle
+
+      - name: Upload the build so the browser job can reuse it
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+          retention-days: 3
+
+  api:
+    name: API integration (mock provider)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: static
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      # Starts its own mock provider and dev API on free ports. No paid key needed.
+      - name: API smoke tests
+        run: npm run smoke:api
+
+  browser:
+    name: Browser end-to-end and accessibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      # The suite needs both the Vite app and the dev API.
+      - name: Start the app
+        run: |
+          npm run dev > /tmp/dev.log 2>&1 &
+          echo $! > /tmp/dev.pid
+          for i in $(seq 1 60); do
+            if curl -sf http://127.0.0.1:5173/ > /dev/null; then echo "app is up"; break; fi
+            sleep 2
+          done
+          curl -sf http://127.0.0.1:8787/api/health || (cat /tmp/dev.log; exit 1)
+
+      - name: Browser suite
+        run: npm run test:ui
+        env:
+          BASE_URL: http://127.0.0.1:5173
+
+      - name: Accessibility audit (WCAG 2.1 AA, light + dark + mobile)
+        run: npm run test:a11y
+        env:
+          BASE_URL: http://127.0.0.1:5173
+
+      - name: Stop the app
+        if: always()
+        run: kill "$(cat /tmp/dev.pid)" 2>/dev/null || true
+
+      - name: Upload failure screenshots and logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failure-artifacts
+          path: |
+            docs/screenshots
+            /tmp/dev.log
+          retention-days: 7
+
+  audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      # Fails on a critical vulnerability only. High and below are reported by
+      # the scheduled job, because a build-tool transitive advisory should not
+      # block a content fix.
+      - name: Audit for critical vulnerabilities
+        run: npm audit --audit-level=critical

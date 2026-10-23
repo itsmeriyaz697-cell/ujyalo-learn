@@ -24,6 +24,9 @@ export default function VerifyEmailPage() {
   const [sending, setSending] = useState(false);
   const [checking, setChecking] = useState(false);
   const [sentAt, setSentAt] = useState<number | null>(null);
+  // Drives the resend cooldown with a timer instead of reading Date.now() while
+  // rendering, so the button re-enables on its own after 60 seconds.
+  const [cooldownActive, setCooldownActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const verified = Boolean(user?.emailVerified);
@@ -34,6 +37,8 @@ export default function VerifyEmailPage() {
     try {
       await sendVerificationEmail();
       setSentAt(Date.now());
+      setCooldownActive(true);
+      window.setTimeout(() => setCooldownActive(false), 60_000);
       toast(`Verification email sent. Check the inbox for ${user?.email ?? 'your email address'}.`, 'success');
     } catch (caught) {
       setError((caught as Error).message);
@@ -157,7 +162,7 @@ export default function VerifyEmailPage() {
               variant="secondary"
               className="w-full"
               loading={sending}
-              disabled={sending || (sentAt !== null && Date.now() - sentAt < 60_000)}
+              disabled={sending || cooldownActive}
               onClick={() => void resend()}
             >
               <Send className="h-4 w-4" aria-hidden="true" />

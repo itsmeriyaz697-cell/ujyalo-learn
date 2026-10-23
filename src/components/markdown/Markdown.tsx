@@ -4,6 +4,7 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { cn } from '@/lib/utils';
+import { safeMarkdownUrl } from '@/lib/markdownUrl';
 
 interface MarkdownProps {
   content: string;
@@ -22,6 +23,9 @@ function MarkdownImpl({ content, className }: MarkdownProps) {
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[rehypeKatex]}
+        // Model output is untrusted text. react-markdown already strips
+        // javascript:/data:/vbscript: URLs; this allowlist is the second lock.
+        urlTransform={safeMarkdownUrl}
         components={{
           a: ({ href, children, ...props }) => (
             <a href={href} target="_blank" rel="noopener noreferrer" {...props}>

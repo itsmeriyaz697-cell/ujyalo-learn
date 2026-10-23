@@ -336,7 +336,7 @@ export default function DashboardPage() {
                         className="badge shrink-0"
                         style={{
                           background: attempt.percent >= 70 ? 'var(--success-soft)' : attempt.percent >= 40 ? 'var(--accent-soft)' : 'var(--danger-soft)',
-                          color: attempt.percent >= 70 ? 'var(--success)' : attempt.percent >= 40 ? 'color-mix(in srgb, var(--accent) 72%, black)' : 'var(--danger)',
+                          color: attempt.percent >= 70 ? 'var(--success)' : attempt.percent >= 40 ? 'var(--accent-text)' : 'var(--danger)',
                         }}
                       >
                         {attempt.score}/{attempt.total}

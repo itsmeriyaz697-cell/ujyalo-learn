@@ -456,7 +456,7 @@ export function HomePage() {
             <li key={step.title} className="card relative p-5">
               <span
                 className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-[13px] font-bold"
-                style={{ background: 'var(--accent-soft)', color: 'color-mix(in srgb, var(--accent) 75%, black)' }}
+                style={{ background: 'var(--accent-soft)', color: 'var(--accent-text)' }}
                 aria-hidden="true"
               >
                 {index + 1}

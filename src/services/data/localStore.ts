@@ -46,6 +46,7 @@ function write<T>(uid: string, name: CollectionName, rows: T[]) {
     if ((error as { name?: string }).name === 'QuotaExceededError') {
       throw new Error(
         'This browser’s storage is full. Delete some old conversations or notes, or connect Firebase for cloud storage.',
+        { cause: error },
       );
     }
     throw error;

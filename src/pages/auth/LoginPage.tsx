@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Eye, EyeOff, LogIn } from 'lucide-react';
 import { Seo } from '@/components/seo/Seo';
+import { safeRedirectPath } from '@/lib/safeRedirect';
 import { AuthShell } from '@/features/auth/AuthShell';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { Button } from '@/components/ui/Button';
@@ -20,10 +21,11 @@ export default function LoginPage() {
   const [googleLoading, setGoogleLoading] = useState(false);
 
   const [searchParams] = useSearchParams();
-  // Only same-origin paths are accepted, so ?next= cannot be used as an open redirect.
-  const requested = searchParams.get('next') ?? '';
-  const safeNext = requested.startsWith('/') && !requested.startsWith('//') ? requested : '';
-  const from = (location.state as { from?: string } | null)?.from ?? safeNext ?? '/app';
+  // Parsed, not pattern-matched: a prefix check alone lets /\\evil.com and
+  // /<tab>/evil.com through, because the browser normalises backslashes.
+  const safeNext = safeRedirectPath(searchParams.get('next'));
+  // `||`, not `??` — safeNext is an empty string when absent, and ?? would keep it.
+  const from = safeRedirectPath((location.state as { from?: string } | null)?.from) || safeNext || '/app';
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();

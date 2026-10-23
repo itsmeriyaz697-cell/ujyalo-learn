@@ -65,7 +65,7 @@ export default function AiTutorPage() {
               </span>
             </div>
             <div className="space-y-3 p-4 text-sm">
-              <p className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-sm px-3.5 py-2 text-white" style={{ background: 'var(--primary)' }}>
+              <p className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-sm px-3.5 py-2" style={{ background: 'var(--primary)', color: 'var(--primary-contrast)' }}>
                 Why does a negative times a negative give a positive?
               </p>
               <div className="max-w-[92%] rounded-2xl rounded-bl-sm px-3.5 py-2" style={{ background: 'var(--surface-2)' }}>

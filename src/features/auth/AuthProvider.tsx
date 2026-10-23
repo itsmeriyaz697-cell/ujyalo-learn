@@ -107,7 +107,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       return await authService.signUp(email, password, name);
     } catch (error) {
-      throw new Error(friendlyAuthError(error));
+      throw new Error(friendlyAuthError(error), { cause: error });
     }
   }, []);
 
@@ -115,7 +115,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       return await authService.signIn(email, password);
     } catch (error) {
-      throw new Error(friendlyAuthError(error));
+      throw new Error(friendlyAuthError(error), { cause: error });
     }
   }, []);
 
@@ -123,7 +123,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       return await authService.signInWithGoogle();
     } catch (error) {
-      throw new Error(friendlyAuthError(error));
+      throw new Error(friendlyAuthError(error), { cause: error });
     }
   }, []);
 
@@ -136,7 +136,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await authService.resetPassword(email);
     } catch (error) {
-      throw new Error(friendlyAuthError(error));
+      throw new Error(friendlyAuthError(error), { cause: error });
     }
   }, []);
 
@@ -144,7 +144,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await authService.sendVerificationEmail();
     } catch (error) {
-      throw new Error(friendlyAuthError(error));
+      throw new Error(friendlyAuthError(error), { cause: error });
     }
   }, []);
 

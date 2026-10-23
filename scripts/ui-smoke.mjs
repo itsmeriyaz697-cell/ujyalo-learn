@@ -193,6 +193,67 @@ await page.getByRole('button', { name: /Finish setup/i }).click();
 await page.waitForURL('**/app', { timeout: 15000 });
 check('onboarding finishes and opens the dashboard', page.url().endsWith('/app'));
 
+// ─── Open-redirect guard on ?next= ──────────────────────────────────────────
+// Regression guard for GHSA-wrjc-x8rr-h8h6 (React Router open redirect via a
+// backslash). The old guard was a string prefix check, so /\\evil.com and
+// /<tab>/evil.com passed it and resolved to another origin after login — a
+// phishing vector for a site used by children.
+{
+  // Sign out through the real UI. Do NOT clear localStorage: in demo mode that
+  // deletes the account itself, which would make every later login fail.
+  async function logOutViaUi() {
+    // The dashboard renders after the auth profile resolves, so wait for the
+    // control rather than assuming it is already there.
+    const menu = page.locator('[aria-label="Account menu"]').first();
+    await menu.waitFor({ state: 'visible', timeout: 10000 }).catch(() => {});
+    if (await menu.isVisible().catch(() => false)) {
+      await menu.click();
+      await page.waitForTimeout(400);
+      await page.getByRole('menuitem', { name: /log out/i }).first().click().catch(async () => {
+        await page.getByRole('button', { name: /^log out$/i }).first().click();
+      });
+      await page.waitForTimeout(1500);
+    }
+  }
+
+  async function loginWith(next) {
+    await visit(`/login${next === null ? '' : `?next=${encodeURIComponent(next)}`}`);
+    await page.getByLabel(/email/i).first().fill(email);
+    await page.getByLabel(/^password$/i).first().fill('StudyHard123');
+    await page.getByRole('button', { name: /^log in$|sign in/i }).first().click();
+    await page.waitForTimeout(2500);
+    return page.url();
+  }
+
+  // Start signed out: /login redirects an authenticated visitor to /app.
+  await visit('/app');
+  await logOutViaUi();
+
+  const escapes = [];
+  for (const attack of ['//evil.com', '/\\evil.com', '/\t/evil.com', 'https://evil.com']) {
+    const landed = await loginWith(attack);
+    if (!landed.startsWith(BASE)) escapes.push(`${JSON.stringify(attack)} -> ${landed}`);
+    await logOutViaUi();
+  }
+  check('?next= cannot be used as an open redirect', escapes.length === 0, escapes.join(' '));
+
+  // A blocked redirect must land somewhere real, not on a blank or stuck page.
+  const blockedLanding = await loginWith('//evil.com');
+  check(
+    'a blocked redirect still signs the student in',
+    new URL(blockedLanding).pathname === '/app' || new URL(blockedLanding).pathname.startsWith('/app'),
+    blockedLanding,
+  );
+  await logOutViaUi();
+
+  // And a legitimate ?next= must still be honoured, or the guard breaks login.
+  const legit = await loginWith('/app/quizzes');
+  check('a legitimate ?next= is still honoured', new URL(legit).pathname === '/app/quizzes', legit);
+
+  // Leave the session in the state the dashboard checks below expect.
+  await visit('/app');
+}
+
 // ─── Dashboard ──────────────────────────────────────────────────────────────
 await page.waitForSelector('h1');
 const dashText = await page.locator('body').innerText();

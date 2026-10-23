@@ -44,8 +44,22 @@ export default function QuizTakePage() {
   const [confirmSubmit, setConfirmSubmit] = useState(false);
   const [isRetry, setIsRetry] = useState(false);
   const [saving, setSaving] = useState(false);
-  const startRef = useRef(Date.now());
+  const startRef = useRef(0);
   const savedAttemptRef = useRef(false);
+  // Elapsed time lives in state and ticks, rather than being computed from
+  // Date.now() during render (impure, and it only moved when something else
+  // re-rendered, so the timer appeared frozen).
+  const [elapsedMinutes, setElapsedMinutes] = useState(0);
+
+  useEffect(() => {
+    // Set on mount: Date.now() in useRef() runs on every render, not just once.
+    if (startRef.current === 0) startRef.current = Date.now();
+    const tick = () =>
+      setElapsedMinutes(Math.max(1, Math.round((Date.now() - startRef.current) / 60000)));
+    tick();
+    const id = window.setInterval(tick, 30000);
+    return () => window.clearInterval(id);
+  }, []);
 
   useEffect(() => {
     if (!quizId) return;
@@ -313,7 +327,7 @@ export default function QuizTakePage() {
             icon={<CircleHelp className="h-4 w-4" />}
             action={
               <span className="badge badge-neutral inline-flex items-center gap-1">
-                <Clock className="h-3 w-3" aria-hidden="true" /> {formatMinutes(Math.max(1, Math.round((Date.now() - startRef.current) / 60000)))}
+                <Clock className="h-3 w-3" aria-hidden="true" /> {formatMinutes(elapsedMinutes)}
               </span>
             }
           />
