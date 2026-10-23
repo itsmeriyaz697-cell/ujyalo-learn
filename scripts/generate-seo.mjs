@@ -74,6 +74,7 @@ const GRADE_PAGES = Array.from({ length: 12 }, (_, index) => {
     description: `What to study in Grade ${grade} in Nepal: the subject list, published Ujyalo Learn courses that cover Grade ${grade}, and the study tools that help at this stage.`,
     priority: grade === 10 ? '0.9' : '0.6',
     changefreq: 'monthly',
+    grade,
   };
 });
 
@@ -97,6 +98,7 @@ const CONTENT_PAGES = [
       priority: '0.7',
       changefreq: 'monthly',
       kind: 'course',
+      course,
     })),
   ...CONTENT_SEED.resources
     .filter((resource) => resource.status === 'published')
@@ -113,6 +115,7 @@ const CONTENT_PAGES = [
       source: resource.source,
       license: resource.license,
       type: resource.type,
+      resource,
     })),
 ];
 
@@ -236,6 +239,144 @@ function renderBreadcrumbs(page) {
   return `<nav class="pr-cr" aria-label="Breadcrumb"><ol>${items}</ol></nav>`;
 }
 
+/**
+ * The skeleton used to stop at the H1 and one description line, which left
+ * every public page around 130 words — boilerplate plus a sentence. Search
+ * engines will render the app eventually, but AI crawlers (GPTBot, ClaudeBot,
+ * PerplexityBot, OAI-SearchBot) fetch HTML and never execute JavaScript, so for
+ * them the site had no content at all.
+ *
+ * These render the same material the app renders, from the same seed data, so
+ * the static copy cannot drift from what a visitor sees. Nothing here is
+ * hidden from people or absent from the app.
+ */
+const SUBJECT_NAMES = [
+  'Mathematics',
+  'Science',
+  'English',
+  'Nepali',
+  'Social Studies',
+  'Computer Science',
+  'Optional Mathematics',
+  'Health & Physical Education',
+  'Economics',
+];
+
+function renderCourseBody(course) {
+  if (!course) return '';
+  const outcomes = (course.outcomes ?? [])
+    .map((outcome) => `<li>${escapeHtml(outcome)}</li>`)
+    .join('');
+  const lessons = (course.lessons ?? [])
+    .map(
+      (lesson) =>
+        `<li><strong>${escapeHtml(lesson.title)}</strong>${
+          lesson.summary ? ` — ${escapeHtml(lesson.summary)}` : ''
+        }<span class="pr-meta"> · ${lesson.minutes} min · ${escapeHtml(lesson.action)}</span></li>`,
+    )
+    .join('');
+  const minutes = (course.lessons ?? []).reduce((sum, lesson) => sum + (lesson.minutes ?? 0), 0);
+
+  return `<section class="pr-s">
+      <h2>About this study path</h2>
+      <p>${escapeHtml(course.description ?? course.summary ?? '')}</p>
+      <p class="pr-meta">${(course.lessons ?? []).length} sessions · about ${minutes} minutes · ${
+        course.gradeMin === course.gradeMax
+          ? `Grade ${course.gradeMin}`
+          : `Grades ${course.gradeMin}–${course.gradeMax}`
+      }</p>
+      ${outcomes ? `<h2>What you will be able to do</h2><ul>${outcomes}</ul>` : ''}
+      ${lessons ? `<h2>Work through the sessions</h2><ol>${lessons}</ol>` : ''}
+      <p class="pr-meta">These sessions are a study plan written by Ujyalo Learn, not official curriculum material. Examinations are set by your school board, not by this site.</p>
+    </section>`;
+}
+
+function renderResourceBody(resource) {
+  if (!resource) return '';
+  const body = (resource.body ?? []).map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join('');
+  if (!body) return '';
+  return `<section class="pr-s">
+      <h2>The guide</h2>
+      ${body}
+      <p class="pr-meta">Source: ${escapeHtml(resource.source ?? 'Ujyalo Learn')} · Licence: ${escapeHtml(
+        resource.license ?? 'Ujyalo Learn original',
+      )}</p>
+    </section>`;
+}
+
+function renderGradeBody(grade) {
+  const courses = CONTENT_SEED.courses.filter(
+    (course) =>
+      course.status === 'published' &&
+      (course.gradeMin ?? 0) <= grade &&
+      (course.gradeMax ?? 12) >= grade,
+  );
+  const list = courses
+    .map(
+      (course) =>
+        `<li><a href="/courses/${course.slug}">${escapeHtml(course.title)}</a> — ${escapeHtml(
+          course.summary,
+        )}</li>`,
+    )
+    .join('');
+  const subjects = SUBJECT_NAMES.map((name) => `<li>${escapeHtml(name)}</li>`).join('');
+
+  return `<section class="pr-s">
+      <h2>Subjects at this level</h2>
+      <ul>${subjects}</ul>
+      <h2>Courses covering Grade ${grade}</h2>
+      ${
+        list
+          ? `<ul>${list}</ul>`
+          : `<p>No published course covers Grade ${grade} yet. The practice tools work for any subject you are studying.</p>`
+      }
+      <p class="pr-meta">Grade names follow the Nepali school system. This is a study aid, not an official syllabus.</p>
+    </section>`;
+}
+
+function renderLibraryBody(kind, heading) {
+  const items =
+    kind === 'courses'
+      ? CONTENT_SEED.courses.filter((course) => course.status === 'published').map((course) => ({
+          href: `/courses/${course.slug}`,
+          title: course.title,
+          description: course.summary,
+        }))
+      : CONTENT_SEED.resources.filter((resource) => resource.status === 'published').map((resource) => ({
+          href: `/resources/${resource.slug}`,
+          title: resource.title,
+          description: resource.description,
+        }));
+
+  if (!items.length) return '';
+  return `<section class="pr-s">
+      <h2>${escapeHtml(heading)}</h2>
+      <ul>${items
+        .map(
+          (item) =>
+            `<li><a href="${item.href}">${escapeHtml(item.title)}</a> — ${escapeHtml(item.description)}</li>`,
+        )
+        .join('')}</ul>
+    </section>`;
+}
+
+/**
+ * / and /faq carry FAQPage structured data. Google requires marked-up content
+ * to be visible on the page, so the questions must exist in the HTML itself —
+ * a JSON-LD block whose questions appear nowhere in the document is a policy
+ * mismatch, not just thin content.
+ */
+function renderFaqBody() {
+  const items = FAQ.map(
+    (entry) =>
+      `<h3>${escapeHtml(entry.q)}</h3><p>${escapeHtml(entry.a)}</p>`,
+  ).join('');
+  return `<section class="pr-s">
+      <h2>Questions students ask</h2>
+      ${items}
+    </section>`;
+}
+
 function renderStaticContent(page) {
   const h1 = page.h1 ?? page.title.split(' — ')[0];
   const updated =
@@ -268,6 +409,21 @@ function renderStaticContent(page) {
     <p class="pr-l">${escapeHtml(page.description)}</p>
     ${updated}
     <p class="pr-a"><a href="/signup">Create a free account</a><a href="/ai-tutor">See how the tutor works</a></p>
+    ${
+      page.kind === 'course'
+        ? renderCourseBody(page.course)
+        : page.kind === 'resource'
+          ? renderResourceBody(page.resource)
+          : page.kind === 'grade'
+            ? renderGradeBody(page.grade)
+            : page.path === '/courses'
+              ? renderLibraryBody('courses', 'Learning paths in the library')
+              : page.path === '/resources'
+                ? renderLibraryBody('resources', 'Guides in the library')
+                : page.path === '/' || page.path === '/faq'
+                  ? renderFaqBody()
+                  : ''
+    }
   </main>
   <footer class="pr-f">
     <div class="pr-c">

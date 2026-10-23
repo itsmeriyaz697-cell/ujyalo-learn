@@ -50,7 +50,7 @@
     },
     {
       "path": "/contact",
-      "title": "Contact Ujyalo Learn",
+      "title": "Contact Ujyalo Learn — support, feedback and corrections",
       "description": "Reach the Ujyalo Learn team about support questions, privacy requests, reported content or account deletion.",
       "priority": "0.5",
       "changefreq": "yearly",
@@ -66,7 +66,7 @@
     },
     {
       "path": "/terms",
-      "title": "Terms of Service",
+      "title": "Terms of Service — the rules for using Ujyalo Learn",
       "description": "The rules for using Ujyalo Learn, including acceptable use, AI limitations, accounts for minors and parental consent.",
       "priority": "0.4",
       "changefreq": "yearly",
@@ -114,7 +114,7 @@
     },
     {
       "path": "/accessibility",
-      "title": "Accessibility statement",
+      "title": "Accessibility statement — how Ujyalo Learn meets WCAG 2.1 AA",
       "description": "How Ujyalo Learn approaches keyboard access, contrast, reduced motion, small screens and language, plus the limitations we know about.",
       "priority": "0.4",
       "changefreq": "yearly",
