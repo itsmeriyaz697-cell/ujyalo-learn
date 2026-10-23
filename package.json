@@ -16,13 +16,14 @@
     "check:secrets": "node scripts/check-secrets.mjs",
     "check:bundle": "node scripts/check-bundle.mjs",
     "icons": "node scripts/generate-icons.mjs",
-    "postbuild": "node scripts/generate-seo.mjs",
+    "postbuild": "node scripts/generate-seo.mjs && node scripts/check-prerender.mjs",
     "smoke:api": "node scripts/smoke-api.mjs",
     "mock:provider": "node scripts/mock-provider.mjs",
     "test:ui": "node scripts/ui-smoke.mjs",
     "test:ai": "node scripts/ai-smoke.mjs",
     "submit:bing": "node scripts/submit-urls.mjs --submit",
-    "urls:print": "node scripts/submit-urls.mjs"
+    "urls:print": "node scripts/submit-urls.mjs",
+    "check:prerender": "node scripts/check-prerender.mjs"
   },
   "dependencies": {
     "firebase": "^11.10.0",

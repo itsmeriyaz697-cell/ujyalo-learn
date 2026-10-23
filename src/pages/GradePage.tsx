@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom';
 import { ArrowRight, BookOpen, GraduationCap } from 'lucide-react';
 import { Seo } from '@/components/seo/Seo';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Section } from '@/components/marketing/Section';
 import { Button } from '@/components/ui/Button';
 import { useContent } from '@/features/content/ContentProvider';
@@ -35,6 +36,14 @@ export default function GradePage() {
       />
 
       <Section className="!pb-8">
+        <Breadcrumbs
+          className="mb-3"
+          items={[
+            { href: '/', label: 'Home' },
+            { href: '/subjects', label: 'Subjects' },
+            { label: `Grade ${value}` },
+          ]}
+        />
         <p className="eyebrow">Grade {value}</p>
         <h1 className="section-title mt-2">Grade {value} study hub</h1>
         <p className="mt-4 max-w-3xl text-[15px] leading-relaxed text-soft sm:text-base">

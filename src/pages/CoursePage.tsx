@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import {
-  ArrowLeft,
   ArrowRight,
   BookOpen,
   CheckCircle2,
@@ -12,6 +11,7 @@ import {
   Target,
 } from 'lucide-react';
 import { Seo } from '@/components/seo/Seo';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Section } from '@/components/marketing/Section';
 import { Button } from '@/components/ui/Button';
 import { useContent, contentStore } from '@/features/content/ContentProvider';
@@ -92,9 +92,13 @@ export default function CoursePage() {
       <Seo title={`${course.title} — Ujyalo Learn`} description={course.summary} path={`/courses/${course.slug}`} />
 
       <Section className="!pb-8">
-        <Link to="/courses" className="inline-flex items-center gap-1.5 text-sm font-medium" style={{ color: 'var(--muted)' }}>
-          <ArrowLeft className="h-4 w-4" aria-hidden="true" /> All courses
-        </Link>
+        <Breadcrumbs
+          items={[
+            { href: '/', label: 'Home' },
+            { href: '/courses', label: 'Courses' },
+            { label: course.title },
+          ]}
+        />
 
         <div className="mt-5 grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
           <div>

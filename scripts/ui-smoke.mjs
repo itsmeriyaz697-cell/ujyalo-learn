@@ -376,6 +376,45 @@ const themeAfter = await page.evaluate(() => document.documentElement.classList.
 check('theme toggle switches theme', themeBefore !== themeAfter, `${themeBefore} → ${themeAfter}`);
 await shot('12-settings-dark', false);
 
+// ─── Crawler view (JavaScript disabled) ────────────────────────────────────
+// Prerendering is a build artifact, so the dev server cannot be checked for it.
+{
+  // Decide from the served HTML, not from the hostname: `vite` sends an empty
+  // #root (prerendering happens at build time), while a build, a preview and
+  // production all send the prerendered skeleton.
+  const probe = await page.request.get(`${BASE}/`);
+  const probeHtml = await probe.text();
+  const prerendered = /<div id="root">\s*<\w/.test(probeHtml);
+  if (!prerendered) {
+    console.log('· skipping the no-JavaScript crawler checks: this server does not serve prerendered HTML (run against a build or production)');
+  } else {
+    const noJs = await browser.newContext({ javaScriptEnabled: false });
+    const crawler = await noJs.newPage();
+    const gaps = [];
+    for (const route of ['/', '/courses', '/resources/how-to-use-active-recall']) {
+      await crawler.goto(`${BASE}${route}`, { waitUntil: 'domcontentloaded' });
+      const seen = await crawler.evaluate(() => ({
+        h1: document.querySelectorAll('h1').length,
+        heading: document.querySelector('h1')?.textContent?.trim() ?? '',
+        footer: document.querySelectorAll('footer a').length,
+        privacy: !!document.querySelector('footer a[href="/privacy"]'),
+        contact: !!document.querySelector('footer a[href="/contact"]'),
+        cta: !!document.querySelector('.pr-a a, a[href="/signup"]'),
+        crumb: !!document.querySelector('nav[aria-label="Breadcrumb"]'),
+      }));
+      if (seen.h1 !== 1) gaps.push(`${route}: h1=${seen.h1}`);
+      if (!seen.heading) gaps.push(`${route}: empty h1`);
+      if (seen.footer < 8) gaps.push(`${route}: footer links=${seen.footer}`);
+      if (!seen.privacy) gaps.push(`${route}: no privacy link`);
+      if (!seen.contact) gaps.push(`${route}: no contact link`);
+      if (!seen.cta) gaps.push(`${route}: no call to action`);
+      if (route !== '/' && !seen.crumb) gaps.push(`${route}: no breadcrumb`);
+    }
+    check('a crawler without JavaScript still sees real page content', gaps.length === 0, gaps.join(' '));
+    await noJs.close();
+  }
+}
+
 // ─── Header navigation across breakpoints ──────────────────────────────────
 // Regression guard: the desktop nav used to appear at lg while the hamburger
 // disappeared at md, leaving 768-1023px with no route to Courses/Resources/SEE.

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, ArrowUpRight, CalendarDays, FileText, ShieldCheck } from 'lucide-react';
+import { ArrowUpRight, CalendarDays, FileText, ShieldCheck } from 'lucide-react';
 import { Seo } from '@/components/seo/Seo';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Section } from '@/components/marketing/Section';
 import { Button } from '@/components/ui/Button';
 import { contentStore, useContent } from '@/features/content/ContentProvider';
@@ -62,9 +63,13 @@ export default function ResourcePage() {
       />
 
       <Section className="!pb-6">
-        <Link to="/resources" className="inline-flex items-center gap-1.5 text-sm font-medium" style={{ color: 'var(--muted)' }}>
-          <ArrowLeft className="h-4 w-4" aria-hidden="true" /> All resources
-        </Link>
+        <Breadcrumbs
+          items={[
+            { href: '/', label: 'Home' },
+            { href: '/resources', label: 'Resources' },
+            { label: resource.title },
+          ]}
+        />
 
         <article className="mt-5 max-w-3xl">
           <div className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--muted)' }}>
