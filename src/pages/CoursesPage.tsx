@@ -21,7 +21,7 @@ const inBand = (course: Course, band: GradeBand) => {
 const totalMinutes = (course: Course) => course.lessons.reduce((sum, lesson) => sum + lesson.minutes, 0);
 
 export default function CoursesPage() {
-  const { publishedCourses: courses, loading, error } = useContent();
+  const { publishedCourses: courses, loading, error, reload } = useContent();
   const [query, setQuery] = useState('');
   const [subject, setSubject] = useState<string>('all');
   const [band, setBand] = useState<GradeBand | 'all'>('all');
@@ -137,6 +137,24 @@ export default function CoursesPage() {
               <div key={key} className="card h-56 animate-pulse p-5" style={{ background: 'var(--surface-2)' }} />
             ))}
             <span className="sr-only">Loading courses…</span>
+          </div>
+        ) : courses.length === 0 && error ? (
+          // A failed load is not an empty library. Saying "no course matches
+          // those filters" when the database refused the read sends students
+          // looking for a filter to clear that does not exist.
+          <div className="card mx-auto max-w-xl p-8 text-center">
+            <h2 className="mt-3 text-lg font-semibold">The library could not be loaded</h2>
+            <p className="mt-2 text-sm text-soft">
+              This is a problem at our end, not yours. The study tools below still work while we fix it.
+            </p>
+            <div className="mt-5 flex flex-wrap justify-center gap-2">
+              <Button variant="secondary" onClick={() => void reload()}>
+                Try again
+              </Button>
+              <Button asChild variant="ghost">
+                <Link to="/ai-tutor">Open the AI tutor</Link>
+              </Button>
+            </div>
           </div>
         ) : filtered.length === 0 ? (
           <div className="card mx-auto max-w-xl p-8 text-center">
