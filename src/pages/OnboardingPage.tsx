@@ -23,7 +23,7 @@ const TOTAL_STEPS = 7;
 const DRAFT_KEY = 'ujyalo:onboarding-draft';
 
 export default function OnboardingPage() {
-  const { user, profile, savePreferences, mode } = useAuth();
+  const { user, profile, savePreferences, signOut, mode } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
@@ -114,13 +114,21 @@ export default function OnboardingPage() {
         <div className="mx-auto w-full max-w-2xl">
           <div className="flex items-center justify-between">
             <Logo size={34} />
-            <button
-              type="button"
-              className="text-xs font-medium text-muted underline"
-              onClick={() => navigate('/')}
-            >
-              Save and exit
-            </button>
+            <div className="flex items-center gap-4">
+              {/* Without this, a student who lands here mid-setup is trapped:
+                  every /app route redirects back, and sign-out lives inside the
+                  app shell they cannot reach. */}
+              <button type="button" className="text-xs font-medium text-muted underline" onClick={() => void signOut()}>
+                Sign out
+              </button>
+              <button
+                type="button"
+                className="text-xs font-medium text-muted underline"
+                onClick={() => navigate('/')}
+              >
+                Save and exit
+              </button>
+            </div>
           </div>
 
           <div className="mt-6">
