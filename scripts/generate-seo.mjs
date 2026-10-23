@@ -517,7 +517,7 @@ function renderStaticContent(page) {
       ${isHome && secondLine ? `<h1>${escapeHtml(firstLine)}<br><span class="hl pr-ul">${escapeHtml(secondLine)}</span></h1>` : `<h1>${headline}</h1>`}
       <p class="pr-lead">${HERO_LEAD}</p>
       <div class="pr-cta">
-        <a class="pr-btn pr-btn-p" href="/signup">Start learning free</a>
+        <a class="pr-btn pr-btn-p" href="/app">Start learning free</a>
         <a class="pr-btn pr-btn-s" href="/features">Explore features</a>
       </div>
       <ul class="pr-trust">
@@ -548,7 +548,7 @@ function renderStaticContent(page) {
       <p class="pr-lead">${escapeHtml(page.description)}</p>
       ${updated}
       <div class="pr-cta">
-        <a class="pr-btn pr-btn-p" href="/signup">Start learning free</a>
+        <a class="pr-btn pr-btn-p" href="/app">Start learning free</a>
         <a class="pr-btn pr-btn-s" href="/ai-tutor">See how the tutor works</a>
       </div>
     </div>
