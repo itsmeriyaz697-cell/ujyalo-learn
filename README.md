@@ -305,6 +305,7 @@ Vercel → Project → Domains → add your domain, then:
 - [ ] `Content-Security-Policy` present; no CSP violations in the browser console
 - [ ] `/googlec3d881d4bf552040.html` returns 200 with the verification line ([docs/SEO.md](docs/SEO.md))
 - [ ] `sitemap.xml` lists only public URLs; an unknown URL returns 404
+- [ ] `npm run check:prerender` passes; `/llms.txt` is reachable
 - [ ] Lighthouse pass on mobile (see Testing)
 
 ---
@@ -463,8 +464,9 @@ curl -s https://your-domain/sitemap.xml | grep -c '<url>'
 | --- | --- | --- |
 | Unit / integration logic | `npm test` | **100 / 100** |
 | API integration (real handlers + mock provider) | `npm run smoke:api` | **20 / 20** |
-| Browser UI, demo mode, mobile, a11y, library and admin | `npm run test:ui` (needs Playwright) | **67 / 67** |
+| Browser UI, demo mode, mobile, a11y, library and admin | `npm run test:ui` (needs Playwright) | **69 / 69** |
 | Browser UI with AI enabled (mock provider) | `npm run test:ai` (needs Playwright) | **18 / 18** |
+| Prerendered HTML, as a JS-less crawler sees it | `npm run check:prerender` (runs in the build) | **41 / 41 routes** |
 
 `test:ui` expects the AI to be **unconfigured** (it asserts the honest “AI not configured” state), while `test:ai` expects the dev server to point at `scripts/mock-provider.mjs`. Run them against separate servers — that is why `docs/TESTING.md` lists them as two setups.
 

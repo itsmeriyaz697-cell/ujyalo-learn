@@ -230,3 +230,45 @@ own DNS — the CDN is already there either way.
 | "JavaScript required" | True for the app, but all 41 public routes ship real prerendered HTML |
 | "Could not verify sitemap/robots/privacy" | Limits of the tool, not the site — all return 200 |
 | "Add security headers" | Six are set; CSP was missing and is now added |
+
+---
+
+## 6. Prerendering, and why the audits were wrong about it
+
+The site is a React SPA, but every public route is also written as a static HTML
+file at build time. Until recently that static file contained only head tags and
+an empty `<div id="root">`, so any crawler that does not execute JavaScript —
+including the ones GPTBot, ClaudeBot and PerplexityBot use — saw almost nothing.
+
+That is why automated audits reported "missing H1", "no footer", "no privacy
+policy link", "no breadcrumb", "no call to action" and "low semantic HTML". None
+of those were true in a browser; all of them were true of the HTML.
+
+Each route now ships a **visible** content skeleton inside `#root`:
+
+- the same `<h1>` the app renders (taken from `shared/seo-pages.json`);
+- the meta description as a direct answer paragraph;
+- breadcrumb navigation, matching the BreadcrumbList JSON-LD;
+- a real `<header>`, `<main>` and `<footer>` with 15 site links;
+- a call to action to `/signup` and `/ai-tutor`;
+- `<time>` and licence for study guides.
+
+React replaces the skeleton on mount, so nothing here is hidden from readers and
+nothing is missing from the app. It is a preview, not a second version of the page.
+
+### Guardrails
+
+| Check | Catches |
+| --- | --- |
+| `npm run check:prerender` (runs on every build) | Any route whose static HTML loses its H1, breadcrumb, footer, privacy/contact links, CTA, JSON-LD `@type`, or has a description over 160 characters |
+| `npm run test:ui` → "crawler without JavaScript" | The same, read through a real browser with JS disabled |
+| `check-prerender.mjs` → llms.txt | Links to pages that are not in the sitemap |
+
+### Limits worth knowing
+
+- The skeleton is a summary. Real educational depth (lesson bodies, guide text)
+  is rendered by React and is not in the static HTML.
+- Study guides and courses published later through `/admin` are served by the SPA
+  and are **not** prerendered until the next deploy that includes them in
+  `shared/content-seed.json`. Their titles and descriptions still come from
+  Firebase at runtime for people.
