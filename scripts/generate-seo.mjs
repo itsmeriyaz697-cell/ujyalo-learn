@@ -152,6 +152,10 @@ const escapeHtml = (value) =>
  * React replaces it on load, so it is a preview of the page, not a substitute:
  * no content here is hidden from people, and none of it is absent from the app.
  */
+const GETTING_STARTED = JSON.parse(
+  fs.readFileSync(path.resolve(process.cwd(), 'shared/getting-started.json'), 'utf8'),
+);
+
 const SITE_NAV = [
   ['/courses', 'Courses'],
   ['/subjects', 'Subjects'],
@@ -443,6 +447,36 @@ function renderFaqBody() {
     </section>`;
 }
 
+/**
+ * The beginner guide lives in shared/getting-started.json so the page React
+ * renders and the HTML a crawler reads are the same words. Without this the
+ * route would prerender as a single sentence.
+ */
+function renderGuideBody() {
+  const escape = escapeHtml;
+  const sections = GETTING_STARTED.sections
+    .map((section) => {
+      const paragraphs = (section.paragraphs ?? []).map((text) => `<p>${escape(text)}</p>`).join('');
+      const bullets = section.bullets
+        ? `<ul>${section.bullets.map((item) => `<li>${escape(item)}</li>`).join('')}</ul>`
+        : '';
+      const steps = section.steps
+        ? `<ol>${section.steps
+            .map((step) => `<li><strong>${escape(step.title)}</strong> — ${escape(step.body)}</li>`)
+            .join('')}</ol>`
+        : '';
+      const items = section.items
+        ? section.items
+            .map((item) => `<h3>${escape(item.question)}</h3><p>${escape(item.answer)}</p>`)
+            .join('')
+        : '';
+      return `<section class="pr-s"><h2>${escape(section.heading)}</h2>${paragraphs}${bullets}${steps}${items}</section>`;
+    })
+    .join('\n');
+
+  return `<section class="pr-s"><p>${escape(GETTING_STARTED.intro)}</p></section>\n${sections}`;
+}
+
 function renderStaticContent(page) {
   const h1 = page.h1 ?? page.title.split(' — ')[0];
   const updated =
@@ -556,7 +590,9 @@ function renderStaticContent(page) {
                 ? renderLibraryBody('resources', 'Guides in the library')
                 : page.path === '/' || page.path === '/faq'
                   ? renderFaqBody()
-                  : ''
+                  : page.path === '/getting-started'
+                    ? renderGuideBody()
+                    : ''
     }
     </div>
   </main>

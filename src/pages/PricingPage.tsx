@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { InlineAlert } from '@/components/ui/Feedback';
 import { PRICING_TIERS } from '@/config/curriculum';
 import { cn } from '@/lib/utils';
+import { StartLearningButton } from '@/components/StartLearningButton';
 
 export default function PricingPage() {
   return (
@@ -65,9 +66,7 @@ export default function PricingPage() {
               </p>
               <div className="mt-4">
                 {tier.available ? (
-                  <Button asChild fullWidth>
-                    <Link to="/signup">Start Learning Free</Link>
-                  </Button>
+                  <StartLearningButton fullWidth>Start Learning Free</StartLearningButton>
                 ) : (
                   <Button asChild variant="secondary" fullWidth>
                     <Link to={tier.id === 'school' ? '/contact' : '/help'}>{tier.cta}</Link>

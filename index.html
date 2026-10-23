@@ -35,6 +35,10 @@
     <!-- External, not inline, so the CSP can forbid inline scripts. Must stay
          blocking and before the body to avoid a flash of the wrong theme. -->
     <script src="/theme-boot.js"></script>
+    <!-- Google Analytics. Loads nothing until the visitor accepts analytics,
+         and lives in its own file so the CSP can forbid inline scripts. -->
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+    <script defer src="/analytics.js"></script>
   </head>
   <body>
     <div id="root"></div>

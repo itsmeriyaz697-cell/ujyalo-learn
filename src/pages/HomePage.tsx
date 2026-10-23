@@ -26,6 +26,7 @@ import { HeroVisual } from '@/components/marketing/HeroVisual';
 import { Button } from '@/components/ui/Button';
 import { SITE, SUBJECTS, TUTOR_MODES } from '@/config/curriculum';
 import { GRADE_LEVELS } from '@/lib/grades';
+import { StartLearningButton } from '@/components/StartLearningButton';
 
 const FAQ_ITEMS = [
   {
@@ -182,16 +183,21 @@ export function HomePage() {
             </p>
 
             <div className="mt-7 flex flex-col gap-2.5 sm:flex-row">
-              <Button asChild size="lg">
-                <Link to="/signup">
-                  Start learning free
-                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </Link>
-              </Button>
+              <StartLearningButton size="lg" iconRight={<ArrowRight className="h-4 w-4" aria-hidden="true" />}>
+                Start learning free
+              </StartLearningButton>
               <Button asChild variant="secondary" size="lg">
                 <Link to="/features">Explore features</Link>
               </Button>
             </div>
+
+            <p className="mt-4 text-[13px]" style={{ color: 'var(--muted)' }}>
+              New to AI tutors?{' '}
+              <Link to="/getting-started" className="font-medium underline" style={{ color: 'var(--primary)' }}>
+                Read the two-minute guide
+              </Link>
+              .
+            </p>
 
             <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-[13px]" style={{ color: 'var(--muted)' }}>
               {['No credit card', 'English & Nepali', 'Private by default'].map((item) => (
@@ -399,12 +405,9 @@ export function HomePage() {
               One screen shows your streak, quiz average, today’s plan, subject-by-subject progress and the notes you
               saved. Every number is calculated from records you created — nothing is estimated or invented.
             </p>
-            <Button asChild variant="secondary" className="mt-4">
-              <Link to="/signup">
-                Get started free
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
-            </Button>
+            <StartLearningButton variant="secondary" className="mt-4" iconRight={<ArrowRight className="h-4 w-4" aria-hidden="true" />}>
+              Get started free
+            </StartLearningButton>
           </div>
         </div>
       </Section>
@@ -656,9 +659,9 @@ export function HomePage() {
             Create a free account, choose your grade and subjects, and ask your first question in under a minute.
           </p>
           <div className="relative mt-6 flex flex-col items-center justify-center gap-2.5 sm:flex-row">
-            <Button asChild variant="accent" size="lg">
-              <Link to="/signup">Start learning free</Link>
-            </Button>
+            <StartLearningButton variant="accent" size="lg">
+              Start learning free
+            </StartLearningButton>
             <Button asChild variant="ghost" size="lg" className="!text-white hover:!bg-white/10">
               <Link to="/help">See how it works</Link>
             </Button>

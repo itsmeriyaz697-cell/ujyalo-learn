@@ -118,6 +118,27 @@ function walk(dir, files = []) {
   return files;
 }
 
+/**
+ * Firebase's web apiKey is a public identifier (it ships in every Firebase web
+ * app and is protected by rules plus authorised domains), so it is not a leak.
+ * Only the exact configured value is exempt; any other Google key still fails.
+ */
+function configuredFirebaseWebKey() {
+  if (process.env.VITE_FIREBASE_API_KEY) return process.env.VITE_FIREBASE_API_KEY;
+  for (const file of ['.env.local', '.env.production', '.env']) {
+    try {
+      const text = fs.readFileSync(path.join(ROOT, file), 'utf8');
+      const match = /^VITE_FIREBASE_API_KEY\s*=\s*(.+)$/m.exec(text);
+      if (match) return match[1].trim().replace(/^["']|["']$/g, '');
+    } catch {
+      /* file not present */
+    }
+  }
+  return null;
+}
+
+const publicFirebaseKey = configuredFirebaseWebKey();
+const allowances = [];
 const findings = [];
 
 // 1. Secret-looking strings in the working tree.
@@ -133,6 +154,10 @@ for (const file of walk(ROOT)) {
     let match;
     while ((match = regex.exec(content)) !== null) {
       if (looksLikePlaceholder(match[0])) continue;
+      if (name === 'Google API key' && publicFirebaseKey && match[0] === publicFirebaseKey) {
+        allowances.push({ file, rule: 'Firebase web API key (public identifier)' });
+        continue;
+      }
       const line = content.slice(0, match.index).split('\n').length;
       findings.push({ file, line, rule: name });
     }
@@ -167,6 +192,11 @@ for (const [key] of viteKeys) {
 const gitignore = fs.existsSync(path.join(ROOT, '.gitignore')) ? fs.readFileSync(path.join(ROOT, '.gitignore'), 'utf8') : '';
 if (!/^\.env(\*|\s|$)/m.test(gitignore)) {
   findings.push({ file: '.gitignore', line: 1, rule: 'Env files are not ignored by git' });
+}
+
+if (allowances.length > 0) {
+  console.log(`· check:secrets — ${allowances.length} allowance(s):`);
+  for (const note of allowances) console.log(`  ${note.file}: ${note.rule}`);
 }
 
 if (findings.length === 0) {

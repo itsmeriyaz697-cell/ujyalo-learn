@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { UserRoundPlus, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from './AuthProvider';
+import { track } from '@/lib/analytics';
 
 /**
  * Shown to anonymous accounts inside the app.
@@ -34,6 +35,7 @@ export function GuestBanner() {
     setBusy(true);
     try {
       await upgradeGuest(email.trim(), password, name.trim() || 'Student');
+      track('guest_upgrade', { method: 'email' });
       setOpen(false);
     } catch (caught) {
       setError((caught as Error).message);

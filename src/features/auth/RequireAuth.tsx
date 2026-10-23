@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthProvider';
 import { PageLoader } from '@/components/ui/Feedback';
+import { StartGate } from './StartGate';
 
 /**
  * Guards student routes. Access is enforced by this check *and* by the
@@ -14,7 +15,9 @@ export function RequireAuth({ children, requireOnboarding = true }: { children: 
   if (loading) return <PageLoader label="Checking your session…" />;
 
   if (!user) {
-    return <Navigate to="/login" replace state={{ from: location.pathname + location.search }} />;
+    // Not a redirect to a login form: a visitor who followed a link into the
+    // app gets a one-click way in, and keeps the page they asked for.
+    return <StartGate next={location.pathname + location.search} />;
   }
 
   // In demo mode the profile is stored locally and loads immediately; still
@@ -24,7 +27,8 @@ export function RequireAuth({ children, requireOnboarding = true }: { children: 
   const needsOnboarding = mode === 'firebase' ? !profile?.onboardingComplete : !profile?.onboardingComplete;
 
   if (requireOnboarding && needsOnboarding) {
-    return <Navigate to="/onboarding" replace />;
+    // Carry the destination through setup so a shared link is not swallowed.
+    return <Navigate to="/onboarding" replace state={{ next: location.pathname + location.search }} />;
   }
 
   if (!requireOnboarding && profile?.onboardingComplete) {

@@ -1,0 +1,75 @@
+{
+  "intro": "Ujyalo Learn is a free study site for students in Nepal and anywhere else following a similar syllabus. This page is for anyone who has never used an AI tutor before: what to press, what happens next, and what to do when something does not work. It takes about two minutes to read, and you do not need an account to try anything.",
+  "sections": [
+    {
+      "heading": "What this site is — and what it is not",
+      "paragraphs": [
+        "It is a study helper. You can ask a question and get an explanation, turn your notes into flashcards, practise with quizzes, and follow a study plan. Explanations can be in English or Nepali.",
+        "It is not an official textbook, exam board or curriculum body. The questions you get in school exams are set by your school and board, not by this site. AI answers are generated, they are labelled as AI, and they can be wrong — check anything that matters against your textbook or teacher."
+      ]
+    },
+    {
+      "heading": "What you need",
+      "bullets": [
+        "Any phone, tablet or computer with a modern browser (Chrome, Safari, Firefox, Edge).",
+        "An internet connection. On slow connections the page still loads and the tutor may take a few extra seconds to answer.",
+        "Nothing else. No card, no payment, no school ID, no phone number."
+      ]
+    },
+    {
+      "heading": "Getting in, step by step",
+      "steps": [
+        {
+          "title": "Press “Start learning free”",
+          "body": "You get a working account immediately — no form, no email, no password. This is a guest account: everything works, and your work is saved in this browser."
+        },
+        {
+          "title": "Answer a few quick questions, or skip them",
+          "body": "Your grade, subjects and language help the tutor pitch explanations correctly. If you would rather start immediately, press “Skip — use defaults” and change the settings later in Settings."
+        },
+        {
+          "title": "Ask, practise, keep notes",
+          "body": "Use the tutor for explanations, generate a quiz on any topic, and save notes. Each tool is one tap away in the menu."
+        },
+        {
+          "title": "Save your progress when you are ready",
+          "body": "A guest account lives only in the browser you used. Press “Keep my progress” and add an email and password to reach the same work from another device. Nothing already created is lost when you do this."
+        }
+      ]
+    },
+    {
+      "heading": "If something does not work",
+      "items": [
+        {
+          "question": "The page is slow",
+          "answer": "The first visit downloads the app; later visits are faster because parts are cached. Turn off phone “data saver” mode if images look wrong, and try again on Wi-Fi."
+        },
+        {
+          "question": "“Continue with Google” does not open a window",
+          "answer": "Your browser blocked the pop-up. Allow pop-ups for this site, or use the email and password option instead. Some school networks block Google sign-in entirely."
+        },
+        {
+          "question": "My work is missing",
+          "answer": "If you are a guest, your work belongs to that browser. Clearing browser data, using a private window, or switching devices removes it. Add an email while you still can, and log in with it afterwards."
+        },
+        {
+          "question": "The tutor says it is not connected",
+          "answer": "That is an owner-side setting: the AI provider has not been configured on this deployment. The quizzes, notes, flashcards and planner still work."
+        }
+      ]
+    },
+    {
+      "heading": "Who it is for",
+      "paragraphs": [
+        "Students from Grade 1 to Grade 12, including SEE preparation. Parents and guardians can use it to check whether a concept is explained clearly. Teachers can use it to build practice quizzes.",
+        "Adults are welcome, but the site is designed for school students: short sentences, plain language, and no advertising."
+      ]
+    },
+    {
+      "heading": "Your data, in one paragraph",
+      "paragraphs": [
+        "A guest account stores your learning records under an anonymous ID. When you add an email, the same records stay attached to the same ID. You can delete everything from Settings at any time; deletion removes your learning records and then your account. Analytics is optional, is off until you allow it, and never includes your notes, chats or answers. Full detail is in the privacy policy."
+      ]
+    }
+  ]
+}

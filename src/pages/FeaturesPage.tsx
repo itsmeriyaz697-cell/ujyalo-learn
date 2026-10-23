@@ -18,6 +18,7 @@ import { seoFor } from '@/config/seoPages';
 import { Section, SectionHeading, FeatureCard } from '@/components/marketing/Section';
 import { Button } from '@/components/ui/Button';
 import { TUTOR_MODES } from '@/config/curriculum';
+import { StartLearningButton } from '@/components/StartLearningButton';
 
 export default function FeaturesPage() {
   return (
@@ -32,11 +33,7 @@ export default function FeaturesPage() {
           description="Every tool is connected: an explanation becomes a note, a note becomes a flashcard, and a quiz becomes evidence of progress."
         />
         <div className="mt-6 flex flex-wrap gap-2.5">
-          <Button asChild>
-            <Link to="/signup">
-              Start Learning Free <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-          </Button>
+          <StartLearningButton>Start Learning Free <ArrowRight className="h-4 w-4" aria-hidden="true" /></StartLearningButton>
           <Button asChild variant="secondary">
             <Link to="/subjects">See subjects</Link>
           </Button>
@@ -155,11 +152,7 @@ export default function FeaturesPage() {
             </h2>
             <p className="mt-1 text-sm text-muted">Free to start. Your first explanation is a minute away.</p>
           </div>
-          <Button asChild size="lg">
-            <Link to="/signup">
-              Start Learning Free <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-          </Button>
+          <StartLearningButton size="lg">Start Learning Free <ArrowRight className="h-4 w-4" aria-hidden="true" /></StartLearningButton>
         </div>
       </Section>
     </>

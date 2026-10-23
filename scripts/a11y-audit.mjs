@@ -56,9 +56,13 @@ const browser = await chromium.launch();
 async function audit(path, { width = 1280, height = 900, scheme = 'light' } = {}) {
   const context = await browser.newContext({ viewport: { width, height }, colorScheme: scheme });
   const page = await context.newPage();
-  await page.goto(`${BASE}${path}`, { waitUntil: 'networkidle' });
+  // 'networkidle' never fires while Firestore holds an open stream, which made
+  // this audit time out instead of reporting. Wait for the document, then for
+  // the app to have rendered a heading.
+  await page.goto(`${BASE}${path}`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('h1', { timeout: 20000 }).catch(() => {});
   // Let async content (content store, search) settle before scanning.
-  await page.waitForTimeout(900);
+  await page.waitForTimeout(1400);
 
   const result = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])

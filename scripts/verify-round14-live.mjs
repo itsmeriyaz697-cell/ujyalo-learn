@@ -1,0 +1,142 @@
+/**
+ * Live checks for the two things round 14 was asked to fix:
+ *   1. Google sign-in — the popup must actually open against production, with
+ *      no Content-Security-Policy violations.
+ *   2. Guest sign-in — a visitor must reach the app without an account.
+ *
+ * Both can legitimately fail for one reason that is not a code bug: the
+ * provider is switched off in the Firebase console. That is reported as
+ * "provider disabled" rather than a vague failure, because the fix differs.
+ *
+ * Self-cleaning: any account it creates is deleted before it finishes.
+ */
+import { chromium } from 'playwright';
+
+const BASE = process.argv[2] ?? 'https://ujyalo-learn.vercel.app';
+const stamp = Date.now();
+const results = [];
+const record = (name, ok, detail = '') => {
+  results.push({ name, ok, detail });
+  console.log(`${ok ? '✓' : '✗'} ${name}${detail ? ` — ${detail}` : ''}`);
+};
+
+const browser = await chromium.launch();
+const context = await browser.newContext({ viewport: { width: 1360, height: 900 } });
+const page = await context.newPage();
+const cspViolations = [];
+page.on('console', (message) => {
+  const text = message.text();
+  if (/Content Security Policy|Refused to load/i.test(text)) cspViolations.push(text.slice(0, 200));
+});
+page.on('pageerror', (error) => cspViolations.push(`pageerror: ${error.message.slice(0, 160)}`));
+
+// ── 1. Google ───────────────────────────────────────────────────────────────
+await page.goto(`${BASE}/login`, { waitUntil: 'domcontentloaded' });
+await page.waitForSelector('form', { timeout: 30000 });
+
+const popupPromise = page.waitForEvent('popup', { timeout: 20000 }).catch(() => null);
+await page.getByRole('button', { name: /continue with google/i }).click();
+const popup = await popupPromise;
+
+record(
+  'Google sign-in opens its popup instead of failing silently',
+  Boolean(popup),
+  popup ? popup.url().slice(0, 90) : 'no popup opened',
+);
+record('no Content-Security-Policy violation on the login page', cspViolations.length === 0, cspViolations[0] ?? '');
+
+if (popup) {
+  // The popup URL matters: accounts.google.com means the SDK loaded; an error
+  // page on our own origin means the script was blocked or the provider is off.
+  const url = popup.url();
+  record(
+    'the popup is the real Google consent screen',
+    url.startsWith('https://accounts.google.com'),
+    url.slice(0, 90),
+  );
+  await popup.close().catch(() => {});
+}
+
+const loginBody = await page.locator('body').innerText();
+if (/not switched on|not enabled/i.test(loginBody)) {
+  record('Google provider is enabled in Firebase', false, 'page says the method is not enabled');
+}
+
+// ── 2. Guest ────────────────────────────────────────────────────────────────
+const guestContext = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true });
+const guestPage = await guestContext.newPage();
+await guestPage.goto(`${BASE}/login`, { waitUntil: 'domcontentloaded' });
+await guestPage.waitForSelector('form', { timeout: 30000 });
+
+const guestButton = guestPage.getByRole('button', { name: /try it without an account/i }).first();
+record('a guest entry point is offered on the live login page', await guestButton.isVisible().catch(() => false));
+
+await guestButton.click();
+await guestPage.waitForURL('**/onboarding', { timeout: 30000 }).catch(() => {});
+const afterGuest = await guestPage.locator('body').innerText();
+const disabled = /not switched on|not enabled|operation-not-allowed/i.test(afterGuest);
+
+record(
+  'a visitor can enter without an email',
+  guestPage.url().includes('/onboarding') || guestPage.url().includes('/app'),
+  disabled ? 'Anonymous provider is disabled in Firebase' : guestPage.url(),
+);
+
+if (!disabled && guestPage.url().includes('/onboarding')) {
+  // Finish setup so the guest session really reaches the app.
+  await guestPage.getByRole('button', { name: 'Continue' }).click();
+  await guestPage.getByRole('button', { name: 'Grade 10', exact: true }).click();
+  await guestPage.getByRole('button', { name: 'Continue' }).click();
+  await guestPage.getByRole('button', { name: /Nepal National Curriculum/ }).click();
+  await guestPage.getByRole('button', { name: 'Continue' }).click();
+  await guestPage.getByRole('button', { name: /^English/ }).first().click();
+  await guestPage.getByRole('button', { name: 'Continue' }).click();
+  await guestPage.getByRole('button', { name: 'Mathematics', exact: true }).click();
+  await guestPage.getByRole('button', { name: 'Continue' }).click();
+  await guestPage.getByRole('button', { name: /Prepare for exams/i }).click();
+  await guestPage.getByRole('button', { name: 'Continue' }).click();
+  await guestPage.getByRole('button', { name: /Step-by-step detailed/i }).click();
+  await guestPage.getByRole('button', { name: /Finish setup/i }).click();
+  await guestPage.waitForURL('**/app', { timeout: 40000 }).catch(() => {});
+  record('the guest reaches the app on the live site', guestPage.url().includes('/app'), guestPage.url());
+
+  await guestPage.reload({ waitUntil: 'domcontentloaded' });
+  await guestPage.waitForTimeout(4000);
+  record('the guest session survives a reload', guestPage.url().includes('/app'), guestPage.url());
+
+  const banner = await guestPage.locator('body').innerText();
+  record('the guest is warned their work is browser-bound', /guest account/i.test(banner));
+
+  // Clean up: turn the guest into a real (throwaway) account, then delete it.
+  const email = `verify.guest.${stamp}@example.com`;
+  try {
+    await guestPage.getByRole('button', { name: /keep my progress/i }).first().click();
+    await guestPage.waitForTimeout(800);
+    await guestPage.getByLabel('Your name').last().fill('Verify Guest');
+    await guestPage.getByLabel('Email address').last().fill(email);
+    await guestPage.getByLabel('Password').last().fill('StudyHard123');
+    await guestPage.getByRole('button', { name: /save my account/i }).click();
+    await guestPage.waitForTimeout(5000);
+
+    const afterUpgrade = await guestPage.locator('body').innerText();
+    record('the guest can be upgraded to a full account', !/You are using a guest account/i.test(afterUpgrade));
+
+    await guestPage.goto(`${BASE}/app/settings`, { waitUntil: 'domcontentloaded' });
+    await guestPage.waitForTimeout(3500);
+    await guestPage.getByRole('button', { name: /delete account/i }).click();
+    await guestPage.locator('#delete-confirm').fill('DELETE');
+    await guestPage.getByRole('dialog').getByRole('button', { name: /delete everything/i }).click();
+    await guestPage.waitForURL('**/login', { timeout: 45000 }).catch(() => {});
+    record('the upgraded account can be deleted again', guestPage.url().includes('/login'), `cleanup ${email}`);
+  } catch (error) {
+    record('cleanup of the upgraded account', false, `${email}: ${error.message.slice(0, 120)}`);
+  }
+}
+
+await guestContext.close();
+await context.close();
+await browser.close();
+
+const passed = results.filter((result) => result.ok).length;
+console.log(`\n${passed}/${results.length} live checks passed against ${BASE}`);
+process.exitCode = passed === results.length ? 0 : 1;

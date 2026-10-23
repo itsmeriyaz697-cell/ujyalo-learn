@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { cn } from '@/lib/utils';
+import { StartLearningButton } from '@/components/StartLearningButton';
 
 const NAV = [
   { to: '/courses', label: 'Courses' },
@@ -75,9 +76,9 @@ export function PublicLayout() {
                 <Button asChild variant="ghost" size="sm" className="hidden whitespace-nowrap sm:inline-flex">
                   <Link to="/login">Log in</Link>
                 </Button>
-                <Button asChild variant="primary" size="sm" className="hidden whitespace-nowrap sm:inline-flex">
-                  <Link to="/signup">Start free</Link>
-                </Button>
+                <span className="hidden whitespace-nowrap sm:inline-flex">
+                  <StartLearningButton size="sm">Start free</StartLearningButton>
+                </span>
               </>
             )}
             <button
@@ -156,6 +157,7 @@ export function PublicLayout() {
                 { to: '/see-preparation', label: 'SEE preparation' },
                 { to: '/app/tutor', label: 'AI tutor' },
                 { to: '/features', label: 'Features' },
+                { to: '/getting-started', label: 'How to use this site' },
                 { to: '/pricing', label: 'Pricing' },
               ].map((item) => (
                 <li key={item.to}>

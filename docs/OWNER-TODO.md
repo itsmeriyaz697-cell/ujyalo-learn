@@ -27,6 +27,15 @@ Firebase console. Without them the buttons are there but the attempt fails with
 - [ ] Anonymous is enabled (guest sign-in works on the live site)
 - [ ] Google is enabled (the popup opens and returns)
 
+**Analytics is already installed** — measurement ID `G-5WQBY059FZ`, loaded only
+after a visitor presses *Allow analytics*, with advertising storage disabled. To
+confirm it works: open **https://analytics.google.com → Reports → Realtime**,
+visit the site in a second tab, press *Allow analytics*, and you should see
+yourself appear within about 30 seconds. If nothing appears, the tag is blocked
+by an extension or the browser; try a private window with tracking protection
+off. Do not expect every visitor in the reports: declining is one click, and
+that is deliberate.
+
 ## B. Blocking — create the owner (~2 minutes)
 
 The library is empty, so `/courses` says it is being set up. Importing it needs

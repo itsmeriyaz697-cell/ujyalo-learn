@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { InlineAlert } from '@/components/ui/Feedback';
 import { TUTOR_MODES } from '@/config/curriculum';
 import { useAiHealth } from '@/hooks/useAiHealth';
+import { StartLearningButton } from '@/components/StartLearningButton';
 
 /**
  * Public introduction to the tutor.
@@ -40,9 +41,7 @@ export default function AiTutorPage() {
                   Open the tutor <ArrowRight className="ml-1 h-4 w-4" aria-hidden="true" />
                 </Link>
               </Button>
-              <Button asChild variant="secondary">
-                <Link to="/signup">Create a free account</Link>
-              </Button>
+              <StartLearningButton variant="secondary">Create a free account</StartLearningButton>
             </div>
 
             {health && !health.configured && (

@@ -6,9 +6,12 @@ import { RequireAuth } from '@/features/auth/RequireAuth';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { ContentProvider } from '@/features/content/ContentProvider';
 import { PageLoader } from '@/components/ui/Feedback';
+import { AnalyticsTracker } from '@/components/AnalyticsTracker';
+import { AnalyticsConsent } from '@/components/AnalyticsConsent';
 import { HomePage } from '@/pages/HomePage';
 
 const FeaturesPage = lazy(() => import('@/pages/FeaturesPage'));
+const GettingStartedPage = lazy(() => import('@/pages/GettingStartedPage'));
 const SubjectsPage = lazy(() => import('@/pages/SubjectsPage'));
 const PricingPage = lazy(() => import('@/pages/PricingPage'));
 const HelpPage = lazy(() => import('@/pages/HelpPage'));
@@ -77,11 +80,13 @@ export function App() {
   return (
     <ContentProvider>
       <ScrollToTop />
+      <AnalyticsTracker />
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route element={<PublicLayout />}>
             <Route index element={<HomePage />} />
             <Route path="features" element={<FeaturesPage />} />
+            <Route path="getting-started" element={<GettingStartedPage />} />
             <Route path="subjects" element={<SubjectsPage />} />
             <Route path="pricing" element={<PricingPage />} />
             <Route path="help" element={<HelpPage />} />
@@ -174,6 +179,7 @@ export function App() {
           </Route>
         </Routes>
       </Suspense>
+      <AnalyticsConsent />
     </ContentProvider>
   );
 }

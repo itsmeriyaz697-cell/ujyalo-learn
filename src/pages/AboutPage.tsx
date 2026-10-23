@@ -3,8 +3,8 @@ import { BookOpen, HeartHandshake, Lightbulb, ShieldCheck, Target } from 'lucide
 import { Seo } from '@/components/seo/Seo';
 import { seoFor } from '@/config/seoPages';
 import { Section, SectionHeading } from '@/components/marketing/Section';
-import { Button } from '@/components/ui/Button';
 import { InlineAlert } from '@/components/ui/Feedback';
+import { StartLearningButton } from '@/components/StartLearningButton';
 
 export default function AboutPage() {
   return (
@@ -157,9 +157,7 @@ export default function AboutPage() {
               Start with a question
             </p>
             <p className="mt-1 text-xs text-muted">Free to use. Private by default.</p>
-            <Button asChild className="mt-4" fullWidth>
-              <Link to="/signup">Start Learning Free</Link>
-            </Button>
+            <StartLearningButton className="mt-4" fullWidth>Start Learning Free</StartLearningButton>
           </div>
         </div>
       </Section>

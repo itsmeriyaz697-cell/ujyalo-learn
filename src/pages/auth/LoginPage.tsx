@@ -5,6 +5,7 @@ import { Seo } from '@/components/seo/Seo';
 import { safeRedirectPath } from '@/lib/safeRedirect';
 import { AuthShell } from '@/features/auth/AuthShell';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { track } from '@/lib/analytics';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Field';
 import { InlineAlert } from '@/components/ui/Feedback';
@@ -34,6 +35,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await signIn(email.trim(), password);
+      track('login', { method: 'email' });
       navigate(from, { replace: true });
     } catch (signInError) {
       setError((signInError as Error).message);
@@ -47,6 +49,7 @@ export default function LoginPage() {
     setGuestLoading(true);
     try {
       await signInAsGuest();
+      track('guest_start', { entry: 'login' });
       // A new guest has no profile, so onboarding is the honest destination.
       navigate('/onboarding', { replace: true });
     } catch (guestError) {
@@ -61,6 +64,7 @@ export default function LoginPage() {
     setGoogleLoading(true);
     try {
       await signInWithGoogle();
+      track('login', { method: 'google' });
       navigate(from, { replace: true });
     } catch (googleError) {
       setError((googleError as Error).message);

@@ -1,9 +1,10 @@
 import { useMemo, useState, type FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, UserPlus } from 'lucide-react';
 import { Seo } from '@/components/seo/Seo';
 import { AuthShell } from '@/features/auth/AuthShell';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { track } from '@/lib/analytics';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Field';
 import { InlineAlert } from '@/components/ui/Feedback';
@@ -22,6 +23,10 @@ function passwordStrength(password: string): { score: number; label: string } {
 export default function SignupPage() {
   const { signUp, signInWithGoogle, signInAsGuest, mode } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  // Set when guest mode could not be started (the provider is switched off in
+  // Firebase). Saying why turns a dead end into an explanation.
+  const guestUnavailable = (location.state as { reason?: string } | null)?.reason === 'guest-unavailable';
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -55,6 +60,7 @@ export default function SignupPage() {
     setLoading(true);
     try {
       await signUp(email.trim(), password, name.trim());
+      track('sign_up', { method: 'email' });
       navigate('/onboarding', { replace: true });
     } catch (signUpError) {
       setError((signUpError as Error).message);
@@ -68,6 +74,7 @@ export default function SignupPage() {
     setGuestLoading(true);
     try {
       await signInAsGuest();
+      track('guest_start', { entry: 'signup' });
       navigate('/onboarding', { replace: true });
     } catch (guestError) {
       setError((guestError as Error).message);
@@ -85,6 +92,7 @@ export default function SignupPage() {
     setGoogleLoading(true);
     try {
       await signInWithGoogle();
+      track('sign_up', { method: 'google' });
       navigate('/onboarding', { replace: true });
     } catch (googleError) {
       setError((googleError as Error).message);
@@ -109,6 +117,13 @@ export default function SignupPage() {
         }
       >
         <form onSubmit={handleSubmit} noValidate className="space-y-4">
+          {guestUnavailable && !error && (
+            <InlineAlert tone="info">
+              One-click start is not switched on for this site yet. Creating an account takes about thirty seconds and
+              works exactly the same.
+            </InlineAlert>
+          )}
+
           {error && <InlineAlert tone="danger">{error}</InlineAlert>}
 
           <Input

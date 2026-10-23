@@ -9,7 +9,7 @@ export default function PrivacyPage() {
       seoTitle={seoFor('/privacy').title}
       description={seoFor('/privacy').description}
       path="/privacy"
-      updated="22 October 2026"
+      updated="23 October 2026"
       intro={
         <>
           <p>
@@ -151,6 +151,12 @@ export default function PrivacyPage() {
                 If the deployment is in <strong>local demo mode</strong> (Firebase not configured), everything you create is
                 stored only in that browser and is never uploaded. It is not secure and is not synced between devices.
               </p>
+              <p>
+                <strong>Processors:</strong> Google Firebase (authentication, database), Vercel (hosting), the configured AI
+                provider (your question text and the learning context needed to answer it, when you use the tutor), and —
+                only if you allow analytics — Google Analytics. Each provider processes data under its own terms; none of
+                them is given your password.
+              </p>
             </>
           ),
         },
@@ -217,10 +223,24 @@ export default function PrivacyPage() {
           body: (
             <>
               <p>
-                Ujyalo Learn does not use advertising cookies. The app uses browser storage for essential purposes: keeping
-                you signed in (Firebase), remembering your theme preference, and — in demo mode — storing your local
-                account and learning data. A service worker caches static files so the interface can load on unreliable
-                connections; it does not cache AI conversations or private records.
+                Ujyalo Learn does not use advertising cookies, does not run ad or remarketing tags, and does not sell data.
+                The app uses browser storage for essential purposes: keeping you signed in (Firebase), remembering your
+                theme preference and your analytics choice, and — in demo mode — storing your local account and learning
+                data. A service worker caches static files so the interface can load on unreliable connections; it does
+                not cache AI conversations or private records.
+              </p>
+              <p>
+                <strong>Analytics is optional and off until you allow it.</strong> If you choose “Allow analytics”, the
+                site loads Google Analytics 4 (measurement ID <code>G-5WQBY059FZ</code>) to count page views and a small
+                number of product events (for example “a guest started”, “onboarding finished”). Those events describe
+                pages and actions, never content: no email address, name, user ID, note, chat message, quiz answer or
+                grade is sent. Google may set analytics cookies and process the request on servers outside Nepal,
+                including in the United States. Advertising storage and ad personalisation are explicitly disabled.
+              </p>
+              <p>
+                If you decline, or never answer the banner, no analytics script is loaded and nothing is sent to Google.
+                Every feature works the same either way. You can change your choice at any time by clearing this site’s
+                storage in your browser, which brings the banner back.
               </p>
               <p>
                 Clearing your browser storage removes local preferences and any demo-mode data, and signs you out.

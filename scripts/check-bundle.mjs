@@ -13,6 +13,29 @@ import process from 'node:process';
 
 const DIST = path.join(process.cwd(), 'dist');
 
+/**
+ * Firebase's web config (apiKey, authDomain, projectId, appId) is a public
+ * identifier, not a credential: it ships in every Firebase web app, and access
+ * is controlled by security rules and authorised domains. The Google API key
+ * pattern cannot tell it apart from a privileged key, so compare against the
+ * exact configured value and allow only that one. Any other AIza… key still
+ * fails, which is the point of the rule.
+ */
+function configuredFirebaseWebKey() {
+  if (process.env.VITE_FIREBASE_API_KEY) return process.env.VITE_FIREBASE_API_KEY;
+  for (const file of ['.env.local', '.env.production', '.env']) {
+    try {
+      const match = /^VITE_FIREBASE_API_KEY\s*=\s*(.+)$/m.exec(fs.readFileSync(path.join(process.cwd(), file), 'utf8'));
+      if (match) return match[1].trim().replace(/^["']|["']$/g, '');
+    } catch {
+      /* file not present */
+    }
+  }
+  return null;
+}
+
+const publicFirebaseKey = configuredFirebaseWebKey();
+
 if (!fs.existsSync(DIST)) {
   console.error('✗ check:bundle — dist/ not found. Run `npm run build` first.');
   process.exit(1);
@@ -47,11 +70,18 @@ const secretValues = ['AI_API_KEY', 'FIREBASE_WEB_API_KEY', 'ADMIN_UIDS']
   .filter((value) => !/your-|example|placeholder|changeme/i.test(value));
 
 const findings = [];
+const allowances = [];
 for (const file of textFiles) {
   const content = fs.readFileSync(file, 'utf8');
   const relative = path.relative(DIST, file);
   for (const rule of rules) {
-    if (rule.regex.test(content)) findings.push(`${relative}: ${rule.name}`);
+    const match = rule.regex.exec(content);
+    if (!match) continue;
+    if (rule.name === 'Google API key' && publicFirebaseKey && match[0] === publicFirebaseKey) {
+      allowances.push(`${relative}: Firebase web API key (public identifier, expected in the bundle)`);
+      continue;
+    }
+    findings.push(`${relative}: ${rule.name}`);
   }
   for (const value of secretValues) {
     if (content.includes(value)) findings.push(`${relative}: literal credential value from the build environment`);
@@ -65,6 +95,11 @@ if (fs.existsSync(swPath)) {
   if (!/\/api\//.test(sw)) {
     findings.push('sw.js: no guard against caching /api responses was found');
   }
+}
+
+if (allowances.length > 0) {
+  console.log(`· check:bundle — ${allowances.length} allowance(s):`);
+  for (const note of allowances) console.log(`  ${note}`);
 }
 
 const totalBytes = files.reduce((sum, file) => sum + fs.statSync(file).size, 0);

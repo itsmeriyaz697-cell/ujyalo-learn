@@ -4,9 +4,9 @@ import { ArrowRight, BookOpen, GraduationCap, Info } from 'lucide-react';
 import { Seo } from '@/components/seo/Seo';
 import { seoFor } from '@/config/seoPages';
 import { Section, SectionHeading } from '@/components/marketing/Section';
-import { Button } from '@/components/ui/Button';
 import { CURRICULA, SUBJECTS, subjectsForGrade } from '@/config/curriculum';
 import { cn } from '@/lib/utils';
+import { StartLearningButton } from '@/components/StartLearningButton';
 
 export default function SubjectsPage() {
   const [grade, setGrade] = useState(10);
@@ -135,9 +135,7 @@ export default function SubjectsPage() {
             </h2>
             <p className="mt-1 text-sm text-muted">Your tutor uses these settings to tailor every answer.</p>
           </div>
-          <Button asChild size="lg">
-            <Link to="/signup">Create free account</Link>
-          </Button>
+          <StartLearningButton size="lg">Create free account</StartLearningButton>
         </div>
         <div className="sr-only">
           <h2>All configured subjects</h2>

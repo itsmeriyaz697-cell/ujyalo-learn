@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Check, GraduationCap, Sparkles } from 'lucide-react';
 import { Logo } from '@/components/Logo';
 import { Seo } from '@/components/seo/Seo';
@@ -18,6 +18,7 @@ import {
 } from '@/config/curriculum';
 import type { StudentPreferences } from '@/types/domain';
 import { cn, safeJsonParse } from '@/lib/utils';
+import { track } from '@/lib/analytics';
 
 const TOTAL_STEPS = 7;
 const DRAFT_KEY = 'ujyalo:onboarding-draft';
@@ -25,6 +26,10 @@ const DRAFT_KEY = 'ujyalo:onboarding-draft';
 export default function OnboardingPage() {
   const { user, profile, savePreferences, signOut, mode } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  // A shared link that landed on the gate keeps its destination through setup.
+  const next = (location.state as { next?: string } | null)?.next;
+  const done = () => navigate(next && next.startsWith('/') ? next : '/app', { replace: true });
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -83,13 +88,33 @@ export default function OnboardingPage() {
     return true;
   };
 
+  async function skip() {
+    setSaving(true);
+    setError(null);
+    try {
+      // A visitor who just wants to try the tutor should not be stopped by a
+      // seven-step form. The draft is already pre-filled with sensible
+      // defaults (Grade 10, English, the core subjects), so skipping still
+      // produces a real profile the app can work from.
+      await savePreferences(draft, name.trim() || undefined);
+      localStorage.removeItem(DRAFT_KEY);
+      track('onboarding_skipped', { method: 'defaults' });
+      done();
+    } catch (skipError) {
+      setError((skipError as Error).message || 'Your preferences could not be saved. Please try again.');
+    } finally {
+      setSaving(false);
+    }
+  }
+
   async function finish() {
     setSaving(true);
     setError(null);
     try {
       await savePreferences(draft, name.trim() || undefined);
       localStorage.removeItem(DRAFT_KEY);
-      navigate('/app', { replace: true });
+      track('onboarding_complete', { steps: TOTAL_STEPS });
+      done();
     } catch (saveError) {
       setError((saveError as Error).message || 'Your preferences could not be saved. Please try again.');
     } finally {
@@ -131,8 +156,18 @@ export default function OnboardingPage() {
             </div>
           </div>
 
-          <div className="mt-6">
-            <ProgressBar value={step + 1} max={TOTAL_STEPS} label={`Step ${step + 1} of ${TOTAL_STEPS}`} />
+          <div className="mt-6 flex items-center gap-3">
+            <div className="min-w-0 flex-1">
+              <ProgressBar value={step + 1} max={TOTAL_STEPS} label={`Step ${step + 1} of ${TOTAL_STEPS}`} />
+            </div>
+            <button
+              type="button"
+              className="shrink-0 text-xs font-medium text-muted underline"
+              onClick={() => void skip()}
+              disabled={saving}
+            >
+              Skip — use defaults
+            </button>
           </div>
 
           <div className="card mt-4 p-5 sm:p-7">
