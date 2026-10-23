@@ -161,7 +161,8 @@ if (LIVE && problems.length === 0) {
       }
       if (body.authorizedDomains) {
         const domains = body.authorizedDomains ?? [];
-        const siteOrigin = (process.env.VITE_SITE_URL ?? '').trim();
+        if (domains.length) notes.push(`authorized auth domains: ${domains.join(', ')}`);
+        const siteOrigin = env('VITE_SITE_URL');
         if (siteOrigin) {
           const host = new URL(siteOrigin).hostname;
           if (!domains.includes(host)) {
@@ -181,6 +182,78 @@ if (LIVE && problems.length === 0) {
     }
   } catch (error) {
     notes.push(`live check could not run: ${error.message}`);
+  }
+
+  // ── 4b. Are students actually able to sign in? ───────────────────────────
+  // A wrong password for an account that cannot exist creates nothing and
+  // changes nothing, but the error code is decisive: PASSWORD_LOGIN_DISABLED
+  // means the Email/Password provider was never switched on, and every signup
+  // on the live site will fail with an opaque message.
+  try {
+    const res = await fetch(
+      `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${encodeURIComponent(apiKey)}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: 'probe-account-does-not-exist@example.invalid',
+          password: 'not-a-real-password-1A',
+          returnSecureToken: true,
+        }),
+        signal: AbortSignal.timeout(15000),
+      },
+    );
+    const body = await res.json().catch(() => ({}));
+    const code = body?.error?.message ?? '';
+
+    if (code === 'PASSWORD_LOGIN_DISABLED') {
+      problems.push(
+        'email/password sign-in is DISABLED. Students cannot create accounts. ' +
+          'Fix: Firebase console → Authentication → Sign-in method → Email/Password → Enable.',
+      );
+    } else if (code === 'EMAIL_NOT_FOUND' || code === 'INVALID_LOGIN_CREDENTIALS' || code === 'INVALID_PASSWORD') {
+      notes.push('email/password sign-in is enabled');
+    } else if (code) {
+      notes.push(`sign-in provider check inconclusive: ${code}`);
+    }
+  } catch (error) {
+    notes.push(`sign-in provider check could not run: ${error.message}`);
+  }
+
+  // ── 4c. Is Firestore reachable, are the rules deployed? ──────────────────
+  // The app reads settings/site before anything else. 403 means the database
+  // is still on locked-mode rules (deploy pending); 404 means the database was
+  // never created; 200 means rules are live — and tells us whether it is seeded.
+  try {
+    const res = await fetch(
+      `https://firestore.googleapis.com/v1/projects/${encodeURIComponent(projectId)}` +
+        `/databases/(default)/documents/settings/site?key=${encodeURIComponent(apiKey)}`,
+      { signal: AbortSignal.timeout(15000) },
+    );
+    const body = await res.json().catch(() => ({}));
+
+    if (res.ok) {
+      notes.push('Firestore is reachable and firestore.rules is deployed');
+      if (body?.fields?.siteName?.stringValue) {
+        notes.push(`database is seeded (siteName: ${body.fields.siteName.stringValue})`);
+      } else {
+        notes.push('database looks unseeded — run scripts/seed-firestore.mjs');
+      }
+    } else if (res.status === 404 && /database .* does not exist/i.test(body?.error?.message ?? '')) {
+      problems.push(
+        'the Firestore database does not exist yet. Fix: Firebase console → Firestore Database → Create database (production mode).',
+      );
+    } else if (res.status === 403) {
+      problems.push(
+        'Firestore is denying all reads — firestore.rules has not been deployed, so the database is still ' +
+          'on default locked-mode rules. Fix: npx firebase login && npx firebase use --add && ' +
+          'npx firebase deploy --only firestore:rules,firestore:indexes',
+      );
+    } else {
+      notes.push(`Firestore check inconclusive: HTTP ${res.status} ${body?.error?.message ?? ''}`);
+    }
+  } catch (error) {
+    notes.push(`Firestore check could not run: ${error.message}`);
   }
 } else if (LIVE) {
   notes.push('live check skipped because the offline checks already failed');

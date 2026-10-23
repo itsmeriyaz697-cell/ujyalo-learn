@@ -46,6 +46,15 @@ export const missingFirebaseKeys = (): string[] => {
   return required.filter(([key]) => !firebaseConfig[key]).map(([, env]) => env);
 };
 
+/**
+ * Development-only switch that points the SDK at the local emulators.
+ *
+ * Guarded by DEV so it is dead code in a production build: a deployed bundle
+ * can never be talked into sending student data to 127.0.0.1.
+ */
+const USE_EMULATOR = import.meta.env.DEV && import.meta.env.VITE_FIREBASE_EMULATOR === 'true';
+const EMULATOR_HOST = '127.0.0.1';
+
 let appPromise: Promise<FirebaseApp> | null = null;
 let authPromise: Promise<Auth> | null = null;
 let dbPromise: Promise<Firestore> | null = null;
@@ -62,18 +71,26 @@ export async function getFirebaseApp(): Promise<FirebaseApp> {
 
 export async function getFirebaseAuth(): Promise<Auth> {
   if (!authPromise) {
-    authPromise = Promise.all([getFirebaseApp(), import('firebase/auth')]).then(([app, { getAuth }]) =>
-      getAuth(app),
-    );
+    authPromise = Promise.all([getFirebaseApp(), import('firebase/auth')]).then(([app, mod]) => {
+      const auth = mod.getAuth(app);
+      if (USE_EMULATOR) {
+        mod.connectAuthEmulator(auth, `http://${EMULATOR_HOST}:9099`, { disableWarnings: true });
+      }
+      return auth;
+    });
   }
   return authPromise;
 }
 
 export async function getFirebaseDb(): Promise<Firestore> {
   if (!dbPromise) {
-    dbPromise = Promise.all([getFirebaseApp(), import('firebase/firestore')]).then(([app, { getFirestore }]) =>
-      getFirestore(app),
-    );
+    dbPromise = Promise.all([getFirebaseApp(), import('firebase/firestore')]).then(([app, mod]) => {
+      const db = mod.getFirestore(app);
+      if (USE_EMULATOR) {
+        mod.connectFirestoreEmulator(db, EMULATOR_HOST, 8080);
+      }
+      return db;
+    });
   }
   return dbPromise;
 }

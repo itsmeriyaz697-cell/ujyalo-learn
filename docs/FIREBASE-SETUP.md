@@ -7,11 +7,21 @@ browser, and the UI says so on every screen.
 Time: about 20 minutes. Cost: **free tier** (Spark plan) is enough for a pilot.
 No credit card is required for the steps below.
 
-> **What I could and could not verify.** The security rules in `firestore.rules`
-> are now **tested against the Firestore emulator** — 72 assertions covering
-> student isolation, role escalation, draft leakage and the append-only audit
-> log (`npm run test:rules`). They have **not been deployed to a live project**,
-> because that needs your Google account. Deploying is step 6.
+> **Current state — project `ujyalo-learn` (number 223534606772).**
+>
+> Done and verified: the six web values are validated against Google, the
+> production domain is in authorized domains, and the whole app has been driven
+> end-to-end against the local emulators — signup, onboarding, a note written to
+> Firestore, a reload, a second account that cannot see it, sign-out and sign-in
+> (`npm run test:firebase`, 9 checks).
+>
+> **Still blocking, both need the console:** email/password sign-in is switched
+> **off** (`PASSWORD_LOGIN_DISABLED`), and `firestore.rules` has **not been
+> deployed** — every read is currently denied by locked-mode defaults.
+>
+> **Do not redeploy the site until both are fixed.** The six values are already
+> set on Vercel, so the next build will switch production from demo mode to
+> Firebase mode; with sign-up disabled, every new student would hit an error.
 
 ---
 
@@ -29,6 +39,13 @@ No credit card is required for the steps below.
 
 - **Email/Password** → Enable → Save.
 - **Google** → Enable → pick a support email → Save.
+
+If **Email/Password** is off, every signup fails with `auth/operation-not-allowed`.
+Check it from the terminal without opening the console:
+
+```bash
+node scripts/check-firebase.mjs --live
+```
 
 Then **Authentication → Settings → Authorized domains** and add:
 
@@ -92,8 +109,12 @@ environment variables are baked in at build time.
 
 ```bash
 node scripts/check-firebase.mjs          # presence, shape, project/domain agreement, DNS
-node scripts/check-firebase.mjs --live   # also asks Google whether the key and domain are accepted
+node scripts/check-firebase.mjs --live   # also asks Google: key accepted, sign-in enabled, rules deployed
 ```
+
+Run the `--live` form **before every deploy that touches Firebase**. It exits
+non-zero when sign-up is disabled or the rules are not deployed — the two
+mistakes that leave a deployed site looking fine and refusing to let anyone in.
 
 This exists because the failure mode is silent: five of six values still builds,
 renders, and only breaks when a student tries to sign up.
@@ -159,9 +180,14 @@ Everyone after that is granted from the admin panel or the console.
 ## 8. Verify
 
 ```bash
+npm run test:firebase     # 9 checks against the emulators, ~45s, no account needed
 node scripts/health-check.mjs                       # 34 production checks
 BASE_URL=https://ujyalo-learn.vercel.app npm run test:ui   # 72 browser checks
 ```
+
+`test:firebase` is the one that catches wiring mistakes: it signs up, finishes
+onboarding, writes a note, reloads, signs in as a second account to prove the
+note is invisible to them, then signs out and back in.
 
 Then, by hand, because no automated test covers a real account:
 

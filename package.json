@@ -33,7 +33,8 @@
     "verify": "npm run lint && npm run typecheck && npm test && npm run build",
     "test:rules": "firebase emulators:exec --only firestore --project demo-ujyalo \"vitest run --config vitest.rules.config.ts\"",
     "check:firebase": "node scripts/check-firebase.mjs",
-    "seed:firestore": "node scripts/seed-firestore.mjs"
+    "seed:firestore": "node scripts/seed-firestore.mjs",
+    "test:firebase": "firebase emulators:exec --only firestore,auth --project demo-ujyalo \"node scripts/firebase-smoke.mjs\""
   },
   "dependencies": {
     "firebase": "^11.10.0",

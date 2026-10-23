@@ -165,6 +165,12 @@ jobs:
       # append-only audit log, and the shipped seed content passing its own rules.
       - name: Rules tests against the emulator
         run: npm run test:rules
+      # The rules pass in isolation does not prove the app is wired to them.
+      # This drives the real UI through signup, onboarding, a write, a reload
+      # and a second account, against the same emulators.
+      - run: npx playwright install --with-deps chromium
+      - name: Firebase end-to-end (signup, cloud persistence, isolation)
+        run: npm run test:firebase
 
   audit:
     name: Dependency audit
