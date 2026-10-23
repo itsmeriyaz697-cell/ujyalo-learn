@@ -376,6 +376,35 @@ const themeAfter = await page.evaluate(() => document.documentElement.classList.
 check('theme toggle switches theme', themeBefore !== themeAfter, `${themeBefore} → ${themeAfter}`);
 await shot('12-settings-dark', false);
 
+// ─── Header navigation across breakpoints ──────────────────────────────────
+// Regression guard: the desktop nav used to appear at lg while the hamburger
+// disappeared at md, leaving 768-1023px with no route to Courses/Resources/SEE.
+{
+  const widths = [1440, 1280, 1024, 900, 768, 390];
+  const dead = [];
+  for (const width of widths) {
+    const tab = await context.newPage();
+    await tab.setViewportSize({ width, height: 900 });
+    await tab.goto(`${BASE}/`, { waitUntil: 'networkidle' });
+    const desktopNav = await tab.locator('nav[aria-label="Main"]').isVisible();
+    const burger = await tab.getByRole('button', { name: /open menu|close menu/i }).isVisible();
+    if (!desktopNav) {
+      // The hamburger must exist and open a panel holding the same links.
+      const panel = tab.locator('#mobile-nav');
+      if (burger) {
+        await tab.getByRole('button', { name: /open menu/i }).click();
+        await panel.waitFor({ state: 'visible', timeout: 3000 }).catch(() => {});
+      }
+      const links = await panel.locator('a').count();
+      if (links < 7) dead.push(`${width}px:${links}links`);
+    }
+    const overflow = await tab.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    if (overflow > 1) dead.push(`${width}px:overflow${overflow}`);
+    await tab.close();
+  }
+  check('header navigation is reachable at every breakpoint', dead.length === 0, dead.join(' '));
+}
+
 // ─── Mobile layout + overflow ───────────────────────────────────────────────
 const mobile = await context.newPage();
 await mobile.setViewportSize({ width: 375, height: 812 });

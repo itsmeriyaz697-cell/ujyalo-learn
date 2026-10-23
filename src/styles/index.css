@@ -269,7 +269,8 @@
   }
 
   .nav-link {
-    @apply rounded-lg px-3 py-2 text-sm font-medium transition-colors;
+    /* nowrap: "AI tutor" otherwise breaks across two lines in the desktop header */
+    @apply whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition-colors;
     color: var(--text-soft);
   }
   .nav-link:hover {

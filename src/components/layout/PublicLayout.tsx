@@ -51,7 +51,7 @@ export function PublicLayout() {
             <Logo size={34} />
           </Link>
 
-          <nav aria-label="Main" className="hidden items-center gap-0.5 lg:flex">
+          <nav aria-label="Main" className="hidden items-center gap-0.5 xl:flex">
             {NAV.map((item) => (
               <NavLink
                 key={item.to}
@@ -82,7 +82,7 @@ export function PublicLayout() {
             )}
             <button
               type="button"
-              className="btn-icon md:hidden"
+              className="btn-icon xl:hidden"
               aria-expanded={open}
               aria-controls="mobile-nav"
               aria-label={open ? 'Close menu' : 'Open menu'}
@@ -94,7 +94,7 @@ export function PublicLayout() {
         </div>
 
         {open && (
-          <nav id="mobile-nav" aria-label="Mobile" className="border-t px-4 pb-4 pt-2 md:hidden" style={{ borderColor: 'var(--border)' }}>
+          <nav id="mobile-nav" aria-label="Mobile" className="border-t px-4 pb-4 pt-2 xl:hidden" style={{ borderColor: 'var(--border)' }}>
             <ul className="flex flex-col">
               {NAV.map((item) => (
                 <li key={item.to}>
