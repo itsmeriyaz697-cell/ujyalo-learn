@@ -11,8 +11,28 @@ Verified 2026-10-23 against production and your live Firebase project.
 ## A. Blocking — auth does not work until these are done (~5 minutes)
 
 ### A1. Publish the Firestore rules
-**Firestore Database → Rules** → select all → paste the contents of
-`firestore.rules` → **Publish**.
+
+**Option 1 — console (30 seconds).** **Firestore Database → Rules** → select all
+→ paste the contents of `firestore.rules` → **Publish**.
+
+**Option 2 — from a terminal, no console.** Needs Node installed.
+
+```bash
+unzip ujyalo-learn.zip -d ujyalo-learn
+cd ujyalo-learn
+npx firebase-tools@latest login                          # opens a browser; approve it
+npx firebase-tools@latest deploy --only firestore:rules,firestore:indexes --project ujyalo-learn
+```
+
+The deploy prints `✔ Deploy complete!`. Rules deploys do not need Java — only
+the local emulator does.
+
+| If you see | It means |
+| --- | --- |
+| `Could not find a firestore.rules file` | you are not inside the unzipped folder |
+| `Failed to get Firebase project` | `login` did not finish, or a different Google account |
+| `403 The caller does not have permission` | that Google account does not own `ujyalo-learn` |
+| `command not found: npx` | install Node first, or use Option 1 |
 
 Until then every read and write returns `PERMISSION_DENIED`. Signup creates the
 account and then strands the student on onboarding with "your preferences could
