@@ -44,13 +44,53 @@ export default function AdminLayout() {
     return (
       <div className="container-page py-16">
         <Seo title="Admin access — Ujyalo Learn" description="Restricted area." path="/admin" noindex />
-        <div className="card mx-auto max-w-lg p-7 text-center">
+        <div className="card mx-auto max-w-xl p-7">
           <ShieldAlert className="mx-auto h-9 w-9" style={{ color: 'var(--warning, #B45309)' }} aria-hidden="true" />
-          <h1 className="mt-3 text-xl font-bold">This account has no admin role</h1>
-          <p className="mt-2 text-sm text-soft">
-            Signed in as <strong>{user.email}</strong>. Ask the owner to grant a role — roles are stored server-side and
-            checked by the database rules, not by this page.
+          <h1 className="mt-3 text-center text-xl font-bold">This account has no admin role</h1>
+          <p className="mt-2 text-center text-sm text-soft">
+            Signed in as <strong>{user.email}</strong>. Roles are stored server-side and enforced by the database
+            rules, so they cannot be granted from this page.
           </p>
+
+          {mode === 'firebase' && (
+            <div className="mt-5 rounded-xl border p-4" style={{ borderColor: 'var(--border)', background: 'var(--surface-2)' }}>
+              <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--muted)' }}>
+                To make this account the owner, once
+              </p>
+              <ol className="mt-2 list-decimal space-y-2 pl-5 text-sm text-soft">
+                <li>
+                  Open Firebase → <strong>Firestore Database → Start collection</strong>, name it{' '}
+                  <code className="rounded px-1" style={{ background: 'var(--surface)' }}>roles</code>
+                </li>
+                <li>
+                  Document ID — <strong>copy this account's ID</strong>:
+                  <span className="mt-1 flex items-center gap-2">
+                    <code
+                      className="min-w-0 flex-1 truncate rounded px-2 py-1 font-mono text-xs"
+                      style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+                    >
+                      {user.uid}
+                    </code>
+                    <button
+                      type="button"
+                      className="chip shrink-0"
+                      onClick={() => void navigator.clipboard?.writeText(user.uid)}
+                    >
+                      Copy
+                    </button>
+                  </span>
+                </li>
+                <li>
+                  Add a field <code className="rounded px-1" style={{ background: 'var(--surface)' }}>role</code> of type{' '}
+                  <strong>string</strong> with the value <strong>owner</strong>, then save and reload this page.
+                </li>
+              </ol>
+              <p className="mt-3 text-xs text-muted">
+                Everyone after that is granted from the admin panel — this manual step is only for the first owner.
+              </p>
+            </div>
+          )}
+
           <div className="mt-5 flex justify-center gap-2">
             <Button asChild variant="secondary">
               <Link to="/app">Back to the app</Link>

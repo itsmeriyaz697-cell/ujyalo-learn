@@ -66,7 +66,9 @@ try {
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByRole('button', { name: /Step-by-step detailed/i }).click();
     await page.getByRole('button', { name: /Finish setup/i }).click();
-    await page.waitForTimeout(4000);
+    // Wait for the redirect rather than sleeping: the profile write is a network
+    // round trip and a fixed wait made this check flaky against production.
+    await page.waitForURL('**/app', { timeout: 30000 }).catch(() => {});
 
     check('onboarding saves the profile to Firestore', page.url().includes('/app'), page.url());
     const shell = await page.locator('body').innerText();
@@ -100,9 +102,10 @@ try {
 
     // ── Clean up: the app must be able to delete its own account ────────────
     await page.goto(`${BASE}/app/settings`, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(3000);
     const deleteButton = page.locator('button', { hasText: 'Delete account and all data' }).first();
-    const canDelete = await deleteButton.isVisible().catch(() => false);
+    // The settings route is lazy-loaded and the page waits on profile data, so
+    // wait for the control instead of assuming it after an arbitrary delay.
+    const canDelete = await deleteButton.waitFor({ state: 'visible', timeout: 25000 }).then(() => true).catch(() => false);
     check('the account-delete control is reachable', canDelete);
 
     if (canDelete) {
@@ -114,7 +117,9 @@ try {
       const confirmButton = page.locator('[role="dialog"] button').filter({ hasText: 'Delete everything' }).first();
       check('the confirm button stays reachable after typing DELETE', await confirmButton.isEnabled().catch(() => false));
       await confirmButton.click();
-      await page.waitForTimeout(6000);
+      // Deletion removes the account's data before the auth record, which took
+      // around six seconds on the live project — longer than a fixed sleep.
+      await page.waitForURL((url) => !url.pathname.includes('/app'), { timeout: 30000 }).catch(() => {});
 
       const stillInApp = page.url().includes('/app');
       check('account deletion completes', !stillInApp, page.url());
