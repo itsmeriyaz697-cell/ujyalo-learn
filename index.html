@@ -29,18 +29,9 @@
     <meta name="twitter:title" content="Ujyalo Learn — Your Personal AI Tutor, Anytime" />
     <meta name="twitter:description" content="Learn Smarter. Shine Brighter. An AI tutor for Grades 1–12 and SEE preparation." />
     <meta name="twitter:image" content="/og-image.png" />
-    <script>
-      // Apply the saved theme before paint to prevent a flash of the wrong theme.
-      (function () {
-        try {
-          var stored = localStorage.getItem('ujyalo:theme');
-          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          var dark = stored ? stored === 'dark' : prefersDark;
-          document.documentElement.classList.toggle('dark', dark);
-          document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
-        } catch (e) {}
-      })();
-    </script>
+    <!-- External, not inline, so the CSP can forbid inline scripts. Must stay
+         blocking and before the body to avoid a flash of the wrong theme. -->
+    <script src="/theme-boot.js"></script>
   </head>
   <body>
     <div id="root"></div>

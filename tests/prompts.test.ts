@@ -95,3 +95,20 @@ describe('quiz and flashcard prompts', () => {
     expect(prompt).toContain('Exactly 6 cards');
   });
 });
+
+describe('arithmetic self-check', () => {
+  it('tells the model to recompute its own results before finishing', () => {
+    expect(TUTOR_SYSTEM_PROMPT).toContain('CHECK YOUR WORK');
+    expect(TUTOR_SYSTEM_PROMPT).toContain('recompute every arithmetic result');
+  });
+
+  it('pins the mixed-number rule that the tutor previously got wrong', () => {
+    // Live Nepali answer said 23/20 = 1 3/5; the remainder keeps the denominator.
+    expect(TUTOR_SYSTEM_PROMPT).toContain('23/20 = 1 3/20, not 1 3/5');
+    expect(TUTOR_SYSTEM_PROMPT).toContain('SAME denominator');
+  });
+
+  it('still requires honesty when a result cannot be verified', () => {
+    expect(TUTOR_SYSTEM_PROMPT).toContain('cannot verify something, say so plainly');
+  });
+});
