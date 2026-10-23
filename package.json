@@ -2,7 +2,7 @@
   "name": "ujyalo-learn",
   "private": true,
   "version": "1.0.0",
-  "description": "Ujyalo Learn — AI-powered learning and tutoring platform for students in Nepal (Grades 1–12 and SEE).",
+  "description": "Ujyalo Learn \u2014 AI-powered learning and tutoring platform for students in Nepal (Grades 1\u201312 and SEE).",
   "type": "module",
   "scripts": {
     "dev": "concurrently -k -n web,api -c cyan,magenta \"vite\" \"tsx server/dev-api.ts\"",
@@ -30,7 +30,10 @@
     "test:a11y": "node scripts/a11y-audit.mjs",
     "check:links": "node scripts/check-links.mjs",
     "health": "node scripts/health-check.mjs",
-    "verify": "npm run lint && npm run typecheck && npm test && npm run build"
+    "verify": "npm run lint && npm run typecheck && npm test && npm run build",
+    "test:rules": "firebase emulators:exec --only firestore --project demo-ujyalo \"vitest run --config vitest.rules.config.ts\"",
+    "check:firebase": "node scripts/check-firebase.mjs",
+    "seed:firestore": "node scripts/seed-firestore.mjs"
   },
   "dependencies": {
     "firebase": "^11.10.0",
@@ -48,6 +51,7 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
     "@eslint/js": "^9.39.5",
+    "@firebase/rules-unit-testing": "^4.0.1",
     "@types/node": "^22.10.2",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
@@ -58,6 +62,8 @@
     "eslint": "^9.39.5",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.7",
+    "firebase-admin": "^13.10.0",
+    "firebase-tools": "^15.34.1",
     "globals": "^17.13.0",
     "playwright": "^1.47.2",
     "postcss": "^8.4.49",

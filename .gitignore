@@ -15,3 +15,9 @@ ujyalo-learn.zip
 tsconfig.tsbuildinfo
 *.tsbuildinfo
 .env*
+
+# Firebase service-account keys must never be committed — they bypass all rules.
+*-firebase-adminsdk-*.json
+service-account*.json
+firebase-debug.log
+.firebase/
