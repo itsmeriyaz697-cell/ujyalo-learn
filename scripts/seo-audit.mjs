@@ -196,6 +196,52 @@ for (const url of sitemapUrls) {
   }
 }
 
+// ── 3b. Favicon ─────────────────────────────────────────────────────────────
+// Search results show this icon, and Google only reads the <link rel="icon"> on
+// the page: it does not read manifest.webmanifest, and it does not accept SVG.
+// A site whose only icons are an SVG and a manifest gets a generic globe.
+const ICON_FORMATS = /\.(ico|png|gif|jpe?g|bmp|ppm|tiff?)$/i;
+const iconLinks = [];
+{
+  const homeRes = await fetch(BASE === ORIGIN ? BASE : `${BASE}/`, { redirect: 'follow' });
+  const homeHtml = await homeRes.text();
+  for (const tag of homeHtml.match(/<link\s+[^>]*rel=["'][^"']*icon[^"']*["'][^>]*>/gi) ?? []) {
+    const href = tag.match(/href=["']([^"']+)["']/i)?.[1];
+    const sizes = tag.match(/sizes=["']([^"']+)["']/i)?.[1];
+    if (href) iconLinks.push({ href, sizes, raw: tag });
+  }
+
+  if (!iconLinks.length) problems.push('the home page declares no favicon <link>');
+
+  const raster = iconLinks.filter((i) => ICON_FORMATS.test(i.href.split('?')[0]));
+  if (!raster.length) {
+    problems.push(
+      'no raster favicon declared (SVG only). Google Search does not accept SVG and will show a generic globe.',
+    );
+  }
+
+  // Google recommends larger than 48x48; anything at or below 32px is too small.
+  const declared = iconLinks
+    .map((i) => Number((i.sizes ?? '').split('x')[0]))
+    .filter((n) => Number.isFinite(n) && n > 0);
+  if (raster.length && declared.length && Math.max(...declared) <= 48) {
+    warnings.push(`largest declared favicon is ${Math.max(...declared)}px; Google recommends >48px`);
+  }
+
+  // The implicit default: browsers and Google both probe /favicon.ico.
+  const icoRes = await fetch(`${BASE}/favicon.ico`).catch(() => null);
+  if (!icoRes?.ok) {
+    problems.push(`/favicon.ico returned ${icoRes?.status ?? 'a network error'} — the browser default`);
+  } else if (!/icon|image/i.test(icoRes.headers.get('content-type') ?? '')) {
+    problems.push(`/favicon.ico has content-type ${icoRes.headers.get('content-type')}, not an icon`);
+  }
+
+  for (const icon of raster.filter((i) => i.href.startsWith('/'))) {
+    const res = await fetch(`${BASE}${icon.href}`).catch(() => null);
+    if (!res?.ok) problems.push(`declared favicon ${icon.href} does not resolve (${res?.status ?? 'error'})`);
+  }
+}
+
 // ── 4. Cross-page duplication ───────────────────────────────────────────────
 for (const [title, list] of seen.titles) {
   if (list.length > 1) problems.push(`title reused on ${list.length} pages: "${title.slice(0, 50)}" → ${list.join(', ')}`);
@@ -251,7 +297,8 @@ console.log(`  average words        ${avgWords}`);
 console.log(`  thinnest pages       ${worstWords.map((p) => `${p.path} (${p.words})`).join(', ')}`);
 console.log(`  unique titles        ${seen.titles.size}`);
 console.log(`  unique descriptions  ${seen.descriptions.size}`);
-console.log(`  og:images            ${ogImages.size}\n`);
+console.log(`  og:images            ${ogImages.size}`);
+console.log(`  favicon links        ${iconLinks.length} (${iconLinks.map((i) => i.href).join(', ')})\n`);
 
 if (problems.length) {
   console.log(`${problems.length} problem(s):`);
