@@ -155,6 +155,21 @@
       "source": "/privacy-policy",
       "destination": "/privacy",
       "permanent": true
+    },
+    {
+      "source": "/index.html",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/courses/index.html",
+      "destination": "/courses",
+      "permanent": true
+    },
+    {
+      "source": "/resources/index.html",
+      "destination": "/resources",
+      "permanent": true
     }
   ]
 }
