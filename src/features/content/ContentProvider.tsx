@@ -30,6 +30,8 @@ interface ContentContextValue {
   publishedCourses: Course[];
   publishedResources: Resource[];
   settings: SiteSettings;
+  /** False when the settings document is absent and defaults are being shown. */
+  settingsStored: boolean;
   role: AdminRole;
   roleLoading: boolean;
   audit: AuditEvent[];
@@ -62,6 +64,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
   const [courses, setCourses] = useState<Course[]>([]);
   const [resources, setResources] = useState<Resource[]>([]);
   const [settings, setSettings] = useState<SiteSettings>(DEFAULT_SETTINGS);
+  const [settingsStored, setSettingsStored] = useState(false);
   const [audit, setAudit] = useState<AuditEvent[]>([]);
   const [seoOverrides, setSeoOverridesState] = useState<Record<string, SeoOverride>>({});
   const [role, setRole] = useState<AdminRole>(isFirebaseConfigured ? 'student' : 'owner');
@@ -81,16 +84,18 @@ export function ContentProvider({ children }: { children: ReactNode }) {
 
   const reload = useCallback(async () => {
     try {
-      const [nextCourses, nextResources, nextSettings, nextSeo] = await Promise.all([
+      const [nextCourses, nextResources, nextSettings, nextSeo, nextSettingsStored] = await Promise.all([
         contentStore.listCourses({ includeDrafts: isAdmin }),
         contentStore.listResources({ includeDrafts: isAdmin }),
         contentStore.getSettings(),
         contentStore.listSeoOverrides().catch(() => [] as SeoOverride[]),
+        contentStore.hasStoredSettings().catch(() => false),
       ]);
       if (!mounted.current) return;
       setCourses(nextCourses);
       setResources(nextResources);
       setSettings(nextSettings);
+      setSettingsStored(nextSettingsStored);
       const registry = nextSeo.reduce<Record<string, SeoOverride>>((acc, item) => {
         acc[item.path] = item;
         return acc;
@@ -267,6 +272,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     publishedCourses,
     publishedResources,
     settings,
+    settingsStored,
     role,
     roleLoading,
     audit,

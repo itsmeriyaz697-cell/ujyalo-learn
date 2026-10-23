@@ -101,6 +101,13 @@ export const firestoreContentStore: ContentStore = {
     return snap.exists() ? ({ ...DEFAULT_SETTINGS, ...snap.data() } as SiteSettings) : DEFAULT_SETTINGS;
   },
 
+  async hasStoredSettings() {
+    const { doc, getDoc } = await firestore();
+    const db = await getFirebaseDb();
+    const snap = await getDoc(doc(db, 'settings', 'site'));
+    return snap.exists();
+  },
+
   async saveSettings(settings) {
     await putDoc('settings', 'site', settings);
   },

@@ -131,6 +131,17 @@ The indexes are required: the app queries `status == 'published'` combined with
 `updatedAt` ordering, and without the composite index those queries fail with a
 "missing index" error and a link to create it.
 
+**Until the rules are published, every read returns `PERMISSION_DENIED`** — the
+database stays on default locked-mode rules, the library is empty and signup
+cannot create a profile. Check without opening the console:
+
+```bash
+node scripts/check-firebase.mjs --live
+```
+
+It exits non-zero while the rules are unpublished, sign-in is disabled, or the
+database is missing.
+
 ### Confirm the rules work before you deploy
 
 ```bash
@@ -142,29 +153,7 @@ a student cannot make themselves an owner, drafts are invisible to the public,
 the audit log cannot be edited, and unknown collections are denied. This needs
 Java 21.
 
-## 6. Seed the library (easy to forget)
-
-The starter courses and guides live in `shared/content-seed.json` and, before
-this step, only the browser demo store reads them. **Without seeding, the public
-library is empty the moment Firebase is configured.**
-
-Create a service account key: **Project settings → Service accounts → Generate
-new private key**. Save the JSON **outside the repository**.
-
-```bash
-GOOGLE_APPLICATION_CREDENTIALS=/absolute/path/key.json \
-  node scripts/seed-firestore.mjs --project your-project-id --dry-run   # preview
-
-GOOGLE_APPLICATION_CREDENTIALS=/absolute/path/key.json \
-  node scripts/seed-firestore.mjs --project your-project-id             # write
-```
-
-Re-running skips documents that already exist, so it never overwrites an edit
-made in the admin panel. `--force` overwrites deliberately.
-
-Delete the key file when you are done. It can write to your whole database.
-
-## 7. Make yourself the owner
+## 6. Make yourself the owner
 
 There is deliberately **no default admin password and no self-promotion path**.
 Create the first owner by hand, once:
@@ -177,17 +166,47 @@ Create the first owner by hand, once:
 
 Everyone after that is granted from the admin panel or the console.
 
+## 7. Seed the library (one click, no key needed)
+
+The starter courses and guides live in `shared/content-seed.json`, and until
+they are copied into Firestore the public library is empty. **This is the step
+people skip, and the site looks broken when they do.**
+
+You do **not** need a service-account key for this. Now that you are
+an owner (step 6), open **`/admin`** and press **Import starter library**. It
+writes the records through your own session, using the same rules that guard
+every other write.
+
+- Missing records are counted on the card, so you can see what will happen.
+- Existing documents are **never overwritten**, so pressing it twice cannot
+  clobber an edit you made in the panel.
+- It reports exactly how many were written and surfaces the first failure
+  rather than claiming success.
+
+The old service-account route still works for automation, and is what CI-style
+seeding would use:
+
+```bash
+GOOGLE_APPLICATION_CREDENTIALS=/absolute/path/key.json \
+  node scripts/seed-firestore.mjs --project your-project-id --dry-run
+```
+
+But for a one-time setup it means downloading a credential that can write to
+your entire database, and then remembering to delete it. The button is safer.
+
 ## 8. Verify
 
 ```bash
-npm run test:firebase     # 9 checks against the emulators, ~45s, no account needed
+npm run test:firebase     # 15 checks against the emulators, ~45s, no account needed
 node scripts/health-check.mjs                       # 34 production checks
 BASE_URL=https://ujyalo-learn.vercel.app npm run test:ui   # 72 browser checks
 ```
 
 `test:firebase` is the one that catches wiring mistakes: it signs up, finishes
 onboarding, writes a note, reloads, signs in as a second account to prove the
-note is invisible to them, then signs out and back in.
+note is invisible to them, signs out and back in — then promotes the account to
+owner, empties the library and presses the import button, verifying that all
+fourteen records land in Firestore through the real security rules.
 
 Then, by hand, because no automated test covers a real account:
 

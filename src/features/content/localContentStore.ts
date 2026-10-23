@@ -122,6 +122,11 @@ export const localContentStore: ContentStore = {
     return read<SiteSettings>(KEYS.settings, DEFAULT_SETTINGS);
   },
 
+  async hasStoredSettings() {
+    seedOnce();
+    return localStorage.getItem(KEYS.settings) !== null;
+  },
+
   async saveSettings(settings) {
     write(KEYS.settings, settings);
   },

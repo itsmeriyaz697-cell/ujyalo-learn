@@ -13,6 +13,7 @@
  *   npm run test:firebase
  */
 import { chromium } from 'playwright';
+import admin from 'firebase-admin';
 import { spawn, execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import net from 'node:net';
@@ -244,6 +245,57 @@ try {
     'signing back in restores the account and its note',
     (await page.locator('body').innerText()).includes('Cloud persistence check'),
   );
+
+  // ── Starter-library import, through the UI, as the owner ────────────────
+  // This is the path an owner actually takes on a fresh project: no service
+  // account, no CLI, just a button in the admin panel. It is worth testing
+  // because the rules only accept those writes for owner/admin, so a mistake
+  // in the role check would surface here and nowhere else.
+  {
+    const app = admin.initializeApp({ projectId: PROJECT });
+    const db = app.firestore();
+    const users = await app.auth().listUsers();
+    const aliceUser = users.users.find((user) => user.email === alice);
+    if (!aliceUser) throw new Error('could not find the signed-up account to promote');
+
+    await db.doc(`roles/${aliceUser.uid}`).set({ role: 'owner' });
+
+    // Empty the library so the import panel has something to do.
+    for (const name of ['courses', 'resources']) {
+      const snapshot = await db.collection(name).get();
+      await Promise.all(snapshot.docs.map((doc) => doc.ref.delete()));
+    }
+    await db.doc('settings/site').delete();
+
+    await page.goto(`${BASE}/admin`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(2500);
+    const panel = page.getByRole('button', { name: /import starter library/i });
+    const visible = await panel.isVisible().catch(() => false);
+    check('the import panel appears when the library is empty', visible);
+
+    if (visible) {
+      await panel.click();
+      await page.waitForTimeout(4000);
+      const text = await page.locator('body').innerText();
+      check('import reports success', /Imported \d+ records/i.test(text), text.slice(0, 160));
+
+      const courseCount = (await db.collection('courses').get()).size;
+      const resourceCount = (await db.collection('resources').get()).size;
+      check('all 7 courses reached Firestore', courseCount === 7, `${courseCount} documents`);
+      check('all 6 guides reached Firestore', resourceCount === 6, `${resourceCount} documents`);
+
+      const settingsDoc = await db.doc('settings/site').get();
+      check('site settings were written', settingsDoc.exists, String(settingsDoc.exists));
+
+      // And the public library renders from those writes.
+      await page.goto(`${BASE}/courses`, { waitUntil: 'domcontentloaded' });
+      await page.waitForTimeout(2500);
+      check(
+        'the imported library is visible on the public site',
+        /learning paths|course/i.test(await page.locator('body').innerText()),
+      );
+    }
+  }
 
   check('no uncaught page errors', pageErrors.length === 0, pageErrors.slice(0, 2).join(' | '));
   await aliceContext.close();

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, BookOpen, CheckCircle2, FileText, Plus, ScrollText } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useContent } from '@/features/content/ContentProvider';
+import { StarterLibraryImport } from '@/features/content/StarterLibraryImport';
 
 const formatWhen = (iso: string) => {
   const date = new Date(iso);
@@ -53,6 +54,10 @@ export default function AdminDashboard() {
             </Link>
           </Button>
         </div>
+      </div>
+
+      <div className="mt-6">
+        <StarterLibraryImport />
       </div>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

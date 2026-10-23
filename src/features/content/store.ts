@@ -25,6 +25,14 @@ export interface ContentStore {
   deleteResource(id: string): Promise<void>;
 
   getSettings(): Promise<SiteSettings>;
+  /**
+   * Whether the settings document genuinely exists in storage.
+   *
+   * Needed because `getSettings()` returns defaults when nothing is stored —
+   * an object that is indistinguishable from a saved one. Anything that offers
+   * to import or repair the settings needs to tell "absent" from "present".
+   */
+  hasStoredSettings(): Promise<boolean>;
   saveSettings(settings: SiteSettings): Promise<void>;
 
   listSeoOverrides(): Promise<SeoOverride[]>;
