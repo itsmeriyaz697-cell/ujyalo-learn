@@ -196,3 +196,37 @@ policy must be updated in the same change. `docs/ROADMAP.md` tracks this.
 
 The sitemap existing does not mean the site is indexed, ranked, or visited.
 Those depend on content quality, competition and time.
+
+---
+
+## 5. Third-party audit flags
+
+Automated site checkers sometimes report **"no CDN active"** for this site. That
+is a false positive: the site is served by Vercel's global edge network. The
+response headers prove it:
+
+```
+server: Vercel
+x-vercel-cache: HIT        # served from an edge cache, not origin
+x-vercel-id: pdx1::...      # which edge region answered
+age: 605                    # seconds since this object was cached
+cache-control: public, max-age=31536000, immutable   # on /assets/*
+content-encoding: br        # Brotli, negotiated per client
+```
+
+Checkers that only recognise CNAME-based CDNs (Cloudflare, Akamai, Fastly) cannot
+see this, because Vercel terminates TLS on anycast IPs rather than behind a
+customer CNAME. There is nothing to "enable", and adding a second CDN in front of
+Vercel would add a hop and break its cache.
+
+If a checker insists, the only defensible next step is a custom domain with your
+own DNS — the CDN is already there either way.
+
+### What a checker cannot see, and what it can
+
+| Claim | Reality |
+| --- | --- |
+| "CDN not active" | False — see headers above |
+| "JavaScript required" | True for the app, but all 41 public routes ship real prerendered HTML |
+| "Could not verify sitemap/robots/privacy" | Limits of the tool, not the site — all return 200 |
+| "Add security headers" | Six are set; CSP was missing and is now added |
