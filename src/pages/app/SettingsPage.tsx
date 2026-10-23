@@ -451,7 +451,10 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {deleteOpen && deleteConfirmText !== 'DELETE' && (
+      {/* Rendered on deleteOpen alone. Guarding on `deleteConfirmText !== 'DELETE'`
+          hid the dialog the instant the word was typed, which put the confirm
+          button out of reach — the account could not be deleted at all. */}
+      {deleteOpen && (
         <div className="fixed inset-0 z-50 flex items-end justify-center p-3 sm:items-center">
           <div className="absolute inset-0 bg-[rgba(4,10,24,0.55)]" onClick={() => { setDeleteOpen(false); setDeleteConfirmText(''); }} aria-hidden="true" />
           <div className="relative z-10 w-full max-w-md rounded-2xl border p-5 shadow-lift" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }} role="dialog" aria-modal="true" aria-labelledby="delete-title">

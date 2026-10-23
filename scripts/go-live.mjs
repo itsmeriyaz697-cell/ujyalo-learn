@@ -86,19 +86,17 @@ try {
   if (problems) failed = true;
 }
 
-// The one thing that proves accounts are real: the signed-in browser flow.
-step('Browser checks against production');
+// The one thing that proves accounts are real. The full browser suite is run
+// against a preview instead: it would create test accounts in the live project.
+step('Signing up, reloading and signing in on production');
 try {
-  const ui = run('node', ['scripts/ui-smoke.mjs'], {
-    env: { ...process.env, BASE_URL: 'https://ujyalo-learn.vercel.app', SHOTS: '/tmp/shots' },
-    timeout: 600000,
-  });
-  const summary = ui.trim().split('\n').filter(Boolean).pop();
+  const auth = run('node', ['scripts/verify-auth-live.mjs'], { timeout: 300000 });
+  const summary = auth.trim().split('\n').filter(Boolean).pop();
   console.log(`  ${summary}`);
-  if (!/72\/72/.test(summary ?? '')) failed = true;
+  if (!/\b(\d+)\/\1\b/.test(summary ?? '')) failed = true;
 } catch (error) {
   const out = `${error.stdout ?? ''}`.trim().split('\n').filter(Boolean);
-  console.log(`  ${out.slice(-1)[0] ?? 'browser checks failed'}`);
+  console.log(`  ${out.slice(-1)[0] ?? 'auth verification failed'}`);
   failed = true;
 }
 

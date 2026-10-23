@@ -138,6 +138,21 @@ export default function CoursesPage() {
             ))}
             <span className="sr-only">Loading courses…</span>
           </div>
+        ) : courses.length === 0 && activeFilters === 0 ? (
+          // An empty library with no filters is a setup state, not a search that
+          // found nothing. Only the owner can fix it, so say so plainly.
+          <div className="card mx-auto max-w-xl p-8 text-center">
+            <GraduationCap className="mx-auto h-8 w-8" style={{ color: 'var(--muted)' }} aria-hidden="true" />
+            <h2 className="mt-3 text-lg font-semibold">The library is being set up</h2>
+            <p className="mt-2 text-sm text-soft">
+              Courses and guides are not published yet. The tutor, quizzes and study tools all work in the meantime.
+            </p>
+            <div className="mt-5 flex flex-wrap justify-center gap-2">
+              <Button asChild>
+                <Link to="/ai-tutor">Open the AI tutor</Link>
+              </Button>
+            </div>
+          </div>
         ) : courses.length === 0 && error ? (
           // A failed load is not an empty library. Saying "no course matches
           // those filters" when the database refused the read sends students

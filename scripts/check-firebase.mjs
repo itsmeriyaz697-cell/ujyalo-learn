@@ -239,6 +239,11 @@ if (LIVE && problems.length === 0) {
       } else {
         notes.push('database looks unseeded — run scripts/seed-firestore.mjs');
       }
+    } else if (res.status === 404 && /not found/i.test(body?.error?.message ?? '')) {
+      // The read was permitted and the document is absent: rules are live, the
+      // starter library simply has not been imported yet.
+      notes.push('Firestore rules are live (the database is reachable and readable)');
+      notes.push('the library is not seeded yet — press "Import starter library" on /admin');
     } else if (res.status === 404 && /database .* does not exist/i.test(body?.error?.message ?? '')) {
       problems.push(
         'the Firestore database does not exist yet. Fix: Firebase console → Firestore Database → Create database (production mode).',

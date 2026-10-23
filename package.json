@@ -35,7 +35,8 @@
     "check:firebase": "node scripts/check-firebase.mjs",
     "seed:firestore": "node scripts/seed-firestore.mjs",
     "test:firebase": "firebase emulators:exec --only firestore,auth --project demo-ujyalo \"node scripts/firebase-smoke.mjs\"",
-    "go-live": "node scripts/go-live.mjs"
+    "go-live": "node scripts/go-live.mjs",
+    "verify:auth": "node scripts/verify-auth-live.mjs"
   },
   "dependencies": {
     "firebase": "^11.10.0",
