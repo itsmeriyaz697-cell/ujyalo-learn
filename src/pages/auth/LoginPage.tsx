@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/Field';
 import { InlineAlert } from '@/components/ui/Feedback';
 
 export default function LoginPage() {
-  const { signIn, signInWithGoogle, mode } = useAuth();
+  const { signIn, signInWithGoogle, signInAsGuest, mode } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [email, setEmail] = useState('');
@@ -19,6 +19,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [guestLoading, setGuestLoading] = useState(false);
 
   const [searchParams] = useSearchParams();
   // Parsed, not pattern-matched: a prefix check alone lets /\\evil.com and
@@ -38,6 +39,20 @@ export default function LoginPage() {
       setError((signInError as Error).message);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleGuest() {
+    setError(null);
+    setGuestLoading(true);
+    try {
+      await signInAsGuest();
+      // A new guest has no profile, so onboarding is the honest destination.
+      navigate('/onboarding', { replace: true });
+    } catch (guestError) {
+      setError((guestError as Error).message);
+    } finally {
+      setGuestLoading(false);
     }
   }
 
@@ -127,6 +142,14 @@ export default function LoginPage() {
           {mode === 'local' && (
             <p className="text-center text-[11px] text-muted">Google sign-in is available once Firebase is configured.</p>
           )}
+
+          <Button type="button" variant="ghost" fullWidth onClick={handleGuest} loading={guestLoading}>
+            Try it without an account
+          </Button>
+          <p className="text-center text-[11px] leading-relaxed text-muted">
+            A guest account works straight away and keeps your work, but it lives only in this browser. Add an email
+            later to keep it — nothing is lost.
+          </p>
         </form>
       </AuthShell>
     </>

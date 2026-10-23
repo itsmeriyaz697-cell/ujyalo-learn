@@ -2,13 +2,14 @@ import type { AuthUser, AuthService } from './types';
 import { getFirebaseAuth } from '@/services/firebase/client';
 import { assertDatabaseReady } from '@/services/firebase/preflight';
 
-function toUser(user: { uid: string; email: string | null; displayName: string | null; photoURL: string | null; emailVerified: boolean }): AuthUser {
+function toUser(user: { uid: string; email: string | null; displayName: string | null; photoURL: string | null; emailVerified: boolean; isAnonymous?: boolean }): AuthUser {
   return {
     uid: user.uid,
     email: user.email,
     displayName: user.displayName,
     photoURL: user.photoURL,
     emailVerified: user.emailVerified,
+    isAnonymous: Boolean(user.isAnonymous),
   };
 }
 
@@ -67,6 +68,38 @@ export const firebaseAuthService: AuthService = {
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
     const credential = await signInWithPopup(auth, provider);
+    return toUser(credential.user);
+  },
+
+  async signInAsGuest() {
+    await assertDatabaseReady();
+    const auth = await getFirebaseAuth();
+    const { signInAnonymously, updateProfile } = await import('firebase/auth');
+    const credential = await signInAnonymously(auth);
+    try {
+      await updateProfile(credential.user, { displayName: 'Guest' });
+    } catch {
+      // The name is cosmetic; the session is what matters.
+    }
+    return toUser(credential.user);
+  },
+
+  async upgradeGuest(email, password, displayName) {
+    const auth = await getFirebaseAuth();
+    const { EmailAuthProvider, linkWithCredential, updateProfile, sendEmailVerification } = await import('firebase/auth');
+    const current = auth.currentUser;
+    if (!current) {
+      const error = new Error('There is no guest session to save. Please sign in again.');
+      (error as Error & { code?: string }).code = 'app/no-guest-session';
+      throw error;
+    }
+    const credential = await linkWithCredential(current, EmailAuthProvider.credential(email, password));
+    await updateProfile(credential.user, { displayName });
+    try {
+      await sendEmailVerification(credential.user);
+    } catch {
+      // Best effort, as with a normal signup.
+    }
     return toUser(credential.user);
   },
 

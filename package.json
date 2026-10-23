@@ -16,7 +16,7 @@
     "check:secrets": "node scripts/check-secrets.mjs",
     "check:bundle": "node scripts/check-bundle.mjs",
     "icons": "node scripts/generate-icons.mjs",
-    "postbuild": "node scripts/generate-seo.mjs && node scripts/check-prerender.mjs && node scripts/check-links.mjs",
+    "postbuild": "node scripts/generate-seo.mjs && node scripts/make-app-shell.mjs && node scripts/check-prerender.mjs && node scripts/check-links.mjs",
     "smoke:api": "node scripts/smoke-api.mjs",
     "mock:provider": "node scripts/mock-provider.mjs",
     "test:ui": "node scripts/ui-smoke.mjs",

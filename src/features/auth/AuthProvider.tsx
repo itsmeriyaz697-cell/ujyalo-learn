@@ -41,6 +41,10 @@ interface AuthContextValue {
   signUp: (email: string, password: string, name: string) => Promise<AuthUser>;
   signIn: (email: string, password: string) => Promise<AuthUser>;
   signInWithGoogle: () => Promise<AuthUser>;
+  signInAsGuest: () => Promise<AuthUser>;
+  upgradeGuest: (email: string, password: string, name: string) => Promise<AuthUser>;
+  /** True when the signed-in account is anonymous. */
+  isGuest: boolean;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   sendVerificationEmail: () => Promise<void>;
@@ -126,6 +130,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error(friendlyAuthError(error), { cause: error });
     }
   }, []);
+
+  const signInAsGuest = useCallback(async () => {
+    try {
+      return await authService.signInAsGuest();
+    } catch (error) {
+      throw new Error(friendlyAuthError(error), { cause: error });
+    }
+  }, []);
+
+  const upgradeGuest = useCallback(
+    async (email: string, password: string, name: string) => {
+      try {
+        // Linking keeps the uid, so every note and quiz already taken as a guest
+        // stays attached to the account instead of being orphaned.
+        const upgraded = await authService.upgradeGuest(email, password, name);
+        // Linking does not always emit onAuthStateChanged, so the in-memory user
+        // would keep isAnonymous = true and the banner would stay on screen.
+        // The linked user is returned directly, so trust it instead of waiting.
+        setUser(upgraded);
+        await loadProfile(upgraded.uid);
+        return upgraded;
+      } catch (error) {
+        throw new Error(friendlyAuthError(error), { cause: error });
+      }
+    },
+    [loadProfile],
+  );
 
   const signOut = useCallback(async () => {
     await authService.signOut();
@@ -213,6 +244,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signUp,
       signIn,
       signInWithGoogle,
+      signInAsGuest,
+      upgradeGuest,
+      isGuest: Boolean(user?.isAnonymous),
       signOut,
       resetPassword,
       sendVerificationEmail,
@@ -231,6 +265,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signUp,
       signIn,
       signInWithGoogle,
+      signInAsGuest,
+      upgradeGuest,
       signOut,
       resetPassword,
       sendVerificationEmail,

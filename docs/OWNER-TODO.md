@@ -7,10 +7,27 @@ configured · real signup, onboarding, reload, sign-out and sign-in verified
 against production (10/10) · account deletion verified and fixed · favicon fixed
 · SEO audit 0 problems · health 34/34.
 
-**What is left needs your account, and it is now one step plus a button.**
+**What is left needs your account: two switches, one owner document, one button.**
 ---
 
-## A. Blocking — the last step (~2 minutes)
+## A. Turn on the two sign-in methods (~1 minute)
+
+Guest sign-in and "Continue with Google" both need to be switched on in the
+Firebase console. Without them the buttons are there but the attempt fails with
+`auth/operation-not-allowed`.
+
+1. Open **https://console.firebase.google.com** → your project → **Authentication**
+2. **Sign-in method** tab
+3. **Google** → should say *Enabled*. If it says *Add new provider*, choose Google,
+   pick a support email, save. (The production domain is already an authorised
+   domain, so no extra setup is needed.)
+4. **Anonymous** → *Add new provider* → **Enable** → save. This is what lets a
+   visitor try the app without an account.
+
+- [ ] Anonymous is enabled (guest sign-in works on the live site)
+- [ ] Google is enabled (the popup opens and returns)
+
+## B. Blocking — create the owner (~2 minutes)
 
 The library is empty, so `/courses` says it is being set up. Importing it needs
 an owner, and the first owner can only be created by hand.
@@ -29,9 +46,9 @@ an owner, and the first owner can only be created by hand.
 - [ ] Library imported (expect 14 records)
 - [ ] `/courses` lists the 7 courses and 6 guides
 
-## B. Do this week (~30 minutes)
+## C. Do this week (~30 minutes)
 
-### B1. Set a contact email
+### C1. Set a contact email
 The live contact page currently tells visitors:
 
 > "The site owner has not set `VITE_CONTACT_EMAIL` yet, so this form cannot send email."
@@ -41,7 +58,7 @@ Variables → add `VITE_CONTACT_EMAIL` for Production, then redeploy.
 
 - [ ] Set, redeployed, page no longer shows the notice
 
-### B2. Create the GitHub repo and push
+### C2. Create the GitHub repo and push
 **There is no git remote on this project.** Nothing has been pushed, which means:
 
 - `ci.yml` (lint, types, tests, build, browser, Firebase E2E, rules) has **never run**
@@ -52,7 +69,7 @@ Needs a Personal Access Token or the GitHub CLI logged in.
 
 - [ ] Repo exists, `main` pushed, Actions tab shows both workflows passing
 
-### B3. Get monitoring running
+### C3. Get monitoring running
 Right now **nothing checks production**. Options, cheapest first:
 
 - **Free:** push to GitHub (B2) — the health workflow then runs 34 checks every 6 hours
@@ -63,39 +80,39 @@ Right now **nothing checks production**. Options, cheapest first:
 
 ---
 
-## C. Search visibility (needs your Google/Microsoft accounts, ~20 minutes)
+## D. Search visibility (needs your Google/Microsoft accounts, ~20 minutes)
 
 The verification file is already live and correct at
 `/googlec3d881d4bf552040.html`. What is missing is everything after it.
 
-### C1. Google Search Console
+### D1. Google Search Console
 - [ ] Verify the property (the file is there; click Verify)
 - [ ] Submit `https://ujyalo-learn.vercel.app/sitemap.xml`
 - [ ] Request indexing for `/`, `/courses`, `/see-preparation`, `/grades/10`
 - [ ] Check back in 2 weeks: Coverage → are pages "Indexed" or "Discovered — not indexed"?
 
-### C2. Bing Webmaster Tools
+### D2. Bing Webmaster Tools
 Mirrors Google and feeds ChatGPT search. Submit the same sitemap.
 Optional: an API key lets `scripts/submit-urls.mjs` push URLs automatically.
 
 - [ ] Site added, sitemap submitted
 
-### C3. Expect a delay on the favicon
+### D3. Expect a delay on the favicon
 Google recrawls icons on its own schedule — days to weeks. There is no button.
 The fix ships with the next deploy (A1 unblocks it).
 
 ---
 
-## D. Content — the real work, and the biggest lever (weeks)
+## E. Content — the real work, and the biggest lever (weeks)
 
-### D1. Review the starter library
+### E1. Review the starter library
 7 courses and 6 guides exist. They are written as **study paths, not official
 curriculum** — labelled that way on every page. Before you promote the site,
 read them once and confirm you are happy standing behind them.
 
 - [ ] Read all 13 and agree with them, or edit them in `/admin`
 
-### D2. Real curriculum content
+### E2. Real curriculum content
 Search traffic needs genuine pages: one per chapter per subject, plus past
 papers with worked solutions. Roughly **300–500 pages** before search becomes a
 serious channel, and 6–9 months before it compounds.
@@ -108,7 +125,7 @@ and against Google's spam policy. It needs you, or teachers you work with.
 
 ---
 
-## E. Decisions only you can make
+## F. Decisions only you can make
 
 - [ ] **Analytics** — none installed. Without it, nothing about traffic is
       measurable. Cookieless option needs no cookie banner.

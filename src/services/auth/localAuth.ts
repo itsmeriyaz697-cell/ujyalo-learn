@@ -15,7 +15,7 @@ const AUTH_EVENT = 'ujyalo:auth-changed';
 
 interface LocalAccount {
   uid: string;
-  email: string;
+  email: string | null;
   displayName: string;
   passwordHash: string;
   createdAt: string;
@@ -45,6 +45,9 @@ const toAuthUser = (account: LocalAccount | null): AuthUser | null =>
         photoURL: null,
         // Local accounts cannot verify email. Never pretend otherwise.
         emailVerified: false,
+        // A local account with no email is a guest; say so explicitly so the
+        // UI never has to infer it from a null email.
+        isAnonymous: !account.email,
       }
     : null;
 
@@ -131,6 +134,43 @@ export const localAuthService: AuthService = {
     const error = new Error('Google sign-in requires Firebase configuration.');
     (error as Error & { code?: string }).code = 'auth/operation-not-allowed';
     throw error;
+  },
+
+  async signInAsGuest() {
+    // Local demo mode: an account with no email, kept in this browser only.
+    const account: LocalAccount = {
+      uid: makeId('guest'),
+      email: null,
+      displayName: 'Guest',
+      passwordHash: '',
+      createdAt: new Date().toISOString(),
+    };
+    writeUsers([...readUsers(), account]);
+    localStorage.setItem(SESSION_KEY, account.uid);
+    emit();
+    return { uid: account.uid, email: null, displayName: 'Guest', emailVerified: false, isAnonymous: true };
+  },
+
+  async upgradeGuest(email: string, password: string, displayName: string) {
+    const uid = localStorage.getItem(SESSION_KEY);
+    const users = readUsers();
+    const account = users.find((item) => item.uid === uid);
+    if (!account) {
+      const error = new Error('No guest session to upgrade.');
+      (error as Error & { code?: string }).code = 'auth/user-not-found';
+      throw error;
+    }
+    if (users.some((item) => item.email?.toLowerCase() === email.toLowerCase())) {
+      const error = new Error('An account with this email already exists.');
+      (error as Error & { code?: string }).code = 'auth/email-already-in-use';
+      throw error;
+    }
+    account.email = email;
+    account.displayName = displayName;
+    account.passwordHash = await hash(password);
+    writeUsers(users);
+    emit();
+    return { uid: account.uid, email, displayName, emailVerified: false, isAnonymous: false };
   },
 
   async signOut() {

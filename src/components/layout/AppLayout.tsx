@@ -22,6 +22,7 @@ import { Logo } from '@/components/Logo';
 import { ThemeToggle } from './PublicLayout';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { GuestBanner } from '@/features/auth/GuestBanner';
 import { useContent } from '@/features/content/ContentProvider';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { storageModeLabel } from '@/services/data';
@@ -136,6 +137,7 @@ export function AppLayout() {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
+        <GuestBanner />
         <header
           className="sticky top-0 z-40 border-b backdrop-blur"
           style={{ background: 'color-mix(in srgb, var(--bg) 90%, transparent)', borderColor: 'var(--border)' }}

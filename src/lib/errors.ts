@@ -10,13 +10,18 @@ const AUTH_ERRORS: Record<string, string> = {
   'auth/weak-password': 'Please use a stronger password (at least 6 characters).',
   'auth/too-many-requests': 'Too many attempts. Please wait a few minutes and try again.',
   'auth/network-request-failed': 'Network problem. Check your internet connection and try again.',
-  'auth/operation-not-allowed': 'This sign-in method is not enabled yet. Please contact support.',
+  'auth/operation-not-allowed':
+    'That sign-in method is not switched on for this site yet. Try email and password, or contact support.',
   'auth/popup-closed-by-user': 'Sign-in window was closed before finishing.',
   'auth/popup-blocked': 'Your browser blocked the sign-in window. Allow pop-ups and try again.',
   'auth/cancelled-popup-request': 'Sign-in was cancelled.',
   'auth/account-exists-with-different-credential':
     'This email is already used with a different sign-in method. Log in with that method instead.',
   'auth/requires-recent-login': 'Please log in again before making this change.',
+  // Guest → full account.
+  'auth/credential-already-in-use':
+    'That email already belongs to another account. Log in with it instead — your guest work stays in this browser until you do.',
+  'auth/provider-already-linked': 'This account already has a password. You can log in with it.',
   'auth/invalid-api-key': 'Firebase is not configured correctly. Please contact the site owner.',
   // Raised by the preflight probe before an account is ever created.
   'app/database-not-ready':

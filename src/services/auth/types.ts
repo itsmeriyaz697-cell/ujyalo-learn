@@ -4,6 +4,8 @@ export interface AuthUser {
   displayName: string | null;
   photoURL?: string | null;
   emailVerified: boolean;
+  /** Anonymous account: usable immediately, but only recoverable in this browser. */
+  isAnonymous?: boolean;
 }
 
 export type AuthMode = 'firebase' | 'local';
@@ -16,6 +18,14 @@ export interface AuthService {
   signUp(email: string, password: string, displayName: string): Promise<AuthUser>;
   signIn(email: string, password: string): Promise<AuthUser>;
   signInWithGoogle(): Promise<AuthUser>;
+  /**
+   * Starts a session without an email or password. The account is real (the
+   * database rules treat it as an owner of its own data) but unrecoverable if
+   * the browser's storage is cleared, so the UI must say so.
+   */
+  signInAsGuest(): Promise<AuthUser>;
+  /** Adds an email and password to a guest account, keeping its uid and data. */
+  upgradeGuest(email: string, password: string, displayName: string): Promise<AuthUser>;
   signOut(): Promise<void>;
   resetPassword(email: string): Promise<void>;
   sendVerificationEmail(): Promise<void>;

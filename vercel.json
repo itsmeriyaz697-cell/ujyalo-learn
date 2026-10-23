@@ -66,7 +66,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com; frame-src 'self' https://*.firebaseapp.com https://accounts.google.com; media-src 'self' blob:; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests"
+          "value": "default-src 'self'; script-src 'self' https://apis.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://accounts.google.com; img-src 'self' data: blob: https://*.googleusercontent.com https://www.gstatic.com; font-src 'self' data:; connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://www.googleapis.com https://apis.google.com https://*.firebaseio.com wss://*.firebaseio.com; frame-src 'self' https://*.firebaseapp.com https://accounts.google.com; media-src 'self' blob:; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests"
         },
         {
           "key": "Cross-Origin-Opener-Policy",
@@ -99,55 +99,55 @@
   "rewrites": [
     {
       "source": "/app",
-      "destination": "/index.html"
+      "destination": "/app-shell.html"
     },
     {
       "source": "/app/(.*)",
-      "destination": "/index.html"
+      "destination": "/app-shell.html"
     },
     {
       "source": "/onboarding",
-      "destination": "/index.html"
+      "destination": "/app-shell.html"
     },
     {
       "source": "/login",
-      "destination": "/index.html"
+      "destination": "/app-shell.html"
     },
     {
       "source": "/signup",
-      "destination": "/index.html"
+      "destination": "/app-shell.html"
     },
     {
       "source": "/forgot-password",
-      "destination": "/index.html"
+      "destination": "/app-shell.html"
     },
     {
       "source": "/verify-email",
-      "destination": "/index.html"
+      "destination": "/app-shell.html"
     },
     {
       "source": "/courses/(.*)",
-      "destination": "/index.html"
+      "destination": "/app-shell.html"
     },
     {
       "source": "/resources/(.*)",
-      "destination": "/index.html"
+      "destination": "/app-shell.html"
     },
     {
       "source": "/grades/(.*)",
-      "destination": "/index.html"
+      "destination": "/app-shell.html"
     },
     {
       "source": "/search",
-      "destination": "/index.html"
+      "destination": "/app-shell.html"
     },
     {
       "source": "/admin",
-      "destination": "/index.html"
+      "destination": "/app-shell.html"
     },
     {
       "source": "/admin/(.*)",
-      "destination": "/index.html"
+      "destination": "/app-shell.html"
     }
   ],
   "redirects": [

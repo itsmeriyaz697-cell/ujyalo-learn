@@ -297,6 +297,80 @@ try {
     }
   }
 
+  // ── Guest mode: no account, then keep the work ───────────────────────────
+  {
+    const guestContext = await browser.newContext({ viewport: { width: 1360, height: 900 } });
+    const guestPage = await guestContext.newPage();
+    await guestPage.goto(`${BASE}/login`, { waitUntil: 'domcontentloaded' });
+    await guestPage.waitForTimeout(2000);
+
+    const guestButton = guestPage.getByRole('button', { name: /try it without an account/i }).first();
+    check('a guest entry point exists on the login page', await guestButton.isVisible().catch(() => false));
+
+    await guestButton.click();
+    await guestPage.waitForURL('**/onboarding', { timeout: 30000 }).catch(() => {});
+    check('a guest lands in onboarding', guestPage.url().includes('/onboarding'), guestPage.url());
+
+    await guestPage.waitForSelector('text=Your learning profile', { timeout: 30000 });
+    await guestPage.getByRole('button', { name: 'Continue' }).click();
+    await guestPage.getByRole('button', { name: 'Grade 10', exact: true }).click();
+    await guestPage.getByRole('button', { name: 'Continue' }).click();
+    await guestPage.getByRole('button', { name: /Nepal National Curriculum/ }).click();
+    await guestPage.getByRole('button', { name: 'Continue' }).click();
+    await guestPage.getByRole('button', { name: /^English/ }).first().click();
+    await guestPage.getByRole('button', { name: 'Continue' }).click();
+    await guestPage.getByRole('button', { name: 'Mathematics', exact: true }).click();
+    await guestPage.getByRole('button', { name: 'Continue' }).click();
+    await guestPage.getByRole('button', { name: /Prepare for exams/i }).click();
+    await guestPage.getByRole('button', { name: 'Continue' }).click();
+    await guestPage.getByRole('button', { name: /Step-by-step detailed/i }).click();
+    await guestPage.getByRole('button', { name: /Finish setup/i }).click();
+    await guestPage.waitForURL('**/app', { timeout: 30000 }).catch(() => {});
+    check('a guest reaches the app without an email', guestPage.url().includes('/app'), guestPage.url());
+
+    // A guest can do real work.
+    await guestPage.goto(`${BASE}/app/notes`, { waitUntil: 'domcontentloaded' });
+    await guestPage.waitForTimeout(2000);
+    await guestPage.getByRole('button', { name: /new note/i }).first().click();
+    await guestPage.getByLabel('Title', { exact: true }).fill('Guest note to keep');
+    await guestPage.getByLabel('Subject', { exact: true }).selectOption({ label: 'Science' });
+    await guestPage.getByLabel('Content', { exact: true }).fill('Written while anonymous.');
+    await guestPage.getByRole('button', { name: /save note/i }).click();
+    await guestPage.waitForTimeout(2500);
+
+    // The banner must warn them, honestly.
+    const guestShell = await guestPage.locator('body').innerText();
+    check('the guest sees a warning that work is browser-bound', /guest account/i.test(guestShell));
+
+    // Upgrade, and prove the note survives.
+    await guestPage.getByRole('button', { name: /keep my progress/i }).first().click();
+    await guestPage.waitForTimeout(600);
+    const guestEmail = `guest.upgrade.${stamp}@example.test`;
+    await guestPage.getByLabel('Your name').last().fill('Former Guest');
+    await guestPage.getByLabel('Email address').last().fill(guestEmail);
+    await guestPage.getByLabel('Password').last().fill('StudyHard123');
+    await guestPage.getByRole('button', { name: /save my account/i }).click();
+    await guestPage.waitForTimeout(4000);
+
+    const afterUpgrade = await guestPage.locator('body').innerText();
+    const dialogAlert = await guestPage.getByRole('alert').first().innerText().catch(() => '');
+    const dialogOpen = await guestPage.getByRole('dialog').count();
+    check(
+      'the guest banner disappears once the account is saved',
+      !/You are using a \*?guest account/i.test(afterUpgrade),
+      `dialogOpen=${dialogOpen} alert="${dialogAlert}"`,
+    );
+
+    await guestPage.reload({ waitUntil: 'domcontentloaded' });
+    await guestPage.waitForTimeout(3000);
+    check(
+      'the note written as a guest survives the upgrade',
+      (await guestPage.locator('body').innerText()).includes('Guest note to keep'),
+    );
+
+    await guestContext.close();
+  }
+
   check('no uncaught page errors', pageErrors.length === 0, pageErrors.slice(0, 2).join(' | '));
   await aliceContext.close();
   await bobContext.close();

@@ -113,6 +113,42 @@ if (!fs.existsSync(llms)) {
   notes.push(`llms.txt lists ${new Set(listed).size} public pages`);
 }
 
+// ── One page per file ───────────────────────────────────────────────────────
+// A non-greedy replace of <div id="root"> used to leave the previous page's
+// markup behind, so a file could contain two complete pages (two <h1>s, two
+// <main>s) and still pass every check above. Guard the shape explicitly.
+for (const route of routes) {
+  const file = route === '/' ? path.join(DIST, 'index.html') : path.join(DIST, route.slice(1), 'index.html');
+  if (!fs.existsSync(file)) continue;
+  const html = fs.readFileSync(file, 'utf8');
+  const counts = {
+    h1: (html.match(/<h1[\s>]/g) ?? []).length,
+    main: (html.match(/<main[\s>]/g) ?? []).length,
+    root: (html.match(/<div id="root">/g) ?? []).length,
+    style: (html.match(/<style data-prerender>/g) ?? []).length,
+  };
+  if (counts.h1 !== 1) fail(`${route} has ${counts.h1} <h1> elements (expected 1)`);
+  if (counts.main !== 1) fail(`${route} has ${counts.main} <main> elements (expected 1)`);
+  if (counts.root !== 1) fail(`${route} has ${counts.root} #root containers (expected 1)`);
+  if (counts.style !== 1) fail(`${route} has ${counts.style} prerender style blocks (expected 1)`);
+}
+
+// ── The app shell ───────────────────────────────────────────────────────────
+// Client-only routes (/login, /app/*, unknown course slugs) are rewritten to
+// this file. If it ever contains the home page again, those routes flash a
+// page the visitor did not ask for.
+const shell = path.join(DIST, 'app-shell.html');
+if (!fs.existsSync(shell)) {
+  fail('app-shell.html is missing — client-only routes would 404 or show the home page');
+} else {
+  const html = fs.readFileSync(shell, 'utf8');
+  if (/class="pr"/.test(html)) fail('app-shell.html still contains prerendered page markup');
+  if (!/<meta name="robots" content="noindex/.test(html)) fail('app-shell.html must be noindex');
+  if (!/stylesheet/.test(html)) fail('app-shell.html must load the app stylesheet');
+  if (!/id="root"/.test(html)) fail('app-shell.html must contain #root');
+  notes.push('app-shell.html is clean, noindex, and carries the app bundle');
+}
+
 if (failures.length) {
   console.error(`[prerender] ${failures.length} problem(s):`);
   for (const problem of failures) console.error(`  ✗ ${problem}`);

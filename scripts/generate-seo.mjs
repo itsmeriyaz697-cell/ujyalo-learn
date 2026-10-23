@@ -180,35 +180,101 @@ const FOOTER_LINKS = [
   ['/accessibility', 'Accessibility'],
 ];
 
+const PRERENDER_LOGO = `<svg width="34" height="34" viewBox="0 0 64 64" fill="none" aria-hidden="true"><rect width="64" height="64" rx="15" fill="#15245F"/><g stroke="#F7B733" stroke-width="2.4" stroke-linecap="round"><path d="M32 9v4.6"/><path d="M19.6 13l2.8 3.4"/><path d="M44.4 13l-2.8 3.4"/><path d="M12.5 23.6l4.3 1.4"/><path d="M51.5 23.6l-4.3 1.4"/></g><circle cx="32" cy="26.5" r="7.6" fill="#F7B733"/><path d="M8 37.5c7-4 16-3.4 24 2 8-5.4 17-6 24-2V50c-7-4-16-3.5-24 1.7C24 47.5 15 47 8 50V37.5Z" fill="#FFFFFF"/><path d="M32 39.5v12.1" stroke="#92B0FF" stroke-width="1.5" stroke-linecap="round"/><path d="M13.5 40c4.5-2.1 9.9-2.1 14.5.4M50.5 40c-4.5-2.1-9.9-2.1-14.5.4" stroke="#2947D6" stroke-width="1.3" stroke-linecap="round" opacity=".55"/></svg>`;
+
+const PRERENDER_MENU_ICON = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>`;
+
+/*
+ * The HTML below is what a visitor sees for the first ~1 second, before React
+ * mounts and replaces it. It therefore has to look like the app, not like a
+ * plain document: same sticky 64px header, same wordmark, same hero scale,
+ * same buttons, same footer. Every colour comes from the app's own CSS
+ * variables, so light/dark, contrast and future palette changes stay in one
+ * place. The app stylesheet is render-blocking, so these rules are always
+ * applied before the first paint.
+ */
 const PRERENDER_CSS = `
-.pr{display:flex;flex-direction:column;min-height:100dvh;background:#f6f8fc;color:#0b1b3a;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.pr{display:flex;flex-direction:column;min-height:100dvh;background:var(--bg);color:var(--text)}
 .pr-c{width:100%;max-width:76rem;margin:0 auto;padding:0 1rem}
-.pr-h{border-bottom:1px solid #dde5f2;background:#fff}
-.pr-h .pr-c{display:flex;align-items:center;justify-content:space-between;gap:1rem;min-height:64px;flex-wrap:wrap;padding-top:.5rem;padding-bottom:.5rem}
-.pr-b{font-weight:700;font-size:1.05rem;color:#0b1b3a;text-decoration:none;letter-spacing:-.01em}
-.pr-n{display:flex;flex-wrap:wrap;gap:.15rem .9rem}
-.pr-n a{color:#33425f;text-decoration:none;font-size:.875rem}
-.pr-n a:hover{color:#2947d6}
-.pr-m{flex:1;padding-top:2.5rem;padding-bottom:3rem}
-.pr-cr{font-size:.8rem;color:#5b6b8c;margin:0 0 1rem}
-.pr-cr ol{list-style:none;display:flex;flex-wrap:wrap;gap:.4rem;padding:0;margin:0}
-.pr-cr li+li::before{content:"/";margin-right:.4rem;color:#a9b5cc}
-.pr-cr a{color:#5b6b8c;text-decoration:none}
-.pr h1{font-size:clamp(1.75rem,4vw,2.75rem);line-height:1.15;letter-spacing:-.02em;margin:0 0 1rem;max-width:46rem}
-.pr-l{font-size:1.05rem;line-height:1.6;color:#33425f;max-width:44rem;margin:0 0 1.5rem}
-.pr-meta{font-size:.8rem;color:#5b6b8c;margin:0 0 1.25rem}
-.pr-a a{display:inline-block;background:#2947d6;color:#fff;text-decoration:none;font-weight:600;font-size:.9rem;padding:.6rem 1.1rem;border-radius:.6rem;margin:.25rem .5rem .25rem 0}
-.pr-a a+a{background:transparent;color:#2947d6;border:1px solid #c6d3e8}
-.pr-f{border-top:1px solid #dde5f2;background:#fff;padding:1.75rem 0}
-.pr-f nav{display:flex;flex-wrap:wrap;gap:.5rem 1.1rem;margin-bottom:.9rem}
-.pr-f nav a{color:#33425f;text-decoration:none;font-size:.85rem}
-.pr-f p{color:#5b6b8c;font-size:.8rem;margin:.3rem 0;line-height:1.6}
-.dark .pr{background:#081226;color:#eef3ff}
-.dark .pr-h,.dark .pr-f{background:#0e1c38;border-color:#22355c}
-.dark .pr-b{color:#eef3ff}
-.dark .pr-n a,.dark .pr-f nav a{color:#c9d5ee}
-.dark .pr-l{color:#c9d5ee}
-.dark .pr-cr,.dark .pr-cr a,.dark .pr-meta,.dark .pr-f p{color:#94a6c8}
+@media (min-width:640px){.pr-c{padding:0 1.5rem}}
+@media (min-width:1024px){.pr-c{padding:0 2rem}}
+.pr a{color:inherit}
+
+/* Header — mirrors PublicLayout: sticky, 64px, blurred, hairline border. */
+.pr-h{position:sticky;top:0;z-index:40;border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--bg) 88%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.pr-h .pr-c{display:flex;height:4rem;align-items:center;justify-content:space-between;gap:.75rem}
+.pr-b{display:inline-flex;align-items:center;gap:.625rem;border-radius:.5rem;text-decoration:none}
+.pr-bt{display:flex;flex-direction:column;line-height:1}
+.pr-bn{font-size:17px;font-weight:700;letter-spacing:-.01em;color:var(--text)}
+.pr-bn span{color:var(--primary)}
+.pr-bs{display:none;margin-top:.25rem;font-size:10px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+@media (min-width:640px){.pr-bs{display:block}}
+.pr-n{display:none;align-items:center;gap:.125rem}
+@media (min-width:1280px){.pr-n{display:flex}}
+.pr-n a{padding:.5rem .75rem;border-radius:.75rem;font-size:.875rem;font-weight:500;color:var(--text-soft);text-decoration:none}
+.pr-r{display:flex;align-items:center;gap:.375rem}
+.pr-login,.pr-start{display:none;align-items:center;min-height:2.25rem;padding:.375rem .75rem;border-radius:.75rem;font-size:.8125rem;font-weight:600;white-space:nowrap;text-decoration:none}
+@media (min-width:640px){.pr-login,.pr-start{display:inline-flex}}
+.pr-login{color:var(--text-soft)}
+.pr-start{background:var(--primary);color:var(--primary-contrast)}
+.pr-mn{display:inline-flex;height:2.5rem;width:2.5rem;align-items:center;justify-content:center;border:0;border-radius:.75rem;background:transparent;color:var(--text-soft)}
+@media (min-width:1280px){.pr-mn{display:none}}
+
+/* Hero — same scale and rhythm as the real home page. */
+.pr-hero{position:relative;overflow:hidden;border-bottom:1px solid var(--border);padding:3rem 0 2.5rem}
+.pr-hero-bg{position:absolute;inset:0;pointer-events:none;background:radial-gradient(70% 60% at 80% 0%,color-mix(in srgb,var(--primary) 14%,transparent),transparent 70%),radial-gradient(50% 50% at 0% 10%,color-mix(in srgb,var(--accent) 12%,transparent),transparent 70%)}
+.pr-hero .pr-c{position:relative}
+@media (min-width:640px){.pr-hero{padding:4rem 0 3rem}}
+.pr-badge{display:inline-flex;align-items:center;gap:.375rem;border-radius:9999px;background:var(--primary-soft);color:var(--primary);padding:.3rem .7rem;font-size:.75rem;font-weight:600}
+.pr h1{margin:1rem 0 0;font-size:2.35rem;line-height:1.05;letter-spacing:-.025em;font-weight:800;max-width:22ch;color:var(--text)}
+@media (min-width:640px){.pr h1{font-size:3.2rem}}
+@media (min-width:1024px){.pr h1{font-size:3.6rem}}
+.pr h1 .hl{color:var(--primary)}
+.pr-ul{position:relative;display:inline-block}
+.pr-ul::after{content:"";position:absolute;left:0;right:0;bottom:-.35rem;height:.28rem;border-radius:9999px;background:var(--accent)}
+.dark .pr-ul::after{opacity:.85}
+.pr-lead{margin:1.5rem 0 0;max-width:36rem;font-size:15px;line-height:1.7;color:var(--text-soft)}
+@media (min-width:640px){.pr-lead{font-size:17px}}
+.pr-cta{display:flex;flex-direction:column;gap:.625rem;margin-top:1.75rem}
+@media (min-width:640px){.pr-cta{flex-direction:row}}
+.pr-btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:3.25rem;padding:.75rem 1.5rem;border-radius:.75rem;font-size:1rem;font-weight:600;text-decoration:none}
+.pr-btn-p{background:var(--primary);color:var(--primary-contrast)}
+.pr-btn-s{background:var(--surface);color:var(--text);border:1px solid var(--border-strong)}
+.pr-trust{display:flex;flex-wrap:wrap;gap:.5rem 1.25rem;margin:1.5rem 0 0;padding:0;list-style:none;font-size:13px;color:var(--muted)}
+.pr-trust li::before{content:"✓";margin-right:.4rem;color:var(--success);font-weight:700}
+
+/* Inner pages keep a page-title block instead of the hero. */
+.pr-ph{padding:3.5rem 0 .5rem}
+@media (min-width:640px){.pr-ph{padding:5rem 0 .5rem}}
+.pr-eyebrow{margin:1.25rem 0 0;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.14em;color:var(--muted)}
+.pr-ph h1{font-size:1.5rem;line-height:1.25;letter-spacing:-.01em;max-width:none;margin:.5rem 0 0}
+@media (min-width:640px){.pr-ph h1{font-size:1.875rem}}
+.pr-ph .pr-lead{margin:1rem 0 0;font-size:15px;max-width:44rem}
+@media (min-width:640px){.pr-ph .pr-lead{font-size:16px}}
+.pr-ph .pr-cta{margin-top:1.5rem;flex-wrap:wrap}
+.pr-ph .pr-btn{min-height:2.75rem;padding:.625rem 1rem;font-size:.875rem;border-radius:.75rem}
+.pr-cr{margin:0 0 .75rem;font-size:.75rem;color:var(--muted)}
+.pr-cr ol{display:flex;flex-wrap:wrap;gap:.4rem;list-style:none;padding:0;margin:0}
+.pr-cr li+li::before{content:"/";margin-right:.4rem;color:var(--border-strong)}
+.pr-meta{margin:.75rem 0 0;font-size:.8125rem;color:var(--muted)}
+.pr-m{flex:1;padding-bottom:1rem}
+
+/* Sections and lists — quiet, like the app's article pages. */
+.pr-s{margin-top:2.5rem}
+.pr-s h2{margin:2rem 0 .5rem;font-size:1.125rem;font-weight:700;letter-spacing:-.01em;color:var(--text)}
+.pr-s h3{margin:1.25rem 0 .25rem;font-size:.9375rem;font-weight:650;color:var(--text)}
+.pr-s p,.pr-s li{font-size:15px;line-height:1.7;color:var(--text-soft)}
+.pr-s p{margin:.5rem 0}
+.pr-s ul,.pr-s ol{margin:.5rem 0;padding-left:1.15rem;display:grid;gap:.45rem}
+.pr-s a{color:var(--primary);text-decoration:underline;text-underline-offset:2px}
+.pr-s strong{color:var(--text)}
+
+/* Footer — matches the app footer's band and link rhythm. */
+.pr-f{margin-top:4rem;border-top:1px solid var(--border);background:var(--surface);padding:2.5rem 0}
+.pr-f nav{display:flex;flex-wrap:wrap;gap:.5rem 1.1rem;margin-bottom:1rem}
+.pr-f nav a{font-size:.8125rem;color:var(--text-soft);text-decoration:none}
+.pr-f p{margin:.35rem 0;font-size:.75rem;line-height:1.7;color:var(--muted)}
+.pr-f a{color:var(--muted)}
 `;
 
 /** Home > Courses > This page, matching the breadcrumb JSON-LD. */
@@ -394,21 +460,89 @@ function renderStaticContent(page) {
         }</p>`
       : '';
 
+  const isHome = page.path === '/';
+  const [firstLine, secondLine] = splitHeadline(h1);
+
+  // The home page gets the same two-line headline treatment as the real hero,
+  // so the first paint and the mounted page line up instead of jumping.
+  const headline = isHome && secondLine
+    ? `${escapeHtml(firstLine)}<br><span class="hl">${escapeHtml(secondLine)}</span>`
+    : escapeHtml(h1);
+
+  // The hero text is the app's own copy, verbatim: a first paint that says one
+  // thing and a mounted page that says another is the flash being fixed here.
+  const HERO_LEAD =
+    'Ujyalo Learn brings an AI tutor, practice quizzes, SEE preparation and a personal study plan together in ' +
+    'one place. Understand the topic — don’t just copy the answer.';
+
+  const body = isHome
+    ? `<section class="pr-hero">
+    <div class="pr-hero-bg" aria-hidden="true"></div>
+    <div class="pr-c">
+      <span class="pr-badge">✦ AI-powered learning for Grades 1–12</span>
+      ${isHome && secondLine ? `<h1>${escapeHtml(firstLine)}<br><span class="hl pr-ul">${escapeHtml(secondLine)}</span></h1>` : `<h1>${headline}</h1>`}
+      <p class="pr-lead">${HERO_LEAD}</p>
+      <div class="pr-cta">
+        <a class="pr-btn pr-btn-p" href="/signup">Start learning free</a>
+        <a class="pr-btn pr-btn-s" href="/features">Explore features</a>
+      </div>
+      <ul class="pr-trust">
+        <li>No credit card</li>
+        <li>English &amp; Nepali</li>
+        <li>Private by default</li>
+      </ul>
+    </div>
+  </section>`
+    : `<div class="pr-ph">
+    <div class="pr-c">
+      ${renderBreadcrumbs(page)}
+      ${
+        page.kind === 'course' && page.course
+          ? `<p class="pr-eyebrow">${escapeHtml(
+              [
+                page.course.subjectId ? subjectName(page.course.subjectId) : '',
+                page.course.gradeMin === page.course.gradeMax
+                  ? `Grade ${page.course.gradeMin}`
+                  : `Grades ${page.course.gradeMin}–${page.course.gradeMax}`,
+              ]
+                .filter(Boolean)
+                .join(' · '),
+            )}</p>`
+          : ''
+      }
+      <h1>${headline}</h1>
+      <p class="pr-lead">${escapeHtml(page.description)}</p>
+      ${updated}
+      <div class="pr-cta">
+        <a class="pr-btn pr-btn-p" href="/signup">Start learning free</a>
+        <a class="pr-btn pr-btn-s" href="/ai-tutor">See how the tutor works</a>
+      </div>
+    </div>
+  </div>`;
+
   return `<div class="pr">
   <header class="pr-h">
     <div class="pr-c">
-      <a class="pr-b" href="/">Ujyalo Learn</a>
+      <a class="pr-b" href="/" aria-label="Ujyalo Learn home">
+        ${PRERENDER_LOGO}
+        <span class="pr-bt">
+          <span class="pr-bn">Ujyalo <span>Learn</span></span>
+          <span class="pr-bs">Learn Smarter. Shine Brighter.</span>
+        </span>
+      </a>
       <nav class="pr-n" aria-label="Main">${SITE_NAV.map(
         ([href, label]) => `<a href="${href}">${label}</a>`,
       ).join('')}</nav>
+      <div class="pr-r">
+        <a class="pr-login" href="/login">Log in</a>
+        <a class="pr-start" href="/signup">Start free</a>
+        <span class="pr-mn" aria-hidden="true">${PRERENDER_MENU_ICON}</span>
+      </div>
     </div>
   </header>
-  <main class="pr-m pr-c">
-    ${renderBreadcrumbs(page)}
-    <h1>${escapeHtml(h1)}</h1>
-    <p class="pr-l">${escapeHtml(page.description)}</p>
-    ${updated}
-    <p class="pr-a"><a href="/signup">Create a free account</a><a href="/ai-tutor">See how the tutor works</a></p>
+  <main class="pr-m" id="main">
+    ${body}
+    <div class="pr-c">
     ${
       page.kind === 'course'
         ? renderCourseBody(page.course)
@@ -424,6 +558,7 @@ function renderStaticContent(page) {
                   ? renderFaqBody()
                   : ''
     }
+    </div>
   </main>
   <footer class="pr-f">
     <div class="pr-c">
@@ -435,6 +570,18 @@ function renderStaticContent(page) {
     </div>
   </footer>
 </div>`;
+}
+
+function subjectName(subjectId) {
+  const subject = SUBJECT_NAMES.find((name) => name.toLowerCase().replace(/[^a-z]/g, '') === String(subjectId).replace(/[^a-z]/g, ''));
+  return subject ?? (subjectId ? String(subjectId).replace(/-/g, ' ') : '');
+}
+
+/** "Smart learning. Brighter future." -> ["Smart learning.", "Brighter future."] */
+function splitHeadline(text) {
+  const trimmed = text.trim();
+  const match = trimmed.match(/^(.+?[.!?])\s+(.+)$/);
+  return match ? [match[1], match[2]] : [trimmed, ''];
 }
 
 const FAQ = [
@@ -516,6 +663,39 @@ function upsertLink(html, rel, href) {
   return html.replace('</head>', `    ${tag}\n  </head>`);
 }
 
+/**
+ * Replaces the contents of <div id="root"> with `content`, finding the real
+ * closing tag by counting nested <div>s.
+ *
+ * A non-greedy /<div id="root">[\s\S]*?<\/div>/ stops at the first inner
+ * </div>, which silently left the previous page's markup in place and produced
+ * two pages in one document when the script ran twice.
+ */
+function replaceRootContent(html, content) {
+  const marker = '<div id="root">';
+  const start = html.indexOf(marker);
+  if (start === -1) return html.replace('</body>', `  ${marker}${content}</div>\n  </body>`);
+
+  let depth = 1;
+  const tagPattern = /<div\b|<!--|<\/div>/gi;
+  tagPattern.lastIndex = start + marker.length;
+  let match;
+  while ((match = tagPattern.exec(html))) {
+    if (match[0] === '<div' || match[0].toLowerCase() === '<div') depth += 1;
+    else if (match[0] === '</div>') depth -= 1;
+    // A comment could hide a </div>; skip to the end of it.
+    if (match[0] === '<!--') {
+      const end = html.indexOf('-->', match.index);
+      if (end !== -1) tagPattern.lastIndex = end + 3;
+      continue;
+    }
+    if (depth === 0) {
+      return `${html.slice(0, start)}${marker}${content}</div>${html.slice(match.index + '</div>'.length)}`;
+    }
+  }
+  throw new Error('replaceRootContent: unbalanced #root markup');
+}
+
 function renderPage(page) {
   let html = shell;
   const url = abs(page.path);
@@ -591,13 +771,17 @@ function renderPage(page) {
       return `    <script type="application/ld+json">${json}</script>`;
     })
     .join('\n');
+  // Strip blocks a previous run injected, so re-running is safe.
+  html = html
+    .replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>\n?/g, '')
+    .replace(/<style data-prerender>[\s\S]*?<\/style>\n?/g, '');
   html = html.replace('</head>', `${ldTags}\n  </head>`);
 
   // Visible static content inside #root. React clears the container on mount,
   // so this is what a JS-less crawler reads and what a visitor sees for the
   // first few hundred milliseconds.
   const staticContent = renderStaticContent(page);
-  html = html.replace(/<div id="root">[\s\S]*?<\/div>/i, `<div id="root">${staticContent}</div>`);
+  html = replaceRootContent(html, staticContent);
 
   // Scoped styles for the skeleton only; the app's own stylesheet takes over.
   html = html.replace('</head>', `    <style data-prerender>${PRERENDER_CSS}</style>\n  </head>`);

@@ -7,10 +7,10 @@
   - Navigation requests prefer the network so deployments update promptly,
     with a cached shell as an offline fallback.
 */
-const VERSION = 'ujyalo-v1';
+const VERSION = 'ujyalo-v2';
 const SHELL_CACHE = `${VERSION}-shell`;
 const ASSET_CACHE = `${VERSION}-assets`;
-const SHELL_URLS = ['/', '/index.html', '/offline.html', '/favicon.svg', '/manifest.webmanifest'];
+const SHELL_URLS = ['/', '/index.html', '/app-shell.html', '/offline.html', '/favicon.svg', '/manifest.webmanifest'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -50,13 +50,27 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          const copy = response.clone();
-          caches.open(SHELL_CACHE).then((cache) => cache.put('/index.html', copy)).catch(() => {});
+          // Cache under the page's own URL. Writing every page to '/index.html'
+          // meant that after visiting /about, an offline visit to '/' showed
+          // the About page, and '/login' showed the home page before it loaded.
+          const url = new URL(request.url);
+          const isPublicPage = !/^\/(app|admin|onboarding|login|signup|forgot-password|verify-email)(\/|$)/.test(
+            url.pathname,
+          );
+          if (response.ok && isPublicPage) {
+            const copy = response.clone();
+            caches.open(SHELL_CACHE).then((cache) => cache.put(request, copy)).catch(() => {});
+          }
           return response;
         })
         .catch(async () => {
           const cached = await caches.match(request);
-          return cached || (await caches.match('/index.html')) || (await caches.match('/offline.html')) || Response.error();
+          return (
+            cached ||
+            (await caches.match('/app-shell.html')) ||
+            (await caches.match('/offline.html')) ||
+            Response.error()
+          );
         }),
     );
     return;
