@@ -47,7 +47,13 @@ const shot = async (name, fullPage = true) => {
 };
 
 async function visit(pathname) {
-  await page.goto(`${BASE}${pathname}`, { waitUntil: 'networkidle' });
+  // Not 'networkidle': Firestore keeps a stream open, so that promise never
+  // resolves once real Firebase config is present (it worked in CI only
+  // because CI runs without one). Wait for the document and a rendered
+  // heading instead.
+  await page.goto(`${BASE}${pathname}`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('h1, [role="dialog"], form', { timeout: 20000 }).catch(() => {});
+  await page.waitForTimeout(350);
 }
 
 // ─── Public pages ────────────────────────────────────────────────────────────
@@ -112,8 +118,16 @@ check(
 
 // ─── Signed-out protection ──────────────────────────────────────────────────
 await visit('/app');
-await page.waitForTimeout(600);
-check('protected route redirects to login', page.url().includes('/login'), page.url());
+await page.waitForTimeout(1200);
+// Signed out, an app URL now offers one-click entry instead of bouncing to a
+// login form: a visitor who followed a shared link should be able to start.
+const appGateText = await page.locator('body').innerText();
+check(
+  'a protected route offers a one-click way in, not a dead end',
+  /start in one click/i.test(appGateText),
+  page.url(),
+);
+check('the one-click gate offers logging in for existing accounts', /log in/i.test(appGateText));
 await visit('/admin');
 await page.waitForTimeout(900);
 check('admin also redirects to login when signed out', page.url().includes('/login'), page.url());

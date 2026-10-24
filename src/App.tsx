@@ -1,9 +1,10 @@
 import { lazy, Suspense, useEffect, type ReactNode } from 'react';
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
 import { PublicLayout } from '@/components/layout/PublicLayout';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { RequireAuth } from '@/features/auth/RequireAuth';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { safeRedirectPath } from '@/lib/safeRedirect';
 import { ContentProvider } from '@/features/content/ContentProvider';
 import { PageLoader } from '@/components/ui/Feedback';
 import { AnalyticsTracker } from '@/components/AnalyticsTracker';
@@ -68,11 +69,28 @@ function ScrollToTop() {
   return null;
 }
 
-/** Public auth pages are unavailable to signed-in students. */
+/**
+ * Public auth pages are unavailable to signed-in students.
+ *
+ * It has to agree with where the page itself would send them. When a student
+ * signs in from `?next=/app/quizzes`, two redirects race: this guard fires as
+ * soon as the user appears, and the login handler navigates a moment later.
+ * The guard used to always win with '/app', silently discarding ?next= — so a
+ * student who followed a link to a quiz landed on the dashboard instead.
+ * Resolving the same destination here makes the race harmless.
+ */
 function GuestOnly({ children }: { children: ReactNode }) {
   const { user, profile, loading, profileLoading } = useAuth();
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const fromState = (location.state as { from?: string } | null)?.from;
+  const destination =
+    safeRedirectPath(fromState) ||
+    safeRedirectPath(searchParams.get('next')) ||
+    (profile?.onboardingComplete ? '/app' : '/onboarding');
+
   if (loading || (user && profileLoading)) return <PageLoader label="Checking your session…" />;
-  if (user) return <Navigate to={profile?.onboardingComplete ? '/app' : '/onboarding'} replace />;
+  if (user) return <Navigate to={destination} replace />;
   return <>{children}</>;
 }
 
