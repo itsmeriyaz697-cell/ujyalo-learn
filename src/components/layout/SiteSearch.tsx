@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import {
   ArrowRight,
   BookOpen,
-  Command,
   CornerDownLeft,
   Search,
   Sparkles,
@@ -193,23 +192,20 @@ export function SiteSearch() {
 
   return (
     <>
-      {/* Desktop: labelled pill. Mobile: icon button. Both live here so the
-          palette has a single source of open/closed state. */}
+      {/* Desktop: icon-only pill. The header bar has a fixed 1216px width and
+          eight nav items, so a visible "Search ⌘K" label pushed the logo into
+          wrapping. The label is gone; aria-label keeps the button announced,
+          and the ⌘K shortcut is still shown inside the palette itself.
+          Mobile: icon button. Both live here so the palette has one open state. */}
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="hidden items-center gap-2 rounded-xl border px-3 py-2 text-sm transition-colors md:inline-flex"
+        className="hidden items-center rounded-xl border p-2 transition-colors md:inline-flex"
         style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--muted)' }}
         aria-label="Search the site"
+        title="Search (Ctrl or ⌘ + K)"
       >
-        <Search className="h-4 w-4" aria-hidden="true" />
-        <span className="hidden lg:inline">Search</span>
-        <kbd
-          className="ml-1 hidden items-center gap-0.5 rounded border px-1.5 py-0.5 text-[10px] font-medium lg:inline-flex"
-          style={{ borderColor: 'var(--border)', color: 'var(--muted)' }}
-        >
-          <Command className="h-2.5 w-2.5" aria-hidden="true" />K
-        </kbd>
+        <Search className="h-[18px] w-[18px]" aria-hidden="true" />
       </button>
 
       <button

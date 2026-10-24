@@ -33,6 +33,11 @@ const ContentPolicyPage = lazy(() => import('@/pages/ContentPolicyPage'));
 const AccessibilityPage = lazy(() => import('@/pages/AccessibilityPage'));
 const SearchPage = lazy(() => import('@/pages/SearchPage'));
 
+const ArenaHomePage = lazy(() => import('@/pages/arena/ArenaHomePage'));
+const ArenaPlayPage = lazy(() => import('@/pages/arena/ArenaPlayPage'));
+const ArenaLeaderboardPage = lazy(() => import('@/pages/arena/ArenaLeaderboardPage'));
+const ArenaProfilePage = lazy(() => import('@/pages/arena/ArenaProfilePage'));
+
 const AdminLayout = lazy(() => import('@/pages/admin/AdminLayout'));
 const AdminDashboard = lazy(() => import('@/pages/admin/AdminDashboard'));
 const AdminCourses = lazy(() => import('@/pages/admin/AdminCourses'));
@@ -124,6 +129,12 @@ export function App() {
             <Route path="content-policy" element={<ContentPolicyPage />} />
             <Route path="accessibility" element={<AccessibilityPage />} />
             <Route path="search" element={<SearchPage />} />
+            {/* Global Quiz Arena — public to browse, sign-in needed to be ranked. */}
+            <Route path="global-quiz" element={<ArenaHomePage />} />
+            <Route path="global-quiz/play" element={<ArenaPlayPage />} />
+            <Route path="global-quiz/leaderboard" element={<ArenaLeaderboardPage />} />
+            <Route path="global-quiz/me" element={<ArenaProfilePage />} />
+            <Route path="global-quiz/player/:handle" element={<ArenaProfilePage />} />
             <Route
               path="login"
               element={

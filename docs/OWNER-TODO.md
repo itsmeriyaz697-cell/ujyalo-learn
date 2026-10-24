@@ -139,6 +139,34 @@ and against Google's spam policy. It needs you, or teachers you work with.
 
 ---
 
+## E2. Global Quiz Arena — needs your Firebase key
+
+The Arena is built and tested, but it cannot score anything until the API has a
+service account. **This is the only step between what exists now and a working
+leaderboard.** Full walkthrough: `docs/QUIZ-ARENA.md` section 4.
+
+- [ ] Firebase console → Project settings → **Service accounts** → *Generate new
+      private key*. A `.json` file downloads.
+- [ ] Vercel → project → Settings → Environment Variables → add
+      `FIREBASE_SERVICE_ACCOUNT` with the **whole file contents** as the value,
+      ticked for Production, Preview and Development.
+- [ ] Redeploy (Deployments → ⋯ → Redeploy). Env changes do not apply to an
+      existing deployment.
+- [ ] Open `/global-quiz`. The yellow "Demo mode" bar must be **gone**. If it is
+      still there, the variable name is wrong or the deploy was not re-run.
+- [ ] Play one quiz, reload, confirm the points total is still there.
+- [ ] Delete the downloaded `.json` from your computer.
+- [ ] Visit `/api/quiz-arena?action=meta` — it must say `"configured": true`.
+
+Two composite indexes will be requested by Firestore the first time the Nepal
+and weekly boards run. The error message contains a link; click **Create index**
+and wait a few minutes. The global board works in the meantime.
+
+**What I could not do:** I cannot generate that key, and you should not paste it
+into a chat window. Only you can add it.
+
+---
+
 ## F. Decisions only you can make
 
 - [ ] **Analytics** — none installed. Without it, nothing about traffic is

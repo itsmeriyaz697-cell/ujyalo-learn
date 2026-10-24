@@ -599,3 +599,54 @@ describe('the starter content in shared/content-seed.json satisfies the rules', 
     }
   });
 });
+
+describe('Global Quiz Arena is closed to every browser', () => {
+  /**
+   * The Arena's whole security model is that the client has no write path to a
+   * score. The API writes with Admin credentials, which bypass these rules
+   * entirely, so every rule here can be a flat denial.
+   *
+   * These assertions are deliberately written from the attacker's point of
+   * view: a signed-in student trying to give themselves points.
+   */
+  const arenaCollections = [
+    'arenaPlayers',
+    'arenaHandles',
+    'arenaAttempts',
+    'arenaPoints',
+    'arenaDaily',
+    'arenaBadges',
+    'arenaRate',
+  ];
+
+  it.each(arenaCollections)('a signed-in student cannot read %s', async (name) => {
+    await assertFails(getDoc(doc(db(ALICE), name, 'doc-1')));
+  });
+
+  it.each(arenaCollections)('a signed-in student cannot write %s', async (name) => {
+    await assertFails(setDoc(doc(db(ALICE), name, 'doc-1'), { points: 999999 }));
+  });
+
+  it('a student cannot award themselves points or a rank', async () => {
+    await assertFails(
+      setDoc(doc(db(ALICE), 'arenaPlayers', ALICE), {
+        handle: 'alice',
+        totalPoints: 999999,
+        quizzes: 500,
+      }),
+    );
+  });
+
+  it('a student cannot read another player document', async () => {
+    await assertFails(getDoc(doc(db(BOB), 'arenaPlayers', ALICE)));
+  });
+
+  it('even the site owner cannot write scores from the browser', async () => {
+    // Scores come from the server only. The owner manages content, not points.
+    await assertFails(setDoc(doc(db(OWNER), 'arenaPoints', 'fake'), { points: 1000 }));
+  });
+
+  it('the question bank is not reachable through the database', async () => {
+    await assertFails(getDoc(doc(db(), 'arenaQuestions', 'mathematics/easy/1')));
+  });
+});

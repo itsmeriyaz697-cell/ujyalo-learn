@@ -273,8 +273,10 @@
   }
 
   .nav-link {
-    /* nowrap: "AI tutor" otherwise breaks across two lines in the desktop header */
-    @apply whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition-colors;
+    /* nowrap: "AI tutor" otherwise breaks across two lines in the desktop header.
+       px-2.5 rather than px-3 keeps all eight items plus the logo inside the
+       bar at 1280px, which is the narrowest width where the desktop nav shows. */
+    @apply whitespace-nowrap rounded-lg px-2.5 py-2 text-sm font-medium transition-colors;
     color: var(--text-soft);
   }
   .nav-link:hover {

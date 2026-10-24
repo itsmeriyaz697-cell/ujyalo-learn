@@ -134,6 +134,10 @@
       "destination": "/app-shell.html"
     },
     {
+      "source": "/global-quiz/(.*)",
+      "destination": "/app-shell.html"
+    },
+    {
       "source": "/grades/(.*)",
       "destination": "/app-shell.html"
     },

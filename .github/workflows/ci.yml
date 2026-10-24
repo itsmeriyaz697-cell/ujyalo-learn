@@ -93,6 +93,29 @@ jobs:
       - name: API smoke tests
         run: npm run smoke:api
 
+  arena:
+    name: Quiz Arena scoring and integrity
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: static
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - run: npm ci --no-audit --no-fund
+      # 45 assertions against the real HTTP API and the Firestore emulator:
+      # the answer key never reaches the client, scoring is server-side, a
+      # replayed submission awards nothing, an impossibly fast one is refused,
+      # and the leaderboards only contain players who actually scored.
+      - name: Arena end-to-end (scoring, replay, tampering, rankings)
+        run: npm run test:arena
+
   browser:
     name: Browser end-to-end and accessibility
     runs-on: ubuntu-latest
@@ -127,6 +150,14 @@ jobs:
 
       - name: Accessibility audit (WCAG 2.1 AA, light + dark + mobile)
         run: npm run test:a11y
+        env:
+          BASE_URL: http://127.0.0.1:5173
+
+      # Plays a whole practice quiz in a real Chromium and checks the results,
+      # the empty leaderboard, the profile 404 and the mobile layout. The ranked
+      # path is covered by the `arena` job above, which has a database.
+      - name: Quiz Arena browser run
+        run: node scripts/arena-ui.mjs
         env:
           BASE_URL: http://127.0.0.1:5173
 

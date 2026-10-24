@@ -17,6 +17,7 @@ import {
   Sparkles,
   Timer,
   TrendingUp,
+  Trophy,
   Users,
 } from 'lucide-react';
 import { Seo } from '@/components/seo/Seo';
@@ -188,6 +189,9 @@ export function HomePage() {
               </StartLearningButton>
               <Button asChild variant="secondary" size="lg">
                 <Link to="/features">Explore features</Link>
+              </Button>
+              <Button asChild variant="secondary" size="lg" icon={<Trophy className="h-4 w-4" aria-hidden="true" />}>
+                <Link to="/global-quiz">Global Quiz</Link>
               </Button>
             </div>
 

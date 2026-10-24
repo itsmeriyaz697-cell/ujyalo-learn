@@ -47,6 +47,7 @@ const ROUTES: Record<string, string> = {
   '/api/tutor': 'api/tutor.ts',
   '/api/tools': 'api/tools.ts',
   '/api/quiz': 'api/quiz.ts',
+  '/api/quiz-arena': 'api/quiz-arena.ts',
   '/api/flashcards': 'api/flashcards.ts',
   '/api/health': 'api/health.ts',
 };

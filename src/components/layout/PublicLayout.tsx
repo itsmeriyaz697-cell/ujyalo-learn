@@ -15,6 +15,7 @@ const NAV = [
   { to: '/resources', label: 'Resources' },
   { to: '/see-preparation', label: 'SEE' },
   { to: '/ai-tutor', label: 'AI tutor' },
+  { to: '/global-quiz', label: 'Arena' },
   { to: '/pricing', label: 'Pricing' },
   { to: '/about', label: 'About' },
 ];
@@ -48,7 +49,7 @@ export function PublicLayout() {
         style={{ background: 'color-mix(in srgb, var(--bg) 88%, transparent)', borderColor: 'var(--border)' }}
       >
         <div className="container-page flex h-16 items-center justify-between gap-3">
-          <Link to="/" aria-label="Ujyalo Learn home" className="rounded-lg">
+          <Link to="/" aria-label="Ujyalo Learn home" className="shrink-0 rounded-lg">
             <Logo size={34} />
           </Link>
 
@@ -195,7 +196,8 @@ export function PublicLayout() {
         <div className="border-t px-4 py-5" style={{ borderColor: 'var(--border)' }}>
           <div className="container-page flex flex-col items-start justify-between gap-2 px-0 text-xs text-muted sm:flex-row sm:items-center">
             <p>
-              © {new Date().getFullYear()} Ujyalo Learn. Founded and created by <strong style={{ color: 'var(--text-soft)' }}>Riyaz Chalise</strong>.
+              © {new Date().getFullYear()} Ujyalo Learn — Built by{' '}
+              <strong style={{ color: 'var(--text-soft)' }}>Riyaz Chalise</strong>.
             </p>
             <p>Learn Smarter. Shine Brighter.</p>
           </div>
