@@ -7,6 +7,7 @@ import { Section, SectionHeading } from '@/components/marketing/Section';
 import { CURRICULA, SUBJECTS, subjectsForGrade } from '@/config/curriculum';
 import { cn } from '@/lib/utils';
 import { StartLearningButton } from '@/components/StartLearningButton';
+import { PageContent } from '@/components/marketing/PageContent';
 
 export default function SubjectsPage() {
   const [grade, setGrade] = useState(10);
@@ -127,6 +128,7 @@ export default function SubjectsPage() {
         </div>
       </Section>
 
+      <PageContent path="/subjects" />
       <Section>
         <div className="card flex flex-col items-start justify-between gap-4 p-6 sm:flex-row sm:items-center">
           <div>

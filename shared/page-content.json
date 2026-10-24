@@ -1,0 +1,234 @@
+{
+  "_readme": "Substantive body copy for the pages that are meant to earn search traffic. Read by BOTH the React pages (via PageContent) and scripts/generate-seo.mjs, so what a crawler receives and what a student reads are the same text from one source. Legal and utility routes (/privacy, /terms, /contact, /accessibility, /content-policy) are deliberately absent: padding those with 400 words of filler helps nobody and is worse than leaving them short.",
+  "pages": [
+    {
+      "path": "/features",
+      "sections": [
+        {
+          "heading": "The tools are connected, not a menu",
+          "body": [
+            "Most study apps give you a chatbot, a flashcard maker and a quiz generator that never speak to each other. Here, one action feeds the next. You ask the tutor about a step you keep getting wrong, and the explanation can be saved as a note. A note becomes flashcards. Flashcards become the topics you practise in a quiz. The quiz result is what appears on your progress page.",
+            "That chain matters more than any single feature. The reason a student forgets something is rarely that they never saw it — it is that they saw it once, in one form, and never met it again. Each tool in Ujyalo Learn is a second and third meeting with the same idea."
+          ]
+        },
+        {
+          "heading": "What the AI tutor is for, and what it is not",
+          "body": [
+            "The tutor is for the moment you are stuck and there is nobody to ask. It explains the reasoning rather than handing over an answer, because an answer you copied is worth nothing in an exam hall. You can ask it to slow down, to try a different example, or to check your own working.",
+            "It is not a teacher, and it is not always right. Language models can state something false with complete confidence. Every answer is labelled as AI-generated for that reason, and published course and resource material is kept separate and marked as reviewed content. Where the two disagree, trust your textbook and your teacher, then tell us through the contact page so it can be corrected."
+          ]
+        },
+        {
+          "heading": "Built for the device you actually have",
+          "body": [
+            "Many students here study on a shared, several-year-old Android phone with a data plan that runs out before the month does. That shaped the design rather than being an afterthought: pages are lightweight, the layout is sized for a small screen first, and you can ask your first question without creating an account. A sign-up is only asked for when there is something worth saving.",
+            "A dark theme is included, because a phone at 9pm in a room with a sleeping family is the real study environment for a lot of people."
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/ai-tutor",
+      "sections": [
+        {
+          "heading": "What asking a question looks like",
+          "body": [
+            "You type the question the way you would say it out loud: \"why do we flip the sign when we move a term across the equals sign?\" You do not need the right vocabulary to start, because the tutor will name the idea you are circling. Answers arrive as they are written, so you are not staring at a spinner.",
+            "The useful part is the follow-up. Once an explanation lands, you can ask what happens in a different example, ask it to mark your attempt, or ask why the method fails when a number is negative. That back-and-forth is where understanding actually forms, and it is what a single page of notes cannot do."
+          ]
+        },
+        {
+          "heading": "Where it helps most",
+          "body": [
+            "Late at night before a test, when there is nobody awake to ask. On a topic you have quietly avoided all term because you were embarrassed to admit in class that you never understood the earlier chapter. When you have written an answer and want to know whether your reasoning, not just your result, is sound.",
+            "These are the three situations where private tuition would normally be the answer and where the cost of tuition is exactly what makes it impossible."
+          ]
+        },
+        {
+          "heading": "The honest limits",
+          "body": [
+            "It can be wrong. That is true of every AI tutor, including the expensive ones, and any product that tells you otherwise is selling rather than describing. Check anything that matters against your textbook or your teacher.",
+            "It is not an official source. It has no access to your school's syllabus, it does not mark you, and nothing it says carries the authority of the exam board. It is an extra explanation on demand, not a replacement for teaching.",
+            "Do not type personal details into the chat. You do not need to, and the tutor will not ask."
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/see-preparation",
+      "sections": [
+        {
+          "heading": "What preparation has to solve",
+          "body": [
+            "SEE is not only a test of what you know. It is a test of how well you can produce it under a clock, on paper, in the order the paper demands. Students who understand a topic often lose marks for reasons that have nothing to do with understanding: leaving a question until last, showing no working, running out of time on the section worth the most marks.",
+            "So preparation here is built around four jobs — practise under time, turn mistakes into material, plan the final weeks, and understand before memorising. Each has a tool attached rather than being advice you have to remember to follow."
+          ]
+        },
+        {
+          "heading": "Practising under time",
+          "body": [
+            "Timed practice is uncomfortable in a way that reading notes is not, which is the point. A quiz you can pause indefinitely teaches you the content but not the pace. Doing it against a clock, and then reviewing what you rushed, shows you where the marks actually go.",
+            "After each attempt you get the explanation for every question, not only the ones you missed. Reading why a correct answer was correct is the cheapest revision available, and almost nobody does it."
+          ]
+        },
+        {
+          "heading": "An honest note about SEE",
+          "body": [
+            "Ujyalo Learn is an independent study site. It is not affiliated with the National Examinations Board, it does not set or mark examinations, and the study plans on this site are written by us rather than being official curriculum documents. Examination patterns, marking schemes and routines are decided by the board and should be confirmed from official sources.",
+            "What the site provides is practice and explanation. What decides your result is still your work, your teachers and your school."
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/subjects",
+      "sections": [
+        {
+          "heading": "What changes between Grade 1 and Grade 12",
+          "body": [
+            "The subjects do not simply get harder; the kind of thinking being asked for changes. Early grades are about fluency — reading accurately, computing without hesitation, writing a clean sentence. Middle grades introduce abstraction, where a symbol stands for a number and a formula has to be applied rather than remembered. Later grades ask you to select a method yourself, which is why students who were strong earlier can suddenly struggle without doing anything wrong.",
+            "Each grade page describes the subjects in that year and links to the courses and tools that match it, so you are not guessing which material applies to you."
+          ]
+        },
+        {
+          "heading": "Choosing what to study next",
+          "body": [
+            "The least useful way to revise is to start at the beginning of a subject you already half-know, because the early pages feel easy and the time disappears. The faster route is to find the specific point where an explanation stopped making sense and start there.",
+            "That is why the tutor is the front door to the rest of the site. Once you know which step is broken, notes, flashcards and quizzes all have somewhere to point."
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/help",
+      "sections": [
+        {
+          "heading": "The questions students actually ask",
+          "body": [
+            "Does it cost anything? No. You can start without an account, and creating one is free. If a paid plan is ever added it will be stated plainly on the pricing page rather than appearing as a surprise at the end of a quiz.",
+            "Do I need to give my name or my school? No. An account needs an email address so you can sign in and recover it. Your name, your school and your results are not shown to anyone else.",
+            "Can my teacher see my chats? No. Conversations with the tutor are private to your account. Teachers and administrators can see published course content, not individual conversations."
+          ]
+        },
+        {
+          "heading": "If something looks wrong",
+          "body": [
+            "If an explanation is incorrect, a quiz question is ambiguous, or a page will not load on your phone, that is worth reporting rather than working around. Corrections to published material are the only way the reviewed content improves, and a question that confused you has usually confused someone else too.",
+            "Use the contact page and describe what you saw and what you expected. Screenshots help, but a clear sentence is enough."
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/about",
+      "sections": [
+        {
+          "heading": "Why this exists",
+          "body": [
+            "Ujyalo Learn started from a specific problem rather than a business plan. Private tuition in Nepal costs more per month than many families can set aside, and the students who most need an explanation are the least able to buy one. Meanwhile the explanation itself — the sixth attempt at the same idea, worded differently — is the cheapest thing in the world to give away once the software exists.",
+            "So the site is built around that one moment: you are stuck, it is late, and there is nobody to ask."
+          ]
+        },
+        {
+          "heading": "Who builds it",
+          "body": [
+            "Ujyalo Learn is built and maintained by Riyaz Chalise, a student, as an independent project. That is worth saying plainly because it sets the expectations. There is no company behind the site, no investors, and no support team. It is one person writing the code and the content, which means corrections can be fast and releases can be slow.",
+            "It also means the site is honest about what it is not: not an accredited institution, not affiliated with the National Examinations Board, and not a substitute for a teacher."
+          ]
+        },
+        {
+          "heading": "What we refuse to do",
+          "body": [
+            "No invented testimonials, no fabricated student numbers, no \"trusted by thousands\" language that cannot be backed up. No dark patterns that make an account hard to delete. No selling of student data, because there is nothing to sell that would be worth the betrayal.",
+            "If a feature does not work yet, it is not advertised as working. Where something requires setup the owner has not completed, it says so."
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/pricing",
+      "sections": [
+        {
+          "heading": "What is free, and why",
+          "body": [
+            "The tutor, the notes, the flashcards, the quizzes and the Arena are free to use. An account is free to create. The reasoning is not generosity for its own sake: a study tool that a student cannot afford has no effect on the exam result that motivated building it.",
+            "You can answer your first question without signing up at all. An account is asked for only when there is progress worth saving — notes, flashcard decks, quiz history — because losing that work on a cleared browser is worse than being asked for an email."
+          ]
+        },
+        {
+          "heading": "What might cost money later",
+          "body": [
+            "Running a site costs money: hosting, and the per-question charge from the model provider behind the tutor. If a paid tier is ever added, it will be for heavier usage of that expensive part, it will be stated on this page before it takes effect, and everything free today will stay free at the level it is used now.",
+            "No payment system is connected, nothing on this site takes a card, and there is no \"unlimited\" plan being sold."
+          ]
+        },
+        {
+          "heading": "A cost note for parents and guardians",
+          "body": [
+            "If you are a parent reading this: there is nothing to buy here, no trial that converts into a charge, and no request for card details anywhere in the student flow. A student account needs an email address to sign in, and nothing else."
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/global-quiz",
+      "sections": [
+        {
+          "heading": "What the Arena is",
+          "body": [
+            "The Global Quiz Arena is a timed quiz against the clock and against a public leaderboard. Questions are drawn from fifteen categories spanning school subjects, and every attempt is scored the same way for everyone, so the ranking means something rather than being a participation badge.",
+            "It exists because revision without pressure is a different skill from performing under pressure. A quiz you can pause indefinitely tells you what you recognise; a timed one tells you what you can actually retrieve."
+          ]
+        },
+        {
+          "heading": "How scoring works",
+          "body": [
+            "Points come from correct answers, with a small completion bonus and a larger perfect-score bonus. A streak bonus rewards consistency across attempts rather than one lucky run. Each question has a minimum two-second reading time, so guessing fast does not beat thinking.",
+            "Attempts run on a 45-second-per-question budget plus a 60-second grace period, and timestamps use Asia/Kathmandu so a leaderboard week ends at the same moment for everyone in Nepal."
+          ]
+        },
+        {
+          "heading": "About the leaderboard, honestly",
+          "body": [
+            "Ranks are real. Every entry in the table is an attempt that someone actually submitted, and no placeholder players are ever inserted to make the board look busier than it is.",
+            "When the deployment is not connected to a database, the Arena runs in a clearly labelled practice mode on your own device and its scores are not submitted anywhere. You will see a notice saying so rather than a silently empty table."
+          ]
+        }
+      ]
+    }
+  ],
+  "gradeBands": {
+    "1-5": {
+      "heading": "The primary years: fluency before speed",
+      "body": [
+        "Grades 1 to 5 in Nepal build the mechanics that everything later depends on — reading accurately in Nepali and English, writing a sentence that holds together, and computing with whole numbers without stopping to think. At this stage a wrong answer usually means a missing habit, not a missing idea.",
+        "The useful help here is patient repetition: read the same short passage again, work the same kind of sum again, and get told why the answer was wrong. Speed comes later; accuracy first.",
+        "An adult nearby still matters most at this age. The tutor is best used with someone in the room, asking a follow-up question rather than being left alone with a screen."
+      ]
+    },
+    "6-8": {
+      "heading": "The middle years: when symbols start meaning something",
+      "body": [
+        "Grades 6 to 8 are where school stops being about remembering and starts being about reasoning. A letter stands in for a number, a formula has to be applied rather than recited, and a science answer needs a cause rather than a definition. Many students who were confident in primary school become quietly lost here without anyone noticing, because the earlier marks stay high for a while.",
+        "This is the stage where asking a question feels most embarrassing and matters most. The tutor is useful precisely because nobody else sees the question being asked.",
+        "Notes and flashcards help once a topic is understood, but they cannot substitute for understanding it — a deck built on a wrong explanation just makes the wrong explanation faster to recall."
+      ]
+    },
+    "9-10": {
+      "heading": "Secondary and SEE: producing under a clock",
+      "body": [
+        "Grades 9 and 10 are organised around one examination. The content is finite and known in advance, which means the difference between students is rarely knowledge — it is time management, exam technique, and whether mistakes were ever reviewed rather than made once and forgotten.",
+        "Timed practice is the only way to rehearse that, and reviewing every answer, including the correct ones, is the cheapest revision available.",
+        "Ujyalo Learn is independent of the National Examinations Board. Examination patterns, marking schemes and routine dates are set by the board and should be confirmed from official sources before you rely on them."
+      ]
+    },
+    "11-12": {
+      "heading": "Higher secondary: choosing your own method",
+      "body": [
+        "Grades 11 and 12 assume you can already study. The change is that a question no longer tells you which method to use — you have to recognise it, choose, and justify the choice. Students who were strong at Grade 10 can plateau here not from laziness but because recognition, not recall, is now being tested.",
+        "The useful practice is therefore mixed-problem work rather than single-topic drilling, and explaining your reasoning out loud or in writing to find the gaps.",
+        "Specialisation also begins here, so a subject list is only a starting point. What matters is your own combination and the requirements of the course or examination you are aiming at."
+      ]
+    }
+  }
+}

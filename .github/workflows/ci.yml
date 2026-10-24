@@ -70,6 +70,12 @@ jobs:
       - name: Verify the client bundle carries no server secrets
         run: npm run check:bundle
 
+      # Guards against the failure mode this job was written for: pages that
+      # prerender cleanly but serve a crawler ~130 words of header and footer.
+      # Legal pages are exempt by design — padding them is worse than thin.
+      - name: Check prerendered pages are not thin
+        run: node scripts/measure-prerender.mjs --check
+
       - name: Upload the build so the browser job can reuse it
         uses: actions/upload-artifact@v4
         with:

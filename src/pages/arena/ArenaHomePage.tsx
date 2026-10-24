@@ -34,6 +34,7 @@ import {
 import { HandleForm } from '@/features/arena/HandleForm';
 import type { ArenaHome, ArenaMeta, Difficulty } from '@/features/arena/types';
 import { CATEGORY_META, type ArenaCategory } from '../../../shared/arena/scoring';
+import { PageContent } from '@/components/marketing/PageContent';
 
 const LENGTH_LABELS: Record<number, string> = { 5: '5 questions', 10: '10 questions', 20: '20 questions' };
 const DIFFICULTY_LABELS: Record<Difficulty, string> = { easy: 'Easy', medium: 'Medium', hard: 'Hard' };
@@ -500,6 +501,8 @@ export default function ArenaHomePage() {
           ))}
         </div>
       </Section>
+
+      <PageContent path="/global-quiz" />
     </>
   );
 }

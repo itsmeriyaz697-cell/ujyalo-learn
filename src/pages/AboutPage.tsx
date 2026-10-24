@@ -5,6 +5,7 @@ import { seoFor } from '@/config/seoPages';
 import { Section, SectionHeading } from '@/components/marketing/Section';
 import { InlineAlert } from '@/components/ui/Feedback';
 import { StartLearningButton } from '@/components/StartLearningButton';
+import { PageContent } from '@/components/marketing/PageContent';
 
 export default function AboutPage() {
   return (
@@ -129,6 +130,7 @@ export default function AboutPage() {
         </div>
       </Section>
 
+      <PageContent path="/about" />
       <Section tone="surface" className="!py-12">
         <div className="grid items-center gap-6 md:grid-cols-[1.2fr_0.8fr]">
           <div>

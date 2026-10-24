@@ -2,6 +2,8 @@ import { Link, useParams } from 'react-router-dom';
 import { ArrowRight, BookOpen, GraduationCap } from 'lucide-react';
 import { Seo } from '@/components/seo/Seo';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { ContentSections } from '@/components/marketing/PageContent';
+import { gradeBandFor } from '@/lib/pageContent';
 import { Section } from '@/components/marketing/Section';
 import { Button } from '@/components/ui/Button';
 import { useContent } from '@/features/content/ContentProvider';
@@ -72,6 +74,7 @@ export default function GradePage() {
         </p>
       </Section>
 
+      <ContentSections sections={gradeBandFor(value)} />
       <Section>
         <h2 className="text-xl font-bold tracking-tight sm:text-2xl">Courses covering Grade {value}</h2>
         {loading ? (

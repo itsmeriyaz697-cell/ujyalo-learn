@@ -6,6 +6,7 @@ import { Section, SectionHeading } from '@/components/marketing/Section';
 import { Button } from '@/components/ui/Button';
 import { useContent } from '@/features/content/ContentProvider';
 import { InlineAlert } from '@/components/ui/Feedback';
+import { PageContent } from '@/components/marketing/PageContent';
 
 const WHAT_HELPS = [
   {
@@ -128,6 +129,7 @@ export default function SeePrepPage() {
         )}
       </Section>
 
+      <PageContent path="/see-preparation" />
       <Section className="!pt-4">
         <div className="card flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
           <div>

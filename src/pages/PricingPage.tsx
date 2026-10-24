@@ -8,6 +8,7 @@ import { InlineAlert } from '@/components/ui/Feedback';
 import { PRICING_TIERS } from '@/config/curriculum';
 import { cn } from '@/lib/utils';
 import { StartLearningButton } from '@/components/StartLearningButton';
+import { PageContent } from '@/components/marketing/PageContent';
 
 export default function PricingPage() {
   return (
@@ -30,6 +31,7 @@ export default function PricingPage() {
         </div>
       </Section>
 
+      <PageContent path="/pricing" />
       <Section className="!pt-4">
         <div className="grid gap-4 lg:grid-cols-3">
           {PRICING_TIERS.map((tier) => (

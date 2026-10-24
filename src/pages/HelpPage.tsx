@@ -5,6 +5,7 @@ import { seoFor } from '@/config/seoPages';
 import { Section, SectionHeading, Faq } from '@/components/marketing/Section';
 import { Button } from '@/components/ui/Button';
 import { InlineAlert } from '@/components/ui/Feedback';
+import { PageContent } from '@/components/marketing/PageContent';
 
 const FAQS = [
   {
@@ -92,6 +93,7 @@ export default function HelpPage() {
         </div>
       </Section>
 
+      <PageContent path="/help" />
       <Section>
         <div className="grid gap-6 lg:grid-cols-2">
           <div>

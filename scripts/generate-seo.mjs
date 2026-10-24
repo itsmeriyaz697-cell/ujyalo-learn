@@ -15,6 +15,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+// Body copy for the traffic pages, shared with the React app so the prerendered
+// HTML and the mounted page show the same words. See shared/page-content.json.
+const pageContent = JSON.parse(
+  fs.readFileSync(path.resolve(process.cwd(), 'shared/page-content.json'), 'utf8'),
+);
+
 const DIST = path.resolve(process.cwd(), 'dist');
 const THEME_COLOR = '#15245F';
 const SITE_NAME = 'Ujyalo Learn';
@@ -199,6 +205,12 @@ const PRERENDER_MENU_ICON = `<svg width="20" height="20" viewBox="0 0 24 24" fil
  */
 const PRERENDER_CSS = `
 .pr{display:flex;flex-direction:column;min-height:100dvh;background:var(--bg);color:var(--text)}
+.pr-body{padding-bottom:3rem!important;display:grid;gap:2rem}
+@media (min-width:1024px){.pr-body{grid-template-columns:1fr 1fr;gap:2rem 3rem}.pr-body .pr-sec:first-child{grid-column:1/-1}}
+.pr-sec h2{font-size:1.15rem;font-weight:700;letter-spacing:-.01em;margin:0 0 .6rem;color:var(--pr-text,#111827)}
+.pr-sec p{margin:0 0 .7rem;font-size:.9rem;line-height:1.7;color:var(--pr-soft,#4b5563)}
+.pr-sec ul{margin:.2rem 0 .7rem;padding-left:1.1rem}
+.pr-sec li{font-size:.9rem;line-height:1.7;color:var(--pr-soft,#4b5563);margin-bottom:.3rem}
 .pr-c{width:100%;max-width:76rem;margin:0 auto;padding:0 1rem}
 @media (min-width:640px){.pr-c{padding:0 1.5rem}}
 @media (min-width:1024px){.pr-c{padding:0 2rem}}
@@ -404,6 +416,21 @@ function renderGradeBody(grade) {
     </section>`;
 }
 
+/**
+ * Grade-band copy: the same honest narrative shared by every grade in a stage.
+ * Grades 1-5 share one section rather than 5 near-identical paragraphs, which
+ * is what makes the pages substantive instead of templated.
+ */
+function renderGradeBand(grade) {
+  const key = grade <= 5 ? '1-5' : grade <= 8 ? '6-8' : grade <= 10 ? '9-10' : '11-12';
+  const band = pageContent.gradeBands[key];
+  if (!band) return '';
+  return `<div class="pr-c pr-body"><section class="pr-sec">
+        <h2>${escapeHtml(band.heading)}</h2>
+        ${band.body.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join('\n        ')}
+      </section></div>`;
+}
+
 function renderLibraryBody(kind, heading) {
   const items =
     kind === 'courses'
@@ -436,6 +463,37 @@ function renderLibraryBody(kind, heading) {
  * a JSON-LD block whose questions appear nowhere in the document is a policy
  * mismatch, not just thin content.
  */
+/**
+ * Render the shared body copy for a marketing page.
+ *
+ * This is the fix for thin prerendered pages: crawlers used to receive a
+ * heading, a one-line description and a footer — about 130 words of chrome.
+ * Pages that exist to earn search traffic now carry their real body text in
+ * the static HTML, from the same JSON the React app renders, so the crawler
+ * and the student read the same words.
+ *
+ * Deliberately absent for legal and utility routes, which should stay short.
+ */
+function renderPageContent(pagePath) {
+  const entry = pageContent.pages.find((page) => page.path === pagePath);
+  if (!entry) return '';
+  const sections = entry.sections
+    .map(
+      (section) => `
+      <section class="pr-sec">
+        <h2>${escapeHtml(section.heading)}</h2>
+        ${section.body.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join('\n        ')}
+        ${
+          section.bullets && section.bullets.length
+            ? `<ul>${section.bullets.map((bullet) => `<li>${escapeHtml(bullet)}</li>`).join('')}</ul>`
+            : ''
+        }
+      </section>`,
+    )
+    .join('');
+  return `<div class="pr-c pr-body">${sections}</div>`;
+}
+
 function renderFaqBody() {
   const items = FAQ.map(
     (entry) =>
@@ -595,6 +653,8 @@ function renderStaticContent(page) {
                     : ''
     }
     </div>
+    ${renderPageContent(page.path)}
+    ${page.kind === 'grade' ? renderGradeBand(page.grade) : ''}
   </main>
   <footer class="pr-f">
     <div class="pr-c">

@@ -19,6 +19,7 @@ import { Section, SectionHeading, FeatureCard } from '@/components/marketing/Sec
 import { Button } from '@/components/ui/Button';
 import { TUTOR_MODES } from '@/config/curriculum';
 import { StartLearningButton } from '@/components/StartLearningButton';
+import { PageContent } from '@/components/marketing/PageContent';
 
 export default function FeaturesPage() {
   return (
@@ -144,6 +145,7 @@ export default function FeaturesPage() {
         </div>
       </Section>
 
+      <PageContent path="/features" />
       <Section>
         <div className="card flex flex-col items-start justify-between gap-4 p-6 sm:flex-row sm:items-center">
           <div>

@@ -8,6 +8,7 @@ import { InlineAlert } from '@/components/ui/Feedback';
 import { TUTOR_MODES } from '@/config/curriculum';
 import { useAiHealth } from '@/hooks/useAiHealth';
 import { StartLearningButton } from '@/components/StartLearningButton';
+import { PageContent } from '@/components/marketing/PageContent';
 
 /**
  * Public introduction to the tutor.
@@ -100,6 +101,7 @@ export default function AiTutorPage() {
         </div>
       </Section>
 
+      <PageContent path="/ai-tutor" />
       <Section>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
