@@ -99,19 +99,29 @@ email. Replace everything in [square brackets].
 > do have is a working product, a real list of what it costs to keep running,
 > and a plan for the next year.
 >
-> **What I'm asking:** one gift of $1,000 to cover [12 months of running costs —
-> see the breakdown below]. It isn't an investment and it isn't a loan. Nobody
-> gets a share of anything, and I'm not promising anyone a return, because
-> there isn't one to promise. If $1,000 is more than you'd want to put in, a
-> smaller amount genuinely helps and there's no minimum — I'd rather have ten
-> people giving $100 than one person giving everything.
+> **What I'm asking:** $1,000 in total, and I'll say exactly what it's for. About
+> $[__] of it is twelve months of running costs — domain and AI usage. The rest
+> is one laptop. Right now I build on [a shared family laptop / a borrowed one /
+> a phone], which is why everything takes longer than it should and why I've
+> broken the site by testing on the wrong screen.
 >
-> Here is roughly what it pays for:
+> I want to be straight about that second part, because it's the part you might
+> not want to fund: the laptop would be mine, not the project's. If you'd rather
+> your money went only to the site, $[running-cost total] covers the running
+> costs on their own, and I'd be just as grateful.
+>
+> It isn't an investment and it isn't a loan. Nobody gets a share of anything,
+> and I'm not promising anyone a return, because there isn't one to promise. If
+> $1,000 is more than you'd want to put in, a smaller amount genuinely helps and
+> there's no minimum — I'd rather have ten people giving $100 than one person
+> giving everything.
+>
+> Here is what it adds up to:
 >
 > - [Domain name, 12 months — $__]
 > - [AI usage for the tutor at current traffic — $__]
-> - [Hosting and database — $__ (currently free tier)]
-> - [Anything else — say what it is and why]
+> - [Hosting and database — $__(currently free tier)]
+> - [Laptop — $__, and which one, so you can check the price yourself]
 >
 > **The part I want to be upfront about:** I'm 14, so I can't receive or hold
 > money myself, and I'm not going to pretend otherwise. If you'd like to help,
@@ -182,9 +192,11 @@ part of. Keep it this length; longer messages don't get read on a phone.
 > paying for tuition. It's live and working, but it's new — I don't have big
 > numbers to show you yet.
 >
-> I'm looking for support to keep it running for a year: about $1,000 in total,
-> given by people who want to help. Not an investment — no shares, nothing in
-> return. A smaller amount genuinely helps too.
+> I'm looking for support to keep it running and to stop building it on a shared
+> laptop: about $1,000 in total, given by people who want to help. Not an
+> investment — no shares, nothing in return. Part of it is twelve months of
+> running costs (roughly $[__]) and the rest is one laptop. A smaller amount
+> genuinely helps too.
 >
 > I'm 14, so anything financial goes through my parent/guardian [name], and
 > they're part of this.
@@ -224,49 +236,59 @@ gift.
 
 ---
 
-## 7. The number: be careful with $1,000
+## 7. The number: $1,000 = running costs + one device
 
 **This is the part most likely to go wrong, so read it properly.**
 
-Look at what this project actually costs. The stack is Vercel (free tier),
-Firebase (free tier), and an AI provider whose free allowance covers most of
-what a new site uses. A realistic 12-month bill for the current setup, with a
-domain, is likely to be **in the tens of dollars, not a thousand.**
+The site itself is cheap. The stack is Vercel (free tier), Firebase (free
+tier), and an AI provider whose free allowance covers most of what a new site
+uses. A realistic 12-month bill for the current setup, with a domain, is likely
+to be **in the tens of dollars.**
 
-That matters, because if you write "this covers 12 months of running costs" and
-it actually costs $60, you've told a lie to someone who is being kind to you. If
-they ever ask — and a teacher will — you've lost the thing that makes this
-project worth supporting.
+So if the email says "$1,000 covers 12 months of running costs", it is not
+true, and the first teacher who checks will know. **That is why the device is in
+the ask.** It's real, it's specific, and it's checkable — which is exactly what
+makes the whole email believable.
 
-You have three honest options. Pick one and make the email match it:
+It is also the part you must disclose rather than bury. A laptop paid for by a
+supporter is yours, not the site's. Some people will be happy about that
+(they're backing a person, not a server), and some will only want to fund the
+site. Both are reasonable, which is why the email says it plainly and offers the
+running-costs-only amount as an alternative.
 
-1. **Ask for the real number.** If a year costs $80, ask for $80, or $100. Small
-   specific asks get paid far more often than round big ones. "$100 for the
-   domain and a year of AI usage" is a much stronger email than "$1,000".
-2. **Keep the $1,000 and say what the rest is for**, item by item and truthfully
-   — for example a device you currently share for building, a school pilot with
-   printing and transport, or a paid AI tier so the free users aren't rate-
-   limited. Each of those is a real thing a donor can understand and check.
-3. **Say it plainly as support for your time.** "The costs are about $80; the
-   rest would be the first money I've ever been paid for building this." Some
-   people will say no to that. The ones who say yes will trust you more than if
-   you'd dressed it up.
+### Rough prices, so your figure isn't invented
 
-What you must not do is present a round number as a cost figure without the
-breakdown behind it.
+New student laptops in Nepal were around **NPR 50,000–78,000** in 2026 (budget
+i3/N-series ~NPR 50,000–58,000; a good i5 or Ryzen 5 with 8–16 GB ~NPR 70,000–
+80,000), and import prices rose through the year. Check the current price on a
+Nepali retailer's page before you quote it — and quote the model, not just a
+number.
 
-### Fill this in before sending (replace every blank)
+**Fill this in before sending. Replace every blank.**
 
 | What | Real cost | How I know |
 | --- | --- | --- |
 | Domain, 12 months | $ | |
 | AI usage at current traffic | $ | |
 | Hosting + database | $ | free tier |
-| Other (say what) | $ | |
+| Laptop — [exact model] | $ | [shop name, price seen on ___] |
 | **Total** | **$** | |
 
-Also: **$1,000 is about NPR 1.4 lakh** at recent rates — check the rate before
-you quote it in rupees, because it moves.
+The total should land near $1,000. If it doesn't, either change the device to
+something cheaper or change the ask to match the total — **do not** change the
+sentence to fit the number.
+
+**Rupees:** at recent rates $1,000 is somewhere around NPR 1.3–1.4 lakh, but the
+rate moves. Check it the day you send, and if you quote rupees, say which day
+you checked.
+
+### Why not just ask for the small amount?
+
+You can, and for some people you should. But be clear-eyed about it: a request
+for "$80 for a domain" is small enough that people pay it and forget it, while
+$1,000 for a laptop gets you a real conversation about what you're building.
+Both are honest. Pick the one that matches the person you're writing to, and
+never inflate the running cost to get to a rounder total.
 
 ---
 
@@ -314,7 +336,43 @@ on an application. Rules change and blog posts go stale.
 
 ---
 
-## 10. Before you hit send
+## 10. Something I found, and it matters more than these emails
+
+Your Gmail drafts folder has **53 drafts**, almost all of them a single cold
+email to a large company: Samsung, NVIDIA, a16z, GitHub Education, MLH, Vercel
+careers, Netlify careers, Walmart, AT&T, Capital One, Northrop Grumman, Wells
+Fargo, Outreachy, Gatsby, and more — with several companies receiving two or
+three near-identical versions a few days apart.
+
+None of these is wrong to want. But as a *strategy* it is close to the worst
+available, and it can actively hurt you:
+
+- **These addresses almost never reach a human.** `careers@`, `hr@` and
+  `info@` inboxes are filtered, auto-archived, or handled by a recruiter
+  who has no route to a 14-year-old in Nuwakot. The silence you've had is not
+  a judgement of you.
+- **Repetition is the problem, not the ambition.** Three emails to the same
+  company in five days reads as spam, and Gmail starts treating the *account*
+  that way. That is the one asset you actually need for this project.
+- **Wrong ask.** A company cannot hire a 14-year-old, and it cannot fund one
+  either. The realistic thing to ask a company for is **free stuff they already
+  give** — credits, a student plan, hardware — and you ask through the official
+  form, once, not by email to careers.
+- **Unsolicited "I'm 14 and ambitious" mail to strangers teaches you the wrong
+  lesson.** You'll conclude nobody cares. People care a lot — but about a
+  specific thing you did for a specific person they know.
+
+**My suggestion:** leave those 53 drafts unsent. Don't delete them; keep them as
+a record of what you tried. Then spend the same energy on ten people who can
+actually say yes — a teacher, a principal, an alumnus of your school, a Nepali
+developer who has seen the site. And for the genuine free-credit route (AI
+credits, a domain, a cloud tier), use the official student/free-tier application
+pages rather than emailing a careers address. Those applications get approved by
+a form; they do not get approved by a letter.
+
+---
+
+## 11. Before you hit send
 
 - [ ] You filled in the budget table with real numbers, and the ask matches it.
 - [ ] Every [bracket] is replaced. No "[Name]" left in the greeting.
