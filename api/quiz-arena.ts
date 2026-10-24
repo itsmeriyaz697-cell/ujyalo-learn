@@ -19,7 +19,7 @@
  */
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { handleOptions, methodNotAllowed, sendError, sendJson } from './_lib/http.js';
-import { arenaDb, arenaEnv, verifyCaller, type Caller } from './_lib/arena/store.js';
+import { arenaDb, arenaEnv, arenaStatus, verifyCaller, type Caller } from './_lib/arena/store.js';
 import {
   ArenaError,
   consumeRateLimit,
@@ -107,11 +107,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const db = arenaDb();
 
   // Unconfigured is a legitimate, clearly-reported state: the UI switches to
-  // its labelled demo mode rather than pretending the board is real.
+  // its labelled demo mode rather than pretending the board is real. A key that
+  // exists but cannot be parsed is reported differently, because that one is a
+  // fixable mistake rather than a missing step.
   if (!db || env.mode === 'unconfigured') {
+    const status = arenaStatus();
     return sendJson(res, 200, {
       configured: false,
-      reason: 'Arena storage is not configured on this deployment.',
+      reason: status.problem
+        ? `Arena storage is misconfigured: ${status.problem}`
+        : 'Arena storage is not configured on this deployment.',
       mode: 'demo',
       meta: null,
     });

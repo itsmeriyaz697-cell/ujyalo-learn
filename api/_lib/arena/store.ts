@@ -86,6 +86,30 @@ function adminApp(): App {
   throw new Error('Arena storage is not configured');
 }
 
+/**
+ * Why the Arena is in the state it is in.
+ *
+ * The distinction matters when the owner has just pasted the service account:
+ * "no credentials" and "credentials present but unreadable" look identical from
+ * the outside, and only one of them is fixed by pasting again. Reporting the
+ * difference turns a silent demo mode into a message that says what to fix.
+ */
+export function arenaStatus(): { mode: ArenaMode; problem: string | null } {
+  const env = arenaEnv();
+  if (env.mode === 'unconfigured') return { mode: env.mode, problem: null };
+  try {
+    adminApp();
+    return { mode: env.mode, problem: null };
+  } catch (error) {
+    return {
+      mode: env.mode,
+      problem:
+        (error as Error)?.message ??
+        'FIREBASE_SERVICE_ACCOUNT is present but could not be read as a service account key.',
+    };
+  }
+}
+
 /** Firestore handle, or null when nothing is configured (never throws to callers). */
 export function arenaDb(): Firestore | null {
   try {

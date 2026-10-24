@@ -1,6 +1,9 @@
 # Global Quiz Arena — how it works and how to turn it on
 
-Status as of 24 October 2026. Read section 4 before you tell anyone it is live.
+**Status as of 24 October 2026: deployed and live at
+<https://ujyalo-learn.vercel.app/global-quiz>.** Everything works today except
+one thing — saving scores — which needs a single environment variable only you
+can add. Until then the page runs its labelled demo mode. Section 4.
 
 ---
 
@@ -20,9 +23,11 @@ Status as of 24 October 2026. Read section 4 before you tell anyone it is live.
 | Firestore rules closing the Arena to every browser | **Tested — 22 new assertions** |
 | SEO: title, description, canonical, OG, sitemap, prerendered HTML | Built (43 public routes now) |
 
-**Not yet live.** The code is on `main`, but the API needs a service account on
-Vercel before it can score anything. Until then the page runs in demo mode and
-says so. Section 4.
+**Live now, scoring off until one variable is added.** The page is on the real
+site and plays a real quiz start to finish; the results screen appears, the
+explanations appear, the leaderboard is honest about being empty. What does not
+happen yet is a *saved* score, because the API has no database credentials.
+That is section 4, and it is one variable.
 
 ---
 
@@ -95,6 +100,11 @@ answers + 5 + 20 = **325**, while a 5-question easy quiz is worth at most
 
 ### 4.1 Create the service account (5 minutes)
 
+You need to add **one** variable: `FIREBASE_SERVICE_ACCOUNT`. You do **not** need
+`FIREBASE_PROJECT_ID` or `FIREBASE_WEB_API_KEY` for the Arena — the project id is
+read out of the key file itself. (Those two are worth adding separately for a
+different reason; see section 6, "one unrelated gap".)
+
 The API writes with Admin credentials. It needs a private key, which must live in
 Vercel's environment settings — **never in this repository, never in a message**.
 
@@ -110,16 +120,14 @@ Vercel's environment settings — **never in this repository, never in a message
 3. Tick **Production**, **Preview** and **Development**
 4. **Save**, then redeploy: **Deployments** → the newest one → **⋯** → **Redeploy**
 
-Also make sure these are already set from the earlier work (they are the public
-identifiers, not secrets):
+If pasting the whole JSON is awkward, the value is also accepted base64-encoded.
+Either form works.
 
-```
-FIREBASE_PROJECT_ID=...
-FIREBASE_WEB_API_KEY=...
-```
-
-If you would rather not paste JSON into a form, it also accepts the same JSON
-base64-encoded — either works.
+**If the key is present but broken**, the API now says so explicitly instead of
+silently reporting "not configured": `/api/quiz-arena?action=meta` returns a
+`reason` beginning `Arena storage is misconfigured:` followed by what went wrong.
+That message means the variable exists — paste the file contents again, making
+sure you did not copy only part of it.
 
 ### 4.3 Check it actually turned on
 
@@ -132,7 +140,9 @@ Open <https://ujyalo-learn.vercel.app/global-quiz> and look:
 
 Then open `https://ujyalo-learn.vercel.app/api/quiz-arena?action=meta` in a
 browser. You should see `"configured": true` and a list of 15 categories. If it
-says `"configured": false`, stop and fix section 4.2 before telling anyone.
+says `"configured": false`, read its `reason` field — it now distinguishes "no
+key at all" from "key present but unreadable" — and fix section 4.2 before
+telling anyone.
 
 ### 4.4 Delete the key you downloaded
 
@@ -159,6 +169,7 @@ rows.
 | `npm run test:arena` | 45 checks against the real API + Firestore emulator | Java 21 |
 | `npm run test:rules` | 90 rule assertions, 22 of them Arena denials | Java 21 |
 | `node scripts/arena-ui.mjs` | 35 browser checks: play a quiz, results, mobile, a11y | a running dev server |
+| `node scripts/verify-arena-live.mjs` | 26 checks against the **deployed** site: live quiz, live SEO, existing pages still working | nothing |
 
 **What has actually been run, on 24 October 2026:**
 
@@ -166,11 +177,16 @@ rows.
 - `npm run test:arena` → **45 passed, 0 failed**
 - `npm run test:rules` → **90 passed**
 - `node scripts/arena-ui.mjs` → **35 passed, 0 failed**
+- `node scripts/verify-arena-live.mjs` → **26 passed, 0 failed** against
+  `https://ujyalo-learn.vercel.app`
+- `npm run health` → **34/34**
 - `npm run build` → 43 prerendered routes, links OK
 - typecheck clean; lint 0 errors
 
 **What has not been tested:** the ranked path with a *real signed-in Firebase
-account in production*, because that needs section 4 done first. The emulator run
+account in production*, because that needs section 4 done first. The live run
+above proves the page, the quiz, the scoring maths and the empty states on the
+real internet; it cannot prove saved scores until the key exists. The emulator run
 covers the same code path with a verified-shaped identity, but it is not the same
 thing as a real token from Google, and I will not claim it is.
 
@@ -195,6 +211,14 @@ thing as a real token from Google, and I will not claim it is.
 - **Practice mode and ranked mode use different question sets.** Practice
   questions are easier and shallower. That is the price of not shipping the
   ranked answers to the browser.
+- **One unrelated gap I found while deploying.** Vercel has the public
+  `VITE_FIREBASE_*` variables but **not** the server-side `FIREBASE_PROJECT_ID`
+  and `FIREBASE_WEB_API_KEY`. Those two are what `api/_lib/auth.ts` uses to
+  verify a signed-in student's token on the AI endpoints. Without them the tutor
+  API cannot check who is calling, so it is protected by rate limits only. The
+  Arena does not depend on them (it verifies tokens through the service
+  account), but adding them would close that hole. I have not changed the
+  behaviour — `requireAuth` is your setting, not mine.
 
 ---
 

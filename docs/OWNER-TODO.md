@@ -139,11 +139,15 @@ and against Google's spam policy. It needs you, or teachers you work with.
 
 ---
 
-## E2. Global Quiz Arena — needs your Firebase key
+## E2. Global Quiz Arena — needs ONE environment variable
 
-The Arena is built and tested, but it cannot score anything until the API has a
-service account. **This is the only step between what exists now and a working
-leaderboard.** Full walkthrough: `docs/QUIZ-ARENA.md` section 4.
+**Live now:** <https://ujyalo-learn.vercel.app/global-quiz> — verified in a real
+browser: a quiz plays start to finish, the results and explanations appear, the
+leaderboard is honest about being empty, and no existing page broke.
+
+Scores are not saved yet. That needs one service account key.
+**This is the only step between what exists now and a working leaderboard.**
+Full walkthrough: `docs/QUIZ-ARENA.md` section 4.
 
 - [ ] Firebase console → Project settings → **Service accounts** → *Generate new
       private key*. A `.json` file downloads.
@@ -157,6 +161,17 @@ leaderboard.** Full walkthrough: `docs/QUIZ-ARENA.md` section 4.
 - [ ] Play one quiz, reload, confirm the points total is still there.
 - [ ] Delete the downloaded `.json` from your computer.
 - [ ] Visit `/api/quiz-arena?action=meta` — it must say `"configured": true`.
+- [ ] If it says `configured: false` **but** the `reason` mentions
+      "misconfigured", the variable is there but the JSON is incomplete — paste
+      the whole file again.
+
+Only `FIREBASE_SERVICE_ACCOUNT` is needed. The project id is read from the key.
+
+**Separately (not needed for the Arena):** the Vercel project has no server-side
+`FIREBASE_PROJECT_ID` or `FIREBASE_WEB_API_KEY`, so `api/_lib/auth.ts` cannot
+verify student tokens for the AI endpoints. They still work, protected by rate
+limits alone. Adding those two public values would make the tutor API check who
+is calling.
 
 Two composite indexes will be requested by Firestore the first time the Nepal
 and weekly boards run. The error message contains a link; click **Create index**
