@@ -38,8 +38,11 @@ async function updateMembership(
   const store = db();
   if (!store) return { ok: false, reason: 'unconfigured' };
 
+  // A document id, not a slug: Firestore-generated ids are mixed case, so the
+  // slug pattern (lowercase, dashes) would reject every community this app
+  // creates. Only the shape that could escape the collection is refused.
   const communityId = String(rawCommunityId ?? '').trim();
-  if (!/^[a-z0-9][a-z0-9-]{2,39}$/.test(communityId)) {
+  if (!/^[A-Za-z0-9_-]{1,100}$/.test(communityId)) {
     return { ok: false, reason: 'not_found' };
   }
 

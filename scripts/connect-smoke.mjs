@@ -180,14 +180,28 @@ const page = await context.newPage();
 
 const consoleErrors = [];
 const consoleWarnings = [];
-/** Record console noise from any page the run opens, not just the first. */
+/**
+ * The analytics consent notice is a real part of the site and it covers the
+ * bottom of the page, so a click aimed at a form button underneath it would
+ * wait for ever. Decline it — the suite sends no page views either way.
+ */
+async function dismissConsent(target) {
+  const decline = target.getByRole('button', { name: /no thanks/i }).first();
+  if (await decline.isVisible().catch(() => false)) {
+    await decline.click({ timeout: 5000 }).catch(() => {});
+  }
+}
+
 function watchConsole(target) {
   target.on('console', (msg) => {
     const text = msg.text();
     if (msg.type() === 'error' && !/Failed to load resource/i.test(text)) consoleErrors.push(text);
     if (msg.type() === 'warning') consoleWarnings.push(text);
   });
-  target.on('pageerror', (error) => consoleErrors.push(String(error)));
+  target.on('pageerror', (error) => {
+    consoleErrors.push(String(error));
+    console.log('PAGEERROR:', String(error && error.stack ? error.stack : error).slice(0, 600));
+  });
 }
 watchConsole(page);
 
@@ -208,7 +222,20 @@ try {
   check('messages are withheld from a signed-out visitor', /Messages are for members/i.test(guestView));
   check('the reason is explained before asking anything', /private to the people in it/i.test(guestView));
 
+  // Creating a community is the one Connect feature that needs an account, and
+  // it must say why rather than just refusing.
+  await page.goto(`${BASE}/connect/new`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('#main h1', { timeout: 30000 });
+  await page.waitForTimeout(1200);
+  const createGate = await page.locator('body').innerText();
+  check('creating a community asks for an account, with the reason', /needs a Discord account/i.test(createGate) && /owner/i.test(createGate));
+  check('the create form is not shown to a visitor', (await page.getByRole('button', { name: /create community/i }).count()) === 0);
+
   // --- First sign-in creates a profile --------------------------------------
+  // Back to the community: signing in from the gate would return to /connect/new,
+  // and this run wants to prove it returns to the page that was asked for.
+  await page.goto(`${BASE}/connect/c/see-2026`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('#main h1', { timeout: 30000 });
   await page.getByRole('button', { name: /continue with discord/i }).first().click();
   await page.waitForURL(/\/connect\/c\/see-2026/, { timeout: 45000 });
   await page.waitForTimeout(2500);
@@ -433,6 +460,40 @@ try {
   const afterEdit = await connectedPage.locator('body').innerText();
   check('the new display name survives a reload', afterEdit.includes(customName));
 
+  // --- Creating a community, which needs an account -------------------------
+  await connectedPage.goto(`${BASE}/connect/new`, { waitUntil: 'domcontentloaded' });
+  await connectedPage.waitForSelector('#main h1', { timeout: 30000 });
+  await dismissConsent(connectedPage);
+  const madeSlug = `mock-${Date.now().toString().slice(-6)}`;
+  // Placeholders, not labels: the label text includes the hint underneath it.
+  await connectedPage.getByPlaceholder(/SEE 2026/i).first().fill('Mock Test Community');
+  await connectedPage.getByPlaceholder(/see-2026/i).first().fill(madeSlug);
+  await connectedPage.getByPlaceholder(/who should join/i).first().fill('A community created by the test suite.');
+  await connectedPage.getByRole('button', { name: /create community/i }).first().click();
+  await connectedPage.waitForURL(new RegExp(`/connect/c/${madeSlug}`), { timeout: 30000 }).catch(() => {});
+
+  // Community documents carry a generated id and a separate slug, so look the
+  // community up the way the app does.
+  const madeSnap = await db.collection('communities').where('slug', '==', madeSlug).limit(1).get();
+  const madeDoc = madeSnap.docs[0];
+  const madeId = madeDoc?.id;
+  check('a signed-in person can create a community', Boolean(madeDoc) && madeDoc.get('ownerUid') === uid);
+  const madeMember = madeId ? await db.doc(`communities/${madeId}/members/${uid}`).get() : null;
+  check('the creator is a member of their own community', Boolean(madeMember?.exists) && madeMember?.get('role') === 'member');
+  check(
+    'the new community gets a channel to talk in',
+    madeId ? (await db.collection(`communities/${madeId}/channels`).get()).size >= 1 : false,
+  );
+
+  const madeProfile = (await db.doc(`connectProfiles/${uid}`).get()).data() ?? {};
+  check(
+    'the creator’s profile lists the new community',
+    Array.isArray(madeProfile.memberships) && Boolean(madeId) && madeProfile.memberships.includes(madeId),
+  );
+
+  // Signing out is offered on the profile page, so go back to it.
+  await connectedPage.goto(`${BASE}/connect/me`, { waitUntil: 'domcontentloaded' });
+  await connectedPage.waitForTimeout(2000);
   await connectedPage.getByRole('button', { name: /^sign out$/i }).first().click();
   await connectedPage.waitForTimeout(2500);
   await connectedPage.goto(`${BASE}/connect/me`, { waitUntil: 'domcontentloaded' });

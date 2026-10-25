@@ -203,39 +203,40 @@ export async function createCommunity(input: {
   uid: string;
 }): Promise<string> {
   const db = await getFirebaseDb();
-  const { collection, doc, writeBatch } = await import('firebase/firestore');
+  const { collection, doc, setDoc } = await import('firebase/firestore');
   const now = new Date().toISOString();
-  // `doc(collection(...))` generates the id locally, so the community, its
-  // membership and its first channel are written in a single atomic batch —
-  // there is no window where a community exists that nobody can post in.
   const ref = doc(collection(db, COMMUNITIES));
 
-  const batch = writeBatch(db);
-  batch.set(ref, {
+  // Three writes, in order, each one allowed by the rules as it is written:
+  //
+  //   1. the community itself, with no members yet (the rule requires
+  //      memberCount == 0 at creation, so the counter cannot be pre-inflated);
+  //   2. its first channel — permitted because the community now exists and
+  //      this person owns it (a channel created in the same batch as its
+  //      parent would be judged against a database where the parent is not
+  //      there yet);
+  //   3. the creator's membership, written by the server, which also sets the
+  //      counter to 1 and adds the community to their profile.
+  //
+  // The window between 1 and 3 is a community with no members. Nobody else can
+  // claim it: the owner field is already set, and only the owner can write to
+  // the community document.
+  await setDoc(ref, {
     name: input.name,
     slug: input.slug,
     description: input.description,
     ownerUid: input.uid,
-    memberCount: 1,
+    memberCount: 0,
     createdAt: now,
   });
-  batch.set(doc(db, COMMUNITIES, ref.id, 'members', input.uid), {
-    uid: input.uid,
-    role: 'member',
-    joinedAt: now,
-  });
-  batch.set(doc(db, COMMUNITIES, ref.id, 'channels', 'general'), {
+
+  await setDoc(doc(db, COMMUNITIES, ref.id, 'channels', 'general'), {
     name: 'general',
     topic: 'Say hello',
     createdAt: now,
   });
-  await batch.commit();
 
-  // The person who creates a community is in it. Membership is written by the
-  // server (member document, counter and profile list in one transaction), so
-  // this is the same call the Join button makes.
   await postMembership('join', ref.id);
-
   return ref.id;
 }
 
