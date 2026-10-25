@@ -92,6 +92,31 @@ reports which variable is missing in the Vercel function log
 (`[connect] not configured: …`) — that line is deliberately not shown to
 visitors.
 
+## 2.5 Why the live URL can lag behind `main`
+
+Worth knowing before debugging a "my change is not live" moment.
+
+This project has **automatically assign custom domains to new deployments**
+switched off, and its Git integration has deployments switched off too. So a
+push to `main` builds nothing, and a deployment created from the CLI or API
+builds and is ready but does **not** take over `ujyalo-learn.vercel.app` by
+itself. The alias stays with whichever deployment last owned it — which is why
+the site can look days out of date while the code is perfectly fine.
+
+Two ways to move it:
+
+- In the dashboard: **Deployments → the deployment → ⋯ → Promote to
+  Production**. This is the reliable one, and the only one that needs nothing
+  but a browser.
+- Or re-attach the domain: **Settings → Domains → ujyalo-learn.vercel.app →
+  Edit → Remove**, then **Add** it again *without* a branch, and deploy once
+  more.
+
+Do **not** attach the production domain to a Git branch. A branch-linked domain
+serves the latest deployment of that branch as a preview, and this project
+protects preview deployments with Vercel Authentication — visitors are then met
+with a login wall instead of the site.
+
 ## 3. How the sign-in works
 
 ```
