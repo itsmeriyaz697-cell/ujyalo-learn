@@ -23,8 +23,8 @@
  * `id` field, fetched with the access token this server obtained.
  */
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { sendError, sendJson } from '../_lib/http.js';
-import { checkAndConsume, hashClient } from '../_lib/rateLimit.js';
+import { sendError, sendJson } from './_lib/http.js';
+import { checkAndConsume, hashClient } from './_lib/rateLimit.js';
 import {
   authorizeUrl,
   challengeFor,
@@ -41,8 +41,8 @@ import {
   STATE_COOKIE,
   STATE_TTL_MS,
   type StatePayload,
-} from '../_lib/connect/oauth.js';
-import { customTokenFor, connectStatus, upsertDiscordProfile } from '../_lib/connect/store.js';
+} from './_lib/connect/oauth.js';
+import { customTokenFor, connectStatus, upsertDiscordProfile } from './_lib/connect/store.js';
 
 export const config = { maxDuration: 20 };
 
@@ -116,7 +116,15 @@ function siteUrl(req: VercelRequest): string {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const action = String((req.query?.action as string | undefined) ?? '').toLowerCase();
+  // The action arrives as a query parameter because this project is a Vite
+  // app, not Next.js: /api/connect/<action> is rewritten in vercel.json to
+  // /api/connect?action=<action>. Local dev does the same through
+  // server/dev-api.ts. Fall back to parsing the path so a direct hit on a
+  // rewritten URL still resolves.
+  const rawAction =
+    (req.query?.action as string | undefined) ??
+    new URL(String(req.url ?? '/'), 'http://local').pathname.split('/').filter(Boolean).pop();
+  const action = String(rawAction ?? '').toLowerCase();
   const cfg = connectConfig();
   const site = siteUrl(req);
 

@@ -152,6 +152,18 @@
     {
       "source": "/admin/(.*)",
       "destination": "/app-shell.html"
+    },
+    {
+      "source": "/connect",
+      "destination": "/app-shell.html"
+    },
+    {
+      "source": "/connect/(.*)",
+      "destination": "/app-shell.html"
+    },
+    {
+      "source": "/api/connect/:action",
+      "destination": "/api/connect?action=:action"
     }
   ],
   "redirects": [

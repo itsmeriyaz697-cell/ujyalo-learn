@@ -59,7 +59,7 @@ const ROUTES: Record<string, string> = {
  * `req.query.action`.
  */
 const DYNAMIC_ROUTES: Array<{ prefix: string; file: string; param: string }> = [
-  { prefix: '/api/connect/', file: 'api/connect/[action].ts', param: 'action' },
+  { prefix: '/api/connect/', file: 'api/connect.ts', param: 'action' },
 ];
 
 function decorate(res: http.ServerResponse) {

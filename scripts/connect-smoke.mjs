@@ -385,6 +385,22 @@ try {
   check('the profile page shows the Discord identity', /@riyaz/i.test(profileView), profileView.slice(0, 120).replace(/\n/g, ' '));
   check('it states where the identity came from', /came from Discord/i.test(profileView));
 
+  // --- The Ujyalo display name is the user's own ---------------------------
+  const customName = `Riyaz C. ${Date.now() % 10000}`;
+  await connectedPage.getByLabel(/display name/i).first().fill(customName);
+  await connectedPage.getByRole('button', { name: /save changes/i }).first().click();
+  await connectedPage.getByText(/saved/i).first().waitFor({ state: 'visible', timeout: 15000 }).catch(() => {});
+  await connectedPage.waitForTimeout(1200);
+
+  const editedProfile = (await db.doc(`connectProfiles/${uid}`).get()).data() ?? {};
+  check('the display name can be changed by the user', editedProfile.displayName === customName, String(editedProfile.displayName));
+  check('editing does not overwrite the Discord identity', editedProfile.discordUsername === 'riyaz' && editedProfile.discordId === '100000000000000001');
+
+  await connectedPage.reload({ waitUntil: 'domcontentloaded' });
+  await connectedPage.waitForTimeout(2500);
+  const afterEdit = await connectedPage.locator('body').innerText();
+  check('the new display name survives a reload', afterEdit.includes(customName));
+
   await connectedPage.getByRole('button', { name: /^sign out$/i }).first().click();
   await connectedPage.waitForTimeout(2500);
   await connectedPage.goto(`${BASE}/connect/me`, { waitUntil: 'domcontentloaded' });
