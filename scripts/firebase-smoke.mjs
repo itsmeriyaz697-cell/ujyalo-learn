@@ -170,7 +170,10 @@ async function signUp(email, name) {
 }
 
 async function completeOnboarding() {
-  await page.waitForURL('**/onboarding', { timeout: 30000 });
+  // Setup is reached on purpose — a fresh sign-up lands in the app. Navigating
+  // to /onboarding here keeps the form itself under test without pretending it
+  // is still a forced step.
+  await page.goto(`${BASE}/onboarding?next=%2Fapp`, { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('text=Your learning profile');
   await page.getByLabel('Your name').fill('Firebase Tester');
   await page.getByRole('button', { name: 'Continue' }).click();
@@ -196,6 +199,8 @@ const bob = `bob.${stamp}@example.test`;
 try {
   // ── Signup ───────────────────────────────────────────────────────────────
   await signUp(alice, 'Alice Emulator');
+  await page.waitForURL('**/app', { timeout: 30000 }).catch(() => {});
+  check('a new account lands in the app, with no setup form in the way', /\/app$/.test(page.url()), page.url());
   await completeOnboarding();
   check('signup and onboarding work against Firebase', page.url().endsWith('/app'));
 
@@ -256,7 +261,7 @@ try {
   await bobPage.getByLabel('Confirm password').fill('StudyHard123');
   await bobPage.getByRole('checkbox').check();
   await bobPage.getByRole('button', { name: /create free account|create account/i }).click();
-  await bobPage.waitForURL('**/onboarding', { timeout: 30000 });
+  await bobPage.waitForURL('**/app', { timeout: 30000 }).catch(() => {});
   await bobPage.goto(`${BASE}/app/notes`, { waitUntil: 'domcontentloaded' });
   await bobPage.waitForTimeout(2500);
   check(
@@ -354,9 +359,8 @@ try {
     for (let i = 0; i < (await passwords.count()); i += 1) await passwords.nth(i).fill('StudyHard123');
     await page.locator('input[type="checkbox"]').first().check();
     await page.locator('form button[type="submit"]').click();
-    await page.waitForURL('**/onboarding', { timeout: 30000 });
-
-    await page.getByRole('button', { name: /skip/i }).first().click();
+    // No onboarding detour any more: the form is optional, so the tutor is
+    // reached directly and still has to write a real answer.
     await page.waitForURL('**/app', { timeout: 30000 });
 
     await page.goto(`${BASE}/app/tutor`, { waitUntil: 'domcontentloaded' });
@@ -440,9 +444,11 @@ try {
     check('a guest entry point exists on the login page', await guestButton.isVisible().catch(() => false));
 
     await guestButton.click();
-    await guestPage.waitForURL('**/onboarding', { timeout: 30000 }).catch(() => {});
-    check('a guest lands in onboarding', guestPage.url().includes('/onboarding'), guestPage.url());
+    await guestPage.waitForURL('**/app', { timeout: 30000 }).catch(() => {});
+    check('a guest lands in the app, not a setup form', /\/app/.test(guestPage.url()), guestPage.url());
 
+    // Setup remains available and still writes a real profile when chosen.
+    await guestPage.goto(`${BASE}/onboarding?next=%2Fapp`, { waitUntil: 'domcontentloaded' });
     await guestPage.waitForSelector('text=Your learning profile', { timeout: 30000 });
     await guestPage.getByRole('button', { name: 'Continue' }).click();
     await guestPage.getByRole('button', { name: 'Grade 10', exact: true }).click();
