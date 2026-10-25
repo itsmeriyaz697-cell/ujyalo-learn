@@ -33,7 +33,7 @@ export function ThemeToggle({ className }: { className?: string }) {
 export function PublicLayout() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, isBrowserGuest } = useAuth();
 
   useEffect(() => {
     setOpen(false);
@@ -69,16 +69,28 @@ export function PublicLayout() {
             <SiteSearch />
             <ThemeToggle />
             {user ? (
-              <Button asChild variant="primary" size="sm" className="hidden sm:inline-flex">
-                <Link to="/app">Open dashboard</Link>
-              </Button>
+              <>
+                {/* A visitor who already used the app without an account still
+                    needs a visible way back to a real one. */}
+                {isBrowserGuest && (
+                  <Button asChild variant="ghost" size="sm" className="hidden whitespace-nowrap sm:inline-flex">
+                    <Link to="/login">Log in</Link>
+                  </Button>
+                )}
+                <Button asChild variant="primary" size="sm" className="hidden sm:inline-flex">
+                  <Link to="/app">Open dashboard</Link>
+                </Button>
+              </>
             ) : (
               <>
                 <Button asChild variant="ghost" size="sm" className="hidden whitespace-nowrap sm:inline-flex">
                   <Link to="/login">Log in</Link>
                 </Button>
+                <Button asChild variant="ghost" size="sm" className="hidden whitespace-nowrap md:inline-flex">
+                  <Link to="/signup">Sign up</Link>
+                </Button>
                 <span className="hidden whitespace-nowrap sm:inline-flex">
-                  <StartLearningButton size="sm">Start free</StartLearningButton>
+                  <StartLearningButton size="sm">Try it free</StartLearningButton>
                 </span>
               </>
             )}

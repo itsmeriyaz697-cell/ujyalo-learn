@@ -26,10 +26,13 @@ Firebase console. Without them the buttons are there but the attempt fails with
 3. **Google** → should say *Enabled*. If it says *Add new provider*, choose Google,
    pick a support email, save. (The production domain is already an authorised
    domain, so no extra setup is needed.)
-4. **Anonymous** → *Add new provider* → **Enable** → save. This is what lets a
-   visitor try the app without an account.
+4. **Anonymous** → *Add new provider* → **Enable** → save. *Optional now.*
+   Browsing, the tutor and quizzes no longer depend on it: a visitor gets a
+   session kept in their browser with no network call at all (see
+   `docs/NAVIGATION.md`). Enabling Anonymous makes the "keep my progress"
+   upgrade shorter, because an account already exists to attach an email to.
 
-- [ ] Anonymous is enabled (guest sign-in works on the live site)
+- [ ] Anonymous is enabled (optional — improves the upgrade path, not required)
 - [ ] Google is enabled (the popup opens and returns)
 
 **Analytics is already installed** — measurement ID `G-5WQBY059FZ`, loaded only

@@ -119,15 +119,23 @@ check(
 // ─── Signed-out protection ──────────────────────────────────────────────────
 await visit('/app');
 await page.waitForTimeout(1200);
-// Signed out, an app URL now offers one-click entry instead of bouncing to a
-// login form: a visitor who followed a shared link should be able to start.
+// Signed out, an app URL opens the app. No gate screen, no form, no redirect:
+// a visitor who followed a shared link gets the tool they asked for.
+await page.waitForTimeout(800);
 const appGateText = await page.locator('body').innerText();
 check(
-  'a protected route offers a one-click way in, not a dead end',
-  /start in one click/i.test(appGateText),
+  'an app URL opens the app itself, not a gate screen',
+  !/start in one click/i.test(appGateText) && /\/app/.test(page.url()),
   page.url(),
 );
-check('the one-click gate offers logging in for existing accounts', /log in/i.test(appGateText));
+check(
+  'the account-free session is stated in the app',
+  /without an account|guest/i.test(appGateText),
+);
+check(
+  'creating an account is still offered from inside the app',
+  /create a free account/i.test(appGateText),
+);
 await visit('/admin');
 await page.waitForTimeout(900);
 check('admin also redirects to login when signed out', page.url().includes('/login'), page.url());
@@ -176,10 +184,11 @@ await page.getByLabel('Confirm password').fill('StudyHard123');
 await page.getByRole('checkbox').check();
 await shot('02-signup', false);
 await page.getByRole('button', { name: /create free account|create account/i }).click();
-await page.waitForURL('**/onboarding', { timeout: 15000 });
-check('signup creates a session and opens onboarding', page.url().includes('/onboarding'));
+await page.waitForURL('**/app', { timeout: 15000 });
+check('signup creates a session and lands in the app, not a form', page.url().includes('/app'));
 
-// ─── Onboarding ─────────────────────────────────────────────────────────────
+// ─── Onboarding (voluntary, reached from the in-app nudge) ──────────────────
+await page.goto(`${BASE}/onboarding?next=%2Fapp`);
 await page.waitForSelector('text=Your learning profile');
 // Step 0: name + country
 await page.getByLabel('Your name').fill('Aarati');

@@ -50,8 +50,8 @@ export default function LoginPage() {
     try {
       await signInAsGuest();
       track('guest_start', { entry: 'login' });
-      // A new guest has no profile, so onboarding is the honest destination.
-      navigate('/onboarding', { replace: true });
+      // Same destination as a normal sign-in: no detour through setup.
+      navigate(from, { replace: true });
     } catch (guestError) {
       setError((guestError as Error).message);
     } finally {

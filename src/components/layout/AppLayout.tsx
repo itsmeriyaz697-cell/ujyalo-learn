@@ -9,12 +9,14 @@ import {
   GraduationCap,
   LayoutDashboard,
   Layers,
+  LogIn,
   LogOut,
   Menu,
   Settings,
   ShieldCheck,
   Sparkles,
   TrendingUp,
+  UserRoundPlus,
   Wrench,
   X,
 } from 'lucide-react';
@@ -23,9 +25,10 @@ import { ThemeToggle } from './PublicLayout';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { GuestBanner } from '@/features/auth/GuestBanner';
+import { SetupNudge } from '@/features/auth/SetupNudge';
 import { useContent } from '@/features/content/ContentProvider';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
-import { storageModeLabel } from '@/services/data';
+import { storageModeText } from '@/services/data';
 import { gradeLabel } from '@shared/labels';
 import { cn, initials } from '@/lib/utils';
 
@@ -56,7 +59,7 @@ const MOBILE_NAV: NavItem[] = [
 ];
 
 export function AppLayout() {
-  const { user, profile, mode, signOut } = useAuth();
+  const { user, profile, mode, signOut, isBrowserGuest } = useAuth();
   const { role } = useContent();
   const [menuOpen, setMenuOpen] = useState(false);
   const [userMenu, setUserMenu] = useState(false);
@@ -138,6 +141,7 @@ export function AppLayout() {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <GuestBanner />
+        <SetupNudge />
         <header
           className="sticky top-0 z-40 border-b backdrop-blur"
           style={{ background: 'color-mix(in srgb, var(--bg) 90%, transparent)', borderColor: 'var(--border)' }}
@@ -161,7 +165,7 @@ export function AppLayout() {
                   {name}
                 </p>
                 <p className="truncate text-[11px] text-muted">
-                  {grade ? gradeLabel(grade) : 'Student'} · {storageModeLabel}
+                  {grade ? gradeLabel(grade) : 'Student'} · {storageModeText()}
                 </p>
               </div>
             </div>
@@ -200,10 +204,36 @@ export function AppLayout() {
                       <p className="truncate text-sm font-semibold" style={{ color: 'var(--text)' }}>
                         {name}
                       </p>
-                      <p className="truncate text-xs text-muted">{user?.email}</p>
-                      {mode === 'local' && <p className="mt-1 text-[11px] text-muted">Demo account (this browser)</p>}
+                      <p className="truncate text-xs text-muted">{user?.email ?? 'No account yet'}</p>
+                      {isBrowserGuest ? (
+                        <p className="mt-1 text-[11px] text-muted">Guest · saved in this browser</p>
+                      ) : mode === 'local' ? (
+                        <p className="mt-1 text-[11px] text-muted">Demo account (this browser)</p>
+                      ) : null}
                     </div>
                     <div className="my-1 h-px" style={{ background: 'var(--border)' }} />
+
+                    {/* Voluntary, never a wall: the reason is stated before the ask. */}
+                    {isBrowserGuest && (
+                      <>
+                        <Link
+                          to={`/signup?next=${encodeURIComponent(location.pathname)}`}
+                          role="menuitem"
+                          className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium hover:bg-[color:var(--surface-2)]"
+                          style={{ color: 'var(--primary)' }}
+                        >
+                          <UserRoundPlus className="h-4 w-4" /> Create an account
+                        </Link>
+                        <Link
+                          to={`/login?next=${encodeURIComponent(location.pathname)}`}
+                          role="menuitem"
+                          className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-[color:var(--surface-2)]"
+                        >
+                          <LogIn className="h-4 w-4" /> Log in
+                        </Link>
+                        <div className="my-1 h-px" style={{ background: 'var(--border)' }} />
+                      </>
+                    )}
                     <Link
                       to="/app/settings"
                       role="menuitem"
@@ -220,7 +250,7 @@ export function AppLayout() {
                         navigate('/');
                       }}
                     >
-                      <LogOut className="h-4 w-4" /> Log out
+                      <LogOut className="h-4 w-4" /> {isBrowserGuest ? 'Leave guest session' : 'Log out'}
                     </button>
                   </div>
                 )}

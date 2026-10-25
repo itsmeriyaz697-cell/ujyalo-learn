@@ -85,14 +85,16 @@ function ScrollToTop() {
  * Resolving the same destination here makes the race harmless.
  */
 function GuestOnly({ children }: { children: ReactNode }) {
-  const { user, profile, loading, profileLoading } = useAuth();
+  const { user, loading, profileLoading } = useAuth();
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const fromState = (location.state as { from?: string } | null)?.from;
   const destination =
     safeRedirectPath(fromState) ||
     safeRedirectPath(searchParams.get('next')) ||
-    (profile?.onboardingComplete ? '/app' : '/onboarding');
+    // Personal setup is offered inside the app now; it is not a destination
+    // that sign-in can be redirected into.
+    '/app';
 
   if (loading || (user && profileLoading)) return <PageLoader label="Checking your session…" />;
   if (user) return <Navigate to={destination} replace />;

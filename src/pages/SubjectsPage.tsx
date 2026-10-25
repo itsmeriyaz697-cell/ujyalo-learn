@@ -137,7 +137,7 @@ export default function SubjectsPage() {
             </h2>
             <p className="mt-1 text-sm text-muted">Your tutor uses these settings to tailor every answer.</p>
           </div>
-          <StartLearningButton size="lg">Create free account</StartLearningButton>
+          <StartLearningButton size="lg">Start learning free <ArrowRight className="h-4 w-4" aria-hidden="true" /></StartLearningButton>
         </div>
         <div className="sr-only">
           <h2>All configured subjects</h2>

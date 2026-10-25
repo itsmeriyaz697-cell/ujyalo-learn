@@ -42,7 +42,7 @@ export default function AiTutorPage() {
                   Open the tutor <ArrowRight className="ml-1 h-4 w-4" aria-hidden="true" />
                 </Link>
               </Button>
-              <StartLearningButton variant="secondary">Create a free account</StartLearningButton>
+              <StartLearningButton variant="secondary" to="/app/tutor">Open the tutor</StartLearningButton>
             </div>
 
             {health && !health.configured && (

@@ -1,5 +1,5 @@
 import { useMemo, useState, type FormEvent } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Eye, EyeOff, UserPlus } from 'lucide-react';
 import { Seo } from '@/components/seo/Seo';
 import { AuthShell } from '@/features/auth/AuthShell';
@@ -8,6 +8,7 @@ import { track } from '@/lib/analytics';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Field';
 import { InlineAlert } from '@/components/ui/Feedback';
+import { safeRedirectPath } from '@/lib/safeRedirect';
 
 function passwordStrength(password: string): { score: number; label: string } {
   let score = 0;
@@ -27,6 +28,13 @@ export default function SignupPage() {
   // Set when guest mode could not be started (the provider is switched off in
   // Firebase). Saying why turns a dead end into an explanation.
   const guestUnavailable = (location.state as { reason?: string } | null)?.reason === 'guest-unavailable';
+  const [searchParams] = useSearchParams();
+  // Where they were going before they were asked to create an account. Parsed
+  // through safeRedirectPath so a crafted ?next= cannot bounce them off-site.
+  const next =
+    safeRedirectPath(searchParams.get('next')) ||
+    safeRedirectPath((location.state as { from?: string } | null)?.from) ||
+    '/app';
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -61,7 +69,9 @@ export default function SignupPage() {
     try {
       await signUp(email.trim(), password, name.trim());
       track('sign_up', { method: 'email' });
-      navigate('/onboarding', { replace: true });
+      // Straight where they were going. Personal setup is offered from inside
+      // the app (SetupNudge) instead of standing between them and the tool.
+      navigate(next, { replace: true });
     } catch (signUpError) {
       setError((signUpError as Error).message);
     } finally {
@@ -75,7 +85,7 @@ export default function SignupPage() {
     try {
       await signInAsGuest();
       track('guest_start', { entry: 'signup' });
-      navigate('/onboarding', { replace: true });
+      navigate(next, { replace: true });
     } catch (guestError) {
       setError((guestError as Error).message);
     } finally {
@@ -93,7 +103,7 @@ export default function SignupPage() {
     try {
       await signInWithGoogle();
       track('sign_up', { method: 'google' });
-      navigate('/onboarding', { replace: true });
+      navigate(next, { replace: true });
     } catch (googleError) {
       setError((googleError as Error).message);
     } finally {

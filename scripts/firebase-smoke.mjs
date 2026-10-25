@@ -401,38 +401,28 @@ try {
     check('the home page offers a one-click start', await start.isVisible().catch(() => false));
 
     await start.click();
-    await page.waitForURL('**/onboarding', { timeout: 30000 }).catch(() => {});
-    check('one click from the home page reaches setup, with no form', page.url().includes('/onboarding'), page.url());
-
-    // Skipping setup must still produce a usable profile.
-    const skip = page.getByRole('button', { name: /skip/i }).first();
-    const skipVisible = await skip
-      .waitFor({ state: 'visible', timeout: 20000 })
-      .then(() => true)
-      .catch(() => false);
-    check('setup can be skipped instead of trapping a beginner', skipVisible);
-    await skip.click();
-    await page.waitForURL('**/app', { timeout: 30000 }).catch(() => {});
-    check('skipping setup lands in the app', page.url().includes('/app'), page.url());
+    // One click, and the tutor itself opens — no setup form in between.
+    await page.waitForURL('**/app/tutor', { timeout: 30000 }).catch(() => {});
+    check('one click from the home page reaches the tutor', page.url().includes('/app/tutor'), page.url());
 
     const bannerAppeared = await page
-      .getByText(/You are using a guest account/i)
+      .getByText(/without an account|guest account/i)
       .first()
       .waitFor({ state: 'visible', timeout: 20000 })
       .then(() => true)
       .catch(() => false);
-    check('the skipped profile is a real guest account', bannerAppeared);
+    check('the session is labelled as account-free', bannerAppeared);
 
-    // A direct link into the app must offer one click, not a login form.
+    // A direct link into the app opens the app, with no gate of any kind.
     const deepContext = await browser.newContext({ viewport: { width: 1360, height: 900 } });
     const deep = await deepContext.newPage();
     await deep.goto(`${BASE}/app/notes`, { waitUntil: 'domcontentloaded' });
     await deep.waitForTimeout(2500);
     const deepBody = await deep.locator('body').innerText();
     check(
-      'a shared app link asks for one click, not a password',
-      /start in one click/i.test(deepBody),
-      deepBody.slice(0, 90).replace(/\n/g, ' '),
+      'a shared app link opens the tool, not a gate or a password',
+      !/start in one click/i.test(deepBody) && /\/app\/notes/.test(deep.url()),
+      deep.url(),
     );
     await deepContext.close();
 

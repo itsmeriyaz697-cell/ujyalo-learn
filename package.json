@@ -38,7 +38,8 @@
     "go-live": "node scripts/go-live.mjs",
     "verify:auth": "node scripts/verify-auth-live.mjs",
     "test:arena": "firebase emulators:exec --only firestore,auth --project demo-ujyalo \"bash scripts/run-arena-smoke.sh\"",
-    "check:prerender-body": "node scripts/measure-prerender.mjs --check"
+    "check:prerender-body": "node scripts/measure-prerender.mjs --check",
+    "test:navigation": "node scripts/verify-navigation.mjs"
   },
   "dependencies": {
     "firebase": "^11.10.0",

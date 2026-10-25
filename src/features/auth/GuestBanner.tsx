@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { UserRoundPlus, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from './AuthProvider';
@@ -17,7 +18,8 @@ import { track } from '@/lib/analytics';
  * guest stay exactly where they are.
  */
 export function GuestBanner() {
-  const { isGuest, upgradeGuest, user } = useAuth();
+  const { isGuest, isBrowserGuest, upgradeGuest, user } = useAuth();
+  const location = useLocation();
   const [open, setOpen] = useState(false);
   const [dismissed, setDismissed] = useState(false);
   const [email, setEmail] = useState('');
@@ -27,6 +29,36 @@ export function GuestBanner() {
   const [error, setError] = useState<string | null>(null);
 
   if (!isGuest || dismissed) return null;
+
+  /**
+   * A browser session has no auth record to attach an email to, so the upgrade
+   * is a normal sign-up. AuthProvider carries the work across at that moment;
+   * the copy says so rather than pretending the account already exists.
+   */
+  if (isBrowserGuest) {
+    const next = `${location.pathname}${location.search}`;
+    return (
+      <div className="border-b" style={{ borderColor: 'var(--border)', background: 'var(--primary-soft)' }}>
+        <div className="container-page flex flex-wrap items-center gap-3 py-2.5">
+          <UserRoundPlus className="h-4 w-4 shrink-0" style={{ color: 'var(--primary)' }} aria-hidden="true" />
+          <p className="min-w-0 flex-1 text-sm" style={{ color: 'var(--text)' }}>
+            You are working without an account. Everything is saved <strong>in this browser only</strong> — an account
+            keeps it across devices and survives clearing your data.
+          </p>
+          <div className="flex items-center gap-2">
+            <Button asChild size="sm">
+              <Link to={`/signup?next=${encodeURIComponent(next)}`} onClick={() => track('guest_upgrade', { method: 'browser-prompt' })}>
+                Create a free account
+              </Link>
+            </Button>
+            <button type="button" className="btn-icon" aria-label="Dismiss" onClick={() => setDismissed(true)}>
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   async function save() {
     setError(null);

@@ -159,6 +159,14 @@ jobs:
         env:
           BASE_URL: http://127.0.0.1:5173
 
+      # The brief's acceptance test, literally: open the site, click through
+      # public pages, reach a tool with no account, back/forward, refresh,
+      # sign up voluntarily — on desktop, tablet and phone.
+      - name: Navigation without an account
+        run: node scripts/verify-navigation.mjs
+        env:
+          BASE_URL: http://127.0.0.1:5173
+
       # Plays a whole practice quiz in a real Chromium and checks the results,
       # the empty leaderboard, the profile 404 and the mobile layout. The ranked
       # path is covered by the `arena` job above, which has a database.

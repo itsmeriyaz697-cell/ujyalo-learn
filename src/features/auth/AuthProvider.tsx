@@ -12,7 +12,15 @@ import type { AuthUser, AuthService } from '@/services/auth/types';
 import { firebaseAuthService } from '@/services/auth/firebaseAuth';
 import { localAuthService } from '@/services/auth/localAuth';
 import { isFirebaseConfigured, missingFirebaseKeys } from '@/services/firebase/client';
-import { dataStore } from '@/services/data';
+import { dataStore, activateCloudStore, activateLocalStore } from '@/services/data';
+import {
+  forgetGuest,
+  hasBeenGuest,
+  isBrowserGuest,
+  makeGuestUser,
+  migrateGuestData,
+  rememberGuest,
+} from './guestSession';
 import { registerTokenProvider } from '@/services/ai/client';
 import { friendlyAuthError } from '@/lib/errors';
 import type { StudentPreferences, StudentProfile } from '@/types/domain';
@@ -45,6 +53,13 @@ interface AuthContextValue {
   upgradeGuest: (email: string, password: string, name: string) => Promise<AuthUser>;
   /** True when the signed-in account is anonymous. */
   isGuest: boolean;
+  /** True when the session exists only in this browser and was never a real account. */
+  isBrowserGuest: boolean;
+  /**
+   * Starts the browser-only session. No network, no form, no provider — this is
+   * what makes every tool reachable on first click.
+   */
+  startBrowserGuest: () => void;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   sendVerificationEmail: () => Promise<void>;
@@ -107,37 +122,100 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     void loadProfile(user.uid);
   }, [user, loadProfile]);
 
-  const signUp = useCallback(async (email: string, password: string, name: string) => {
-    try {
-      return await authService.signUp(email, password, name);
-    } catch (error) {
-      throw new Error(friendlyAuthError(error), { cause: error });
-    }
+  /**
+   * Browser-only session, created on demand and never at page load.
+   *
+   * Public marketing pages must not silently mint a session — a reader who
+   * never touches the app should stay a reader. The app routes call this the
+   * first time somebody opens a tool.
+   */
+  const startBrowserGuest = useCallback(() => {
+    activateLocalStore();
+    rememberGuest();
+    setUser(makeGuestUser());
+    setLoading(false);
   }, []);
 
-  const signIn = useCallback(async (email: string, password: string) => {
-    try {
-      return await authService.signIn(email, password);
-    } catch (error) {
-      throw new Error(friendlyAuthError(error), { cause: error });
+  /** After a real sign-in, move whatever the browser guest produced. */
+  /**
+   * Whether work may be sitting in the browser store.
+   *
+   * Reading React state alone is not enough: a full page load (a refresh, or
+   * arriving on /signup from a link) resets the provider, so `user` is null
+   * while the guest's notes are still on disk. The stored marker survives,
+   * which is why it is the marker — not the in-memory user — that decides.
+   */
+  const wasGuestSomewhere = useCallback(() => isBrowserGuest(user) || hasBeenGuest(), [user]);
+
+  const carryGuestWork = useCallback(async (uid: string, wasGuest: boolean) => {
+    if (wasGuest) {
+      // Switch to the destination backend BEFORE migrating: while the guest
+      // session was active the app was pointed at the browser store, so
+      // migrating first would copy the work back into the same browser.
+      activateCloudStore();
+      const result = await migrateGuestData(uid);
+      if (result.moved > 0) {
+        // Surface the outcome once, so nobody wonders where their notes went.
+        try {
+          sessionStorage.setItem('ujyalo:migrated', String(result.moved));
+        } catch {
+          /* ignore */
+        }
+      }
     }
+    forgetGuest();
+    activateCloudStore();
   }, []);
+
+  const signUp = useCallback(
+    async (email: string, password: string, name: string) => {
+      const wasGuest = wasGuestSomewhere();
+      try {
+        const created = await authService.signUp(email, password, name);
+        await carryGuestWork(created.uid, wasGuest);
+        return created;
+      } catch (error) {
+        throw new Error(friendlyAuthError(error), { cause: error });
+      }
+    },
+    [carryGuestWork, wasGuestSomewhere],
+  );
+
+  const signIn = useCallback(
+    async (email: string, password: string) => {
+      const wasGuest = wasGuestSomewhere();
+      try {
+        const signedIn = await authService.signIn(email, password);
+        await carryGuestWork(signedIn.uid, wasGuest);
+        return signedIn;
+      } catch (error) {
+        throw new Error(friendlyAuthError(error), { cause: error });
+      }
+    },
+    [carryGuestWork, wasGuestSomewhere],
+  );
 
   const signInWithGoogle = useCallback(async () => {
+    const wasGuest = wasGuestSomewhere();
     try {
-      return await authService.signInWithGoogle();
+      const signedIn = await authService.signInWithGoogle();
+      await carryGuestWork(signedIn.uid, wasGuest);
+      return signedIn;
     } catch (error) {
       throw new Error(friendlyAuthError(error), { cause: error });
     }
-  }, []);
+  }, [carryGuestWork, wasGuestSomewhere]);
 
   const signInAsGuest = useCallback(async () => {
+    const wasGuest = wasGuestSomewhere();
     try {
-      return await authService.signInAsGuest();
+      const created = await authService.signInAsGuest();
+      await carryGuestWork(created.uid, wasGuest);
+      return created;
     } catch (error) {
       throw new Error(friendlyAuthError(error), { cause: error });
     }
-  }, []);
+  }, [carryGuestWork, wasGuestSomewhere]);
 
   const upgradeGuest = useCallback(
     async (email: string, password: string, name: string) => {
@@ -159,9 +237,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const signOut = useCallback(async () => {
+    // A browser guest has no account to sign out of. Dropping the session
+    // returns the site to its public state, and the work stays on the device
+    // under the guest uid so reopening a tool brings it back.
+    if (isBrowserGuest(user)) {
+      activateCloudStore();
+      setUser(null);
+      setProfile(null);
+      return;
+    }
     await authService.signOut();
     setProfile(null);
-  }, []);
+  }, [user]);
 
   const resetPassword = useCallback(async (email: string) => {
     try {
@@ -247,6 +334,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signInAsGuest,
       upgradeGuest,
       isGuest: Boolean(user?.isAnonymous),
+      isBrowserGuest: isBrowserGuest(user),
+      startBrowserGuest,
       signOut,
       resetPassword,
       sendVerificationEmail,
@@ -267,6 +356,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signInWithGoogle,
       signInAsGuest,
       upgradeGuest,
+      startBrowserGuest,
       signOut,
       resetPassword,
       sendVerificationEmail,

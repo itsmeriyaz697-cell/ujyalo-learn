@@ -8,6 +8,7 @@ import { useStartLearning } from '@/features/auth/useStartLearning';
  */
 export function StartLearningButton({
   children = 'Start learning free',
+  to,
   size = 'lg',
   variant = 'primary',
   fullWidth,
@@ -15,6 +16,8 @@ export function StartLearningButton({
   iconRight,
 }: {
   children?: ReactNode;
+  /** Where the visitor lands. Defaults to the tutor. */
+  to?: string;
   size?: 'sm' | 'md' | 'lg';
   variant?: 'primary' | 'secondary' | 'ghost' | 'accent';
   fullWidth?: boolean;
@@ -24,7 +27,7 @@ export function StartLearningButton({
   const { start, busy } = useStartLearning();
 
   return (
-    <Button onClick={start} loading={busy} size={size} variant={variant} fullWidth={fullWidth} className={className} iconRight={iconRight}>
+    <Button onClick={() => start(to)} loading={busy} size={size} variant={variant} fullWidth={fullWidth} className={className} iconRight={iconRight}>
       {children}
     </Button>
   );

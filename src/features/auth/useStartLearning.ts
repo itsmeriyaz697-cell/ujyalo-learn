@@ -6,50 +6,35 @@ import { track } from '@/lib/analytics';
 /**
  * The front door.
  *
- * A visitor should be able to try the tutor before being asked for anything, so
- * the primary buttons ("Start learning free", "Practise now") call this instead
- * of linking to a sign-up form:
+ * It used to open a guest account and then send the visitor to a seven-step
+ * onboarding form — the form was the first thing they saw after clicking
+ * "start", and most of them left there. The tutor they asked for was two
+ * screens away.
  *
- *   - already signed in  → straight into the app;
- *   - not signed in      → an anonymous account in one click, no form, no email;
- *   - guest mode off     → the sign-up screen, with the reason stated.
- *
- * Nothing is created until the visitor actually clicks, so crawlers and people
- * who only read the marketing pages never produce empty accounts.
+ * Now: one click, straight into the tool. The session behind it is a browser
+ * session (see RequireAuth), so there is no network round-trip that can fail
+ * and nothing that needs a provider enabled in a console somewhere. Onboarding
+ * is offered inside the app, and skipping it is free.
  */
 export function useStartLearning() {
-  const { user, profile, signInAsGuest } = useAuth();
+  const { user, startBrowserGuest } = useAuth();
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const start = useCallback(async () => {
-    setError(null);
-
-    if (user) {
-      navigate(profile?.onboardingComplete ? '/app' : '/onboarding');
-      return;
-    }
-
-    setBusy(true);
-    try {
-      await signInAsGuest();
-      track('guest_start', { entry: 'cta' });
-      // A brand-new guest has no profile yet, so the short setup comes first.
-      navigate('/onboarding');
-    } catch (caught) {
-      const message = (caught as Error).message;
-      setError(message);
-      // `auth/operation-not-allowed` means the owner has not enabled anonymous
-      // sign-in yet. Sending the visitor to the sign-up form is the honest
-      // fallback, and the form explains itself.
-      if (/not switched on|not enabled|operation-not-allowed/i.test(message)) {
-        navigate('/signup', { state: { reason: 'guest-unavailable' } });
-      }
-    } finally {
+  const start = useCallback(
+    // Called both as `onClick={start}` (which passes a MouseEvent) and as
+    // `start('/app/quizzes')`, so the argument is only honoured when it is a
+    // path. A click event must never be treated as a destination.
+    (destination?: string | unknown) => {
+      const to = typeof destination === 'string' && destination.startsWith('/') ? destination : '/app/tutor';
+      setBusy(true);
+      if (!user) startBrowserGuest();
+      track('guest_start', { entry: 'cta', to });
+      navigate(to);
       setBusy(false);
-    }
-  }, [user, profile, signInAsGuest, navigate]);
+    },
+    [navigate, startBrowserGuest, user],
+  );
 
-  return { start, busy, error };
+  return { start, busy, error: null as string | null };
 }
