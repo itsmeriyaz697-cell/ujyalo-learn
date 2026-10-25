@@ -52,6 +52,16 @@ const ROUTES: Record<string, string> = {
   '/api/health': 'api/health.ts',
 };
 
+/**
+ * Dynamic routes, mirroring Vercel's `[action]` naming. The dev server has no
+ * router, so the prefix is matched here and the segment is passed through as
+ * `?action=`, which is exactly what the deployed function reads from
+ * `req.query.action`.
+ */
+const DYNAMIC_ROUTES: Array<{ prefix: string; file: string; param: string }> = [
+  { prefix: '/api/connect/', file: 'api/connect/[action].ts', param: 'action' },
+];
+
 function decorate(res: http.ServerResponse) {
   const response = res as http.ServerResponse & {
     status: (code: number) => typeof response;
@@ -101,7 +111,16 @@ function readBody(req: http.IncomingMessage): Promise<unknown> {
 
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
-  const route = ROUTES[url.pathname];
+  let route = ROUTES[url.pathname];
+  let dynamicParam: { name: string; value: string } | null = null;
+
+  if (!route) {
+    const match = DYNAMIC_ROUTES.find((entry) => url.pathname.startsWith(entry.prefix));
+    if (match) {
+      route = match.file;
+      dynamicParam = { name: match.param, value: url.pathname.slice(match.prefix.length).replace(/\/$/, '') };
+    }
+  }
 
   if (!route) {
     res.statusCode = 404;
@@ -131,7 +150,9 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
-  (req as http.IncomingMessage & { query?: Record<string, string> }).query = Object.fromEntries(url.searchParams);
+  const query = Object.fromEntries(url.searchParams);
+  if (dynamicParam) query[dynamicParam.name] = dynamicParam.value;
+  (req as http.IncomingMessage & { query?: Record<string, string> }).query = query;
 
   try {
     const module = (await import(pathToFileURL(path.resolve(ROOT, route)).href)) as { default: Handler };

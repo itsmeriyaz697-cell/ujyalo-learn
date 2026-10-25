@@ -349,6 +349,116 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+
+    // ---------------------------------------------------------------------
+    // Ujyalo Connect — communities
+    //
+    // A different shape from the rest of Ujyalo Learn, on purpose. Student
+    // records are private to their owner; a community is shared by design, so
+    // the rule is "members may read what the community contains", not "only
+    // the author may read it".
+    //
+    // The identity mapping is the exception and is never client-readable:
+    // knowing another person's Discord id should not be possible from here.
+    // ---------------------------------------------------------------------
+
+    function connectSignedIn() {
+      return request.auth != null && !request.auth.token.firebase.sign_in_provider.matches('anonymous');
+    }
+
+    function isCommunityMember(communityId) {
+      return connectSignedIn()
+        && exists(/databases/$(database)/documents/communities/$(communityId)/members/$(request.auth.uid));
+    }
+
+    // Discord ids are numeric strings; the uid derived from one is the only
+    // shape a Connect profile may have.
+    match /connectIdentities/{discordId} {
+      allow read, write: if false;
+    }
+
+    match /connectProfiles/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      // The server writes this on sign-in with Admin credentials. A client may
+      // edit only the fields a person is allowed to choose for themselves.
+      allow update: if signedIn()
+        && request.auth.uid == uid
+        && request.resource.data.uid == uid
+        && request.resource.data.discordId == resource.data.discordId
+        && request.resource.data.discordUsername == resource.data.discordUsername
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.memberships == resource.data.memberships
+        && request.resource.data.displayName is string
+        && request.resource.data.displayName.size() >= 1
+        && request.resource.data.displayName.size() <= 60
+        && request.resource.data.bio is string
+        && request.resource.data.bio.size() <= 400;
+      allow create, delete: if false;
+    }
+
+    // Community metadata is public so the hub can be browsed before signing
+    // in — the same rule the rest of the site follows.
+    match /communities/{communityId} {
+      allow read: if true;
+
+      allow create: if connectSignedIn()
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 3
+        && request.resource.data.name.size() <= 60
+        && request.resource.data.slug is string
+        && request.resource.data.slug.matches('^[a-z0-9][a-z0-9-]{2,39}$')
+        && request.resource.data.description is string
+        && request.resource.data.description.size() <= 400
+        && request.resource.data.memberCount == 0
+        && request.resource.data.createdAt is string;
+
+      // Only the owner may edit, and the owner cannot be reassigned.
+      allow update: if connectSignedIn()
+        && resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerUid == resource.data.ownerUid
+        && request.resource.data.slug == resource.data.slug;
+      allow delete: if false;
+
+      match /members/{uid} {
+        allow read: if true;
+        // Joining someone else's community: the document must be yours.
+        allow create: if connectSignedIn()
+          && request.auth.uid == uid
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.joinedAt is string
+          && request.resource.data.role == 'member';
+        allow update: if false;
+        // Leaving, or being removed by the community owner.
+        allow delete: if connectSignedIn()
+          && (request.auth.uid == uid
+              || get(/databases/$(database)/documents/communities/$(communityId)).data.ownerUid == request.auth.uid);
+      }
+
+      match /channels/{channelId} {
+        // The channel list is public; the messages inside are not.
+        allow read: if true;
+        allow create, update, delete: if connectSignedIn()
+          && get(/databases/$(database)/documents/communities/$(communityId)).data.ownerUid == request.auth.uid;
+
+        match /messages/{messageId} {
+          allow read: if isCommunityMember(communityId);
+          allow create: if isCommunityMember(communityId)
+            && request.resource.data.authorUid == request.auth.uid
+            && request.resource.data.body is string
+            && request.resource.data.body.size() >= 1
+            && request.resource.data.body.size() <= 2000
+            && request.resource.data.createdAt is string;
+          // Messages are immutable once written. Editing history silently is
+          // worse than having no edit button.
+          allow update: if false;
+          allow delete: if connectSignedIn()
+            && (resource.data.authorUid == request.auth.uid
+                || get(/databases/$(database)/documents/communities/$(communityId)).data.ownerUid == request.auth.uid);
+        }
+      }
+    }
+
     // Deny everything else by default.
     match /{document=**} {
       allow read, write: if false;

@@ -11,6 +11,11 @@ import { AnalyticsTracker } from '@/components/AnalyticsTracker';
 import { AnalyticsConsent } from '@/components/AnalyticsConsent';
 import { HomePage } from '@/pages/HomePage';
 
+const ConnectHubPage = lazy(() => import('@/pages/connect/ConnectHubPage'));
+const ConnectAuthPage = lazy(() => import('@/pages/connect/ConnectAuthPage'));
+const CommunityPage = lazy(() => import('@/pages/connect/CommunityPage'));
+const ConnectProfilePage = lazy(() => import('@/pages/connect/ConnectProfilePage'));
+const CreateCommunityPage = lazy(() => import('@/pages/connect/CreateCommunityPage'));
 const FeaturesPage = lazy(() => import('@/pages/FeaturesPage'));
 const GettingStartedPage = lazy(() => import('@/pages/GettingStartedPage'));
 const SubjectsPage = lazy(() => import('@/pages/SubjectsPage'));
@@ -126,6 +131,12 @@ export function App() {
             <Route path="grades/:grade" element={<GradePage />} />
             <Route path="see-preparation" element={<SeePrepPage />} />
             <Route path="ai-tutor" element={<AiTutorPage />} />
+            {/* Ujyalo Connect: communities are public to browse; posting is not. */}
+            <Route path="connect" element={<ConnectHubPage />} />
+            <Route path="connect/auth" element={<ConnectAuthPage />} />
+            <Route path="connect/c/:slug" element={<CommunityPage />} />
+            <Route path="connect/me" element={<ConnectProfilePage />} />
+            <Route path="connect/new" element={<CreateCommunityPage />} />
             <Route path="privacy-policy" element={<PrivacyPage />} />
             <Route path="faq" element={<FaqPage />} />
             <Route path="content-policy" element={<ContentPolicyPage />} />

@@ -29,7 +29,9 @@ export type AnalyticsEvent =
   | 'note_saved'
   | 'flashcards_created'
   | 'outbound_click'
-  | 'consent_update';
+  | 'consent_update'
+  | 'connect_sign_in_started'
+  | 'connect_sign_in';
 
 type Params = Record<string, string | number | boolean | undefined>;
 

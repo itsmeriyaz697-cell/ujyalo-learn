@@ -16,107 +16,33 @@
  *
  * There is deliberately no fourth "just trust the client" mode.
  */
-import { cert, getApps, initializeApp, type App } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
-import { getFirestore, type Firestore } from 'firebase-admin/firestore';
+import type { Firestore } from 'firebase-admin/firestore';
+import { adminApp, adminDb, adminEnv, adminStatus, type AdminMode } from '../admin.js';
 
-export type ArenaMode = 'emulator' | 'service-account' | 'unconfigured';
+export type ArenaMode = AdminMode;
 
 export interface ArenaEnv {
   mode: ArenaMode;
   projectId: string | null;
 }
 
-const APP_NAME = 'ujyalo-arena';
-
-export function arenaEnv(): ArenaEnv {
-  const emulatorHost = process.env.FIREBASE_AUTH_EMULATOR_HOST;
-  const projectId = process.env.FIREBASE_PROJECT_ID || process.env.GCLOUD_PROJECT || 'demo-ujyalo';
-
-  if (emulatorHost) return { mode: 'emulator', projectId };
-
-  const raw = process.env.FIREBASE_SERVICE_ACCOUNT;
-  if (raw && raw.trim()) return { mode: 'service-account', projectId };
-
-  return { mode: 'unconfigured', projectId: null };
-}
-
-function parseServiceAccount(raw: string): { projectId: string; clientEmail: string; privateKey: string } {
-  // Accept raw JSON, or JSON that was base64-encoded to survive shell quoting.
-  let text = raw.trim();
-  if (!text.startsWith('{')) {
-    try {
-      text = Buffer.from(text, 'base64').toString('utf8');
-    } catch {
-      throw new Error('FIREBASE_SERVICE_ACCOUNT is neither JSON nor base64-encoded JSON');
-    }
-  }
-  const parsed = JSON.parse(text) as { project_id?: string; client_email?: string; private_key?: string };
-  if (!parsed.project_id || !parsed.client_email || !parsed.private_key) {
-    throw new Error('FIREBASE_SERVICE_ACCOUNT is missing project_id, client_email or private_key');
-  }
-  return {
-    projectId: parsed.project_id,
-    clientEmail: parsed.client_email,
-    // Environments often store the key with escaped newlines.
-    privateKey: parsed.private_key.replace(/\\n/g, '\n'),
-  };
-}
-
-let cachedApp: App | null = null;
-
-function adminApp(): App {
-  if (cachedApp) return cachedApp;
-  const existing = getApps().find((app) => app.name === APP_NAME);
-  if (existing) {
-    cachedApp = existing;
-    return existing;
-  }
-
-  const env = arenaEnv();
-  if (env.mode === 'emulator') {
-    cachedApp = initializeApp({ projectId: env.projectId ?? 'demo-ujyalo' }, APP_NAME);
-    return cachedApp;
-  }
-  if (env.mode === 'service-account') {
-    const credentials = parseServiceAccount(process.env.FIREBASE_SERVICE_ACCOUNT as string);
-    cachedApp = initializeApp({ credential: cert(credentials), projectId: credentials.projectId }, APP_NAME);
-    return cachedApp;
-  }
-  throw new Error('Arena storage is not configured');
-}
-
 /**
- * Why the Arena is in the state it is in.
- *
- * The distinction matters when the owner has just pasted the service account:
- * "no credentials" and "credentials present but unreadable" look identical from
- * the outside, and only one of them is fixed by pasting again. Reporting the
- * difference turns a silent demo mode into a message that says what to fix.
+ * The Arena's view of the shared credential handling in `api/_lib/admin.ts`.
+ * These wrappers are kept so the Arena code and its tests read the same as
+ * before; the initialisation itself lives in one place now.
  */
+export function arenaEnv(): ArenaEnv {
+  return adminEnv();
+}
+
 export function arenaStatus(): { mode: ArenaMode; problem: string | null } {
-  const env = arenaEnv();
-  if (env.mode === 'unconfigured') return { mode: env.mode, problem: null };
-  try {
-    adminApp();
-    return { mode: env.mode, problem: null };
-  } catch (error) {
-    return {
-      mode: env.mode,
-      problem:
-        (error as Error)?.message ??
-        'FIREBASE_SERVICE_ACCOUNT is present but could not be read as a service account key.',
-    };
-  }
+  return adminStatus();
 }
 
 /** Firestore handle, or null when nothing is configured (never throws to callers). */
 export function arenaDb(): Firestore | null {
-  try {
-    return getFirestore(adminApp());
-  } catch {
-    return null;
-  }
+  return adminDb();
 }
 
 export interface Caller {

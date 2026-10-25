@@ -217,6 +217,12 @@ jobs:
       - name: Firebase end-to-end (signup, cloud persistence, isolation)
         run: npm run test:firebase
 
+      # Discord sign-in, end to end: real OAuth code flow (against a local
+      # stand-in), real Firestore transaction, real rules, real browser. Needs
+      # no Discord application and no credentials.
+      - name: Ujyalo Connect (Discord sign-in, communities, messages)
+        run: npm run test:connect
+
   audit:
     name: Dependency audit
     runs-on: ubuntu-latest

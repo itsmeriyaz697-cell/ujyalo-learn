@@ -168,6 +168,7 @@ export function PublicLayout() {
                 { to: '/resources', label: 'Resources' },
                 { to: '/subjects', label: 'Subjects & grades' },
                 { to: '/see-preparation', label: 'SEE preparation' },
+                { to: '/connect', label: 'Ujyalo Connect' },
                 { to: '/app/tutor', label: 'AI tutor' },
                 { to: '/features', label: 'Features' },
                 { to: '/getting-started', label: 'How to use this site' },
