@@ -7,6 +7,7 @@ import { DiscordMark } from '@/components/connect/DiscordMark';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { startSignIn } from '@/features/connect/api';
 import {
+  countMembers,
   getCommunityBySlug,
   getMyProfile,
   isMember,
@@ -38,6 +39,7 @@ export default function CommunityPage() {
   const connected = Boolean(user && !isBrowserGuest);
 
   const [community, setCommunity] = useState<Community | null>(null);
+  const [memberTotal, setMemberTotal] = useState(0);
   const [channels, setChannels] = useState<Channel[]>([]);
   const [activeChannel, setActiveChannel] = useState<string>('');
   const [member, setMember] = useState<boolean | null>(null);
@@ -73,6 +75,10 @@ export default function CommunityPage() {
         if (cancelled) return;
         setChannels(rows);
         setActiveChannel(rows[0]?.id ?? '');
+        // The stored counter is only ever written by the owner, so it is not
+        // trusted for display; count the member documents instead.
+        const total = await countMembers(found.id, found.memberCount ?? 0);
+        if (!cancelled) setMemberTotal(total);
       } catch {
         if (!cancelled) setError('This community could not be loaded.');
       } finally {
@@ -241,7 +247,7 @@ export default function CommunityPage() {
           </div>
           <div className="flex items-center gap-3 text-sm text-muted">
             <span className="inline-flex items-center gap-1.5">
-              <Users className="h-4 w-4" aria-hidden="true" /> {community?.memberCount ?? 0} members
+              <Users className="h-4 w-4" aria-hidden="true" /> {memberTotal} member{memberTotal === 1 ? '' : 's'}
             </span>
             {member && (
               <Button variant="ghost" size="sm" onClick={leave} loading={sending}>

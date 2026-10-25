@@ -43,6 +43,8 @@ import {
   type StatePayload,
 } from './_lib/connect/oauth.js';
 import { customTokenFor, connectStatus, upsertDiscordProfile } from './_lib/connect/store.js';
+import { isConnectUid, joinCommunity, leaveCommunity } from './_lib/connect/membership.js';
+import { adminAuth } from './_lib/admin.js';
 
 export const config = { maxDuration: 20 };
 
@@ -272,6 +274,63 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.setHeader('Set-Cookie', expire);
     // `verifier` carries the sealed custom token; `state` carries the uid.
     sendJson(res, 200, { uid: payload.state, token: payload.verifier, next: payload.next }, NO_STORE);
+    return;
+  }
+
+  // ── Membership: written here, not by the browser ──────────────────────────
+  //
+  // Joining or leaving changes three documents at once (the member record, the
+  // community counter and the list on the profile). The rules only let a
+  // community owner touch the community document, and a profile's membership
+  // list is server-owned, so both actions go through this endpoint where one
+  // transaction can keep them consistent.
+  if (action === 'join' || action === 'leave') {
+    if (req.method !== 'POST') {
+      sendError(res, 405, 'invalid_request', 'Use POST for this endpoint.', { ...NO_STORE, Allow: 'POST' });
+      return;
+    }
+
+    const auth = adminAuth();
+    const token = String(req.headers.authorization ?? '').replace(/^Bearer\s+/i, '');
+    if (!auth || !token) {
+      sendError(res, 401, 'missing_session', 'Sign in with Discord first.', NO_STORE);
+      return;
+    }
+
+    let uid: string;
+    try {
+      const decoded = await auth.verifyIdToken(token);
+      uid = decoded.uid;
+    } catch {
+      sendError(res, 401, 'missing_session', 'That session has expired. Sign in again.', NO_STORE);
+      return;
+    }
+
+    if (!isConnectUid(uid)) {
+      // A Firebase account from elsewhere in the site is not a Connect identity.
+      sendError(res, 403, 'identity_conflict', 'This account is not a Ujyalo Connect account.', NO_STORE);
+      return;
+    }
+
+    const body = (req.body ?? {}) as { communityId?: unknown };
+    const communityId = String(body.communityId ?? '');
+    const result =
+      action === 'join' ? await joinCommunity(uid, communityId) : await leaveCommunity(uid, communityId);
+
+    if (!result.ok) {
+      if (result.reason === 'unconfigured') {
+        sendError(res, 503, 'storage_unavailable', 'Community storage is not available right now.', NO_STORE);
+        return;
+      }
+      if (result.reason === 'not_found') {
+        sendError(res, 404, 'not_found', 'That community does not exist.', NO_STORE);
+        return;
+      }
+      sendError(res, 500, 'membership_failed', 'That did not save. Try again.', NO_STORE);
+      return;
+    }
+
+    sendJson(res, 200, { communityId: result.communityId, memberCount: result.memberCount, changed: result.joined }, NO_STORE);
     return;
   }
 

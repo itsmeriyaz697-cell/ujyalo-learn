@@ -139,22 +139,30 @@ Why it is shaped this way:
 ## 4. Data model and rules
 
 ```
-connectIdentities/{discordId}       { uid, createdAt, lastSeenAt }   server-only
+connectIdentities/{discordId}       { uid, createdAt, lastSeenAt }        server-only
 connectProfiles/{uid}               { discordId, discordUsername, displayName,
                                       avatarUrl, email, createdAt, memberships, bio }
 communities/{communityId}           { name, slug, description, ownerUid, memberCount }
-communities/{id}/members/{uid}      { uid, role, joinedAt }
+communities/{id}/members/{uid}      { uid, role, joinedAt }               members only
 communities/{id}/channels/{chId}    { name, topic, createdAt }
 communities/{id}/channels/{chId}/messages/{msgId}
                                     { authorUid, authorName, authorAvatar, body, createdAt }
 ```
 
+Joining and leaving are `POST /api/connect/join` and `/leave`, not client
+writes. One join changes three documents — the member record (which the rules
+read to decide whether messages are visible), the community's counter, and the
+membership list on the profile — and a browser may write none of the last two.
+The server does all three in one transaction, which also means the member list
+can stay private: only that community's members can read who is in it.
+
 What the rules guarantee (23 tests in `tests/rules/connect.test.ts`):
 
 - community metadata and channel names: readable by anyone;
 - messages: readable and writable only by members of that community;
-- a member document can only be created for yourself, and only with
-  `role: 'member'` — no self-promotion;
+- the member list: readable by that community's members and by you, for your
+  own record — never by visitors or by signed-in non-members. Clients cannot
+  write it at all, so nobody can add themselves to a community;
 - messages are immutable once sent (no silent edits), and deletable only by
   their author or the community owner;
 - a profile cannot be created from a browser at all — only the server mints one
@@ -173,9 +181,9 @@ What the rules guarantee (23 tests in `tests/rules/connect.test.ts`):
 ## 6. Testing
 
 ```bash
-npm run test:connect     # 34 checks: OAuth, profile, join, message, isolation, cancel, logout, mobile
+npm run test:connect     # 44 checks: OAuth, profile, join, live messages, isolation, cancel, logout, mobile
 npx vitest run tests/connectOauth.test.ts   # 26 unit tests: PKCE, sealing, safeNext, config
-npm run test:rules       # includes 23 Connect rules tests
+npm run test:rules       # includes 26 Connect rules tests
 ```
 
 `npm run test:connect` starts the Firestore/Auth emulators, a local Discord
@@ -198,8 +206,10 @@ and desktop layout, and Firestore security.
   creation should be owner-only (it is), and messages need a report path.
 - **No attachment support.** Text only, 2000 characters, matching Discord's own
   message limit.
-- **`memberCount` can drift.** It is incremented client-side and is cosmetic; it
-  never grants access.
+- **`memberCount` is maintained by the join/leave endpoint**, and the community
+  page shows a live count of member documents to anyone allowed to read them.
+  It is cosmetic either way: access comes from the member document, never the
+  counter.
 - **The Discord mark is a simplified drawing**, not Discord's official asset.
   Replace it from Discord's brand kit before a public launch.
 - **No email verification gate.** Discord accounts with unverified email can

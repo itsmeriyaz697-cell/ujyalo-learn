@@ -420,19 +420,17 @@ service cloud.firestore {
         && request.resource.data.slug == resource.data.slug;
       allow delete: if false;
 
+      // Who is in a community is not public: a membership list would let any
+      // visitor enumerate people by their Discord id. You may read your own
+      // membership, and members may see who else is in the room. Everyone else
+      // gets nothing.
       match /members/{uid} {
-        allow read: if true;
-        // Joining someone else's community: the document must be yours.
-        allow create: if connectSignedIn()
-          && request.auth.uid == uid
-          && request.resource.data.uid == request.auth.uid
-          && request.resource.data.joinedAt is string
-          && request.resource.data.role == 'member';
-        allow update: if false;
-        // Leaving, or being removed by the community owner.
-        allow delete: if connectSignedIn()
-          && (request.auth.uid == uid
-              || get(/databases/$(database)/documents/communities/$(communityId)).data.ownerUid == request.auth.uid);
+        allow read: if connectSignedIn()
+          && (request.auth.uid == uid || isCommunityMember(communityId));
+        // Writes go through POST /api/connect/join and /leave, which keep the
+        // member record, the community counter and the profile's list in one
+        // transaction. A browser cannot do that, so it cannot do this either.
+        allow write: if false;
       }
 
       match /channels/{channelId} {

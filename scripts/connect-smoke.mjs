@@ -179,9 +179,17 @@ const context = await browser.newContext({ viewport: { width: 1280, height: 950 
 const page = await context.newPage();
 
 const consoleErrors = [];
-page.on('console', (msg) => {
-  if (msg.type() === 'error' && !/Failed to load resource/i.test(msg.text())) consoleErrors.push(msg.text());
-});
+const consoleWarnings = [];
+/** Record console noise from any page the run opens, not just the first. */
+function watchConsole(target) {
+  target.on('console', (msg) => {
+    const text = msg.text();
+    if (msg.type() === 'error' && !/Failed to load resource/i.test(text)) consoleErrors.push(text);
+    if (msg.type() === 'warning') consoleWarnings.push(text);
+  });
+  target.on('pageerror', (error) => consoleErrors.push(String(error)));
+}
+watchConsole(page);
 
 try {
   // --- Browsing without an account -----------------------------------------
@@ -365,9 +373,26 @@ try {
   const replay = await fetch(`${BASE}/api/connect/session`);
   check('a missing handoff cookie yields 401, not a token', replay.status === 401, String(replay.status));
 
+  // Membership is written by the server, so the endpoint itself must refuse
+  // anyone who is not signed in — otherwise the rules would be decoration.
+  const anonymousJoin = await fetch(`${BASE}/api/connect/join`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ communityId: COMMUNITY_ID }),
+  });
+  check('joining without a session is refused', anonymousJoin.status === 401, String(anonymousJoin.status));
+
+  const forgedJoin = await fetch(`${BASE}/api/connect/join`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer not-a-real-token' },
+    body: JSON.stringify({ communityId: COMMUNITY_ID }),
+  });
+  check('joining with a forged token is refused', forgedJoin.status === 401, String(forgedJoin.status));
+
   // --- Logout --------------------------------------------------------------
   const connected = await browser.newContext({ viewport: { width: 1280, height: 950 } });
   const connectedPage = await connected.newPage();
+  watchConsole(connectedPage);
   await fetch(`${DISCORD}/_account?name=riyaz`);
   await connectedPage.goto(`${BASE}/connect/c/see-2026`, { waitUntil: 'domcontentloaded' });
   await connectedPage.waitForSelector('#main h1', { timeout: 30000 });
@@ -381,9 +406,16 @@ try {
     .first()
     .waitFor({ state: 'visible', timeout: 20000 })
     .catch(() => {});
+  // The community list is a second query; give it its own chance to land.
+  await connectedPage
+    .getByText(/your communities/i)
+    .first()
+    .waitFor({ state: 'visible', timeout: 15000 })
+    .catch(() => {});
   const profileView = await connectedPage.locator('body').innerText();
   check('the profile page shows the Discord identity', /@riyaz/i.test(profileView), profileView.slice(0, 120).replace(/\n/g, ' '));
   check('it states where the identity came from', /came from Discord/i.test(profileView));
+  check('the profile lists the communities joined', /Your communities/i.test(profileView) && /SEE 2026/.test(profileView), profileView.slice(0, 160).replace(/\n/g, ' '));
 
   // --- The Ujyalo display name is the user's own ---------------------------
   const customName = `Riyaz C. ${Date.now() % 10000}`;
@@ -422,6 +454,7 @@ try {
   await mobile.close();
 
   check('no console errors during the whole run', consoleErrors.length === 0, consoleErrors.slice(0, 2).join(' | '));
+  check('nothing warned about a failed community listing', !consoleWarnings.some((w) => /could not list communities/.test(w)), consoleWarnings.slice(0, 2).join(' | '));
 } catch (error) {
   check('flow completed without throwing', false, String(error).slice(0, 300));
 } finally {

@@ -129,9 +129,15 @@ describe('browsing without an account', () => {
 });
 
 describe('membership', () => {
-  it('lets a connected user join, and only as themselves', async () => {
+  // Joining and leaving are POST /api/connect/join and /leave. The endpoint
+  // writes three documents in one transaction (member record, community
+  // counter, profile list), which a browser cannot do safely — so the client
+  // holds no write access here at all. These tests pin that down, because a
+  // permissive rule here would let anyone join a community they were excluded
+  // from with a single setDoc.
+  it('refuses a client-side join, even as yourself', async () => {
     await seed();
-    await assertSucceeds(setDoc(doc(connectDb(BOB), 'communities', COMMUNITY, 'members', BOB), member(BOB)));
+    await assertFails(setDoc(doc(connectDb(BOB), 'communities', COMMUNITY, 'members', BOB), member(BOB)));
   });
 
   it('refuses a member document naming someone else', async () => {
@@ -139,11 +145,9 @@ describe('membership', () => {
     await assertFails(setDoc(doc(connectDb(BOB), 'communities', COMMUNITY, 'members', ALICE), member(ALICE)));
   });
 
-  it('refuses self-promotion to a role other than member', async () => {
+  it('refuses a client-side leave', async () => {
     await seed();
-    await assertFails(
-      setDoc(doc(connectDb(BOB), 'communities', COMMUNITY, 'members', BOB), { ...member(BOB), role: 'owner' }),
-    );
+    await assertFails(deleteDoc(doc(connectDb(ALICE), 'communities', COMMUNITY, 'members', ALICE)));
   });
 
   it('refuses an anonymous (browser-guest) session as a credential', async () => {
@@ -151,9 +155,27 @@ describe('membership', () => {
     await assertFails(setDoc(doc(guestDb(), 'communities', COMMUNITY, 'members', GUEST), member(GUEST)));
   });
 
-  it('lets a member leave', async () => {
+  it('lets a member read the member list', async () => {
     await seed();
-    await assertSucceeds(deleteDoc(doc(connectDb(ALICE), 'communities', COMMUNITY, 'members', ALICE)));
+    await assertSucceeds(getDocs(collection(connectDb(ALICE), 'communities', COMMUNITY, 'members')));
+  });
+
+  it('hides the member list from a signed-in non-member', async () => {
+    await seed();
+    await assertFails(getDocs(collection(connectDb(BOB), 'communities', COMMUNITY, 'members')));
+  });
+
+  it('hides the member list from a visitor with no account', async () => {
+    await seed();
+    await assertFails(getDocs(collection(anonDb(), 'communities', COMMUNITY, 'members')));
+  });
+
+  it('lets anyone read their own membership record', async () => {
+    await seed();
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      await setDoc(doc(context.firestore(), 'communities', COMMUNITY, 'members', BOB), member(BOB));
+    });
+    await assertSucceeds(getDoc(doc(connectDb(BOB), 'communities', COMMUNITY, 'members', BOB)));
   });
 });
 

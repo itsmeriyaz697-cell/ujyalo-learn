@@ -7,7 +7,7 @@
  * does not own) the write fails and the UI shows the error — the client does
  * not try to be the security boundary.
  */
-import { getFirebaseDb } from '@/services/firebase/client';
+import { getFirebaseAuth, getFirebaseDb } from '@/services/firebase/client';
 import type { Channel, Community, ConnectMessage, ConnectProfile } from './types';
 
 const COMMUNITIES = 'communities';
@@ -34,43 +34,33 @@ export async function listChannels(communityId: string): Promise<Channel[]> {
   return snap.docs.map((doc) => ({ id: doc.id, ...(doc.data() as Omit<Channel, 'id'>) }));
 }
 
+/**
+ * How many people are actually in a community.
+ *
+ * An aggregation query, so it costs one small request rather than reading
+ * every member document. Falls back to the stored counter when the count
+ * cannot be read, so the page still renders something rather than an error.
+ */
+export async function countMembers(communityId: string, fallback = 0): Promise<number> {
+  try {
+    const db = await getFirebaseDb();
+    const { collection, getCountFromServer } = await import('firebase/firestore');
+    const snap = await getCountFromServer(collection(db, COMMUNITIES, communityId, 'members'));
+    return snap.data().count;
+  } catch {
+    return fallback;
+  }
+}
+
 export async function isMember(communityId: string, uid: string): Promise<boolean> {
   const db = await getFirebaseDb();
   const { doc, getDoc } = await import('firebase/firestore');
-  const snap = await getDoc(doc(db, COMMUNITIES, communityId, 'members', uid));
-  return snap.exists();
-}
-
-export async function listMyMemberships(uid: string): Promise<string[]> {
-  const db = await getFirebaseDb();
-  // Memberships live in two places: a member document per community (which the
-  // rules use) and an id list on the profile (which is one read instead of a
-  // collection-group query that would need its own index).
-  const profile = await getDocProfile(db, uid);
-  return profile?.memberships ?? [];
-}
-
-export async function joinCommunity(communityId: string, uid: string): Promise<void> {
-  const db = await getFirebaseDb();
-  const { doc, setDoc, updateDoc, increment } = await import('firebase/firestore');
-  await setDoc(doc(db, COMMUNITIES, communityId, 'members', uid), {
-    uid,
-    role: 'member',
-    joinedAt: new Date().toISOString(),
-  });
-  // memberCount is display metadata; a failure here does not undo the join.
   try {
-    await updateDoc(doc(db, COMMUNITIES, communityId), { memberCount: increment(1) });
+    const snap = await getDoc(doc(db, COMMUNITIES, communityId, 'members', uid));
+    return snap.exists();
   } catch {
-    /* counters are cosmetic */
-  }
-  try {
-    const current = (await getDocProfile(db, uid))?.memberships ?? [];
-    if (!current.includes(communityId)) {
-      await updateDoc(doc(db, 'connectProfiles', uid), { memberships: [...current, communityId].slice(0, 200) });
-    }
-  } catch {
-    /* profile is written by the server on next sign-in */
+    // "not a member" and "not allowed to look" are the same answer here.
+    return false;
   }
 }
 
@@ -81,22 +71,68 @@ async function getDocProfile(db: import('firebase/firestore').Firestore, uid: st
   return snap.exists() ? (snap.data() as ConnectProfile) : null;
 }
 
-export async function leaveCommunity(communityId: string, uid: string): Promise<void> {
+/**
+ * The communities this person belongs to.
+ *
+ * Read from the membership list the server keeps on the profile. It cannot be
+ * edited from a browser (see firestore.rules), so it cannot be inflated — and
+ * unlike a collection-group query over member documents, it does not require
+ * those documents to be readable by strangers.
+ */
+export async function listMyMemberships(uid: string): Promise<string[]> {
   const db = await getFirebaseDb();
-  const { doc, deleteDoc, updateDoc, increment } = await import('firebase/firestore');
-  await deleteDoc(doc(db, COMMUNITIES, communityId, 'members', uid));
-  try {
-    await updateDoc(doc(db, COMMUNITIES, communityId), { memberCount: increment(-1) });
-  } catch {
-    /* cosmetic */
-  }
-  try {
-    const profile = await getDocProfile(db, uid);
-    const next = (profile?.memberships ?? []).filter((id) => id !== communityId);
-    await updateDoc(doc(db, 'connectProfiles', uid), { memberships: next });
-  } catch {
-    /* ignore */
-  }
+  const profile = await getDocProfile(db, uid);
+  return Array.isArray(profile?.memberships) ? profile.memberships : [];
+}
+
+/**
+ * The communities behind that id list.
+ *
+ * One query rather than one read per id, capped at the ten an `in` filter
+ * allows — a profile in more than ten communities is not a case worth making
+ * eleven round trips for.
+ */
+export async function listMyMemberCommunities(uid: string): Promise<Community[]> {
+  const ids = (await listMyMemberships(uid)).slice(0, 10);
+  if (ids.length === 0) return [];
+  const db = await getFirebaseDb();
+  const { collection, documentId, getDocs, query, where } = await import('firebase/firestore');
+  const snap = await getDocs(query(collection(db, COMMUNITIES), where(documentId(), 'in', ids)));
+  return snap.docs.map((doc) => ({ id: doc.id, ...(doc.data() as Omit<Community, 'id'>) }));
+}
+
+/**
+ * Joins a community.
+ *
+ * Server-side, because one join writes three documents and the rules (rightly)
+ * let a browser write none of the other two.
+ */
+export async function joinCommunity(communityId: string, _uid: string): Promise<void> {
+  await postMembership('join', communityId);
+}
+
+/**
+ * Leaves a community, by the same route.
+ */
+export async function leaveCommunity(communityId: string, _uid: string): Promise<void> {
+  await postMembership('leave', communityId);
+}
+
+async function postMembership(action: 'join' | 'leave', communityId: string): Promise<void> {
+  const auth = await getFirebaseAuth();
+  const user = auth.currentUser;
+  if (!user) throw new Error('You need to be signed in to do that.');
+  const token = await user.getIdToken();
+  const response = await fetch(`/api/connect/${action}`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ communityId }),
+  });
+  if (response.ok) return;
+  const body = (await response.json().catch(() => ({}))) as { error?: string; message?: string };
+  if (response.status === 401) throw new Error('Your session expired. Sign in again to continue.');
+  throw new Error(body.message ?? 'That did not save. Try again.');
 }
 
 /**
@@ -195,18 +231,10 @@ export async function createCommunity(input: {
   });
   await batch.commit();
 
-  // The profile's membership list is display metadata; failing here does not
-  // undo the community, and the server rewrites the list on next sign-in.
-  try {
-    const profile = await getDocProfile(db, input.uid);
-    const current = profile?.memberships ?? [];
-    if (!current.includes(ref.id)) {
-      const { updateDoc } = await import('firebase/firestore');
-      await updateDoc(doc(db, 'connectProfiles', input.uid), { memberships: [...current, ref.id].slice(0, 200) });
-    }
-  } catch {
-    /* ignore */
-  }
+  // The person who creates a community is in it. Membership is written by the
+  // server (member document, counter and profile list in one transaction), so
+  // this is the same call the Join button makes.
+  await postMembership('join', ref.id);
 
   return ref.id;
 }

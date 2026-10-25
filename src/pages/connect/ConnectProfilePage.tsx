@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/Button';
 import { DiscordMark } from '@/components/connect/DiscordMark';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { signOutConnect } from '@/features/connect/api';
-import { getMyProfile, updateMyProfile } from '@/features/connect/firestore';
-import type { ConnectProfile } from '@/features/connect/types';
+import { getMyProfile, listMyMemberCommunities, updateMyProfile } from '@/features/connect/firestore';
+import type { Community, ConnectProfile } from '@/features/connect/types';
 
 /**
  * The Connect profile.
@@ -22,6 +22,7 @@ export default function ConnectProfilePage() {
   const { user, isBrowserGuest } = useAuth();
   const connected = Boolean(user && !isBrowserGuest);
   const [profile, setProfile] = useState<ConnectProfile | null>(null);
+  const [communities, setCommunities] = useState<Community[]>([]);
   const [displayName, setDisplayName] = useState('');
   const [bio, setBio] = useState('');
   const [saving, setSaving] = useState(false);
@@ -42,7 +43,18 @@ export default function ConnectProfilePage() {
         setDisplayName(row?.displayName ?? '');
         setBio(row?.bio ?? '');
       })
-      .catch(() => undefined)
+      .then(() => undefined)
+      .catch(() => undefined);
+    // Names, not just a count: "3 communities" tells the person nothing.
+    listMyMemberCommunities(user.uid)
+      .then((rows) => {
+        if (!cancelled) setCommunities(rows);
+      })
+      .catch((reason: unknown) => {
+        // A failed listing must not look like "you are in no communities".
+        const detail = reason as { code?: string; message?: string };
+        console.warn('[connect] could not list communities', detail?.code ?? '', detail?.message ?? String(reason));
+      })
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
@@ -208,10 +220,25 @@ export default function ConnectProfilePage() {
                 These fields are read from Discord and cannot be edited here — changing them would make this page
                 disagree with the account it describes.
               </p>
-              {profile && profile.memberships.length > 0 && (
-                <Button asChild variant="secondary" className="mt-4">
-                  <Link to="/connect">Go to your communities</Link>
-                </Button>
+              {communities.length > 0 && (
+                <div className="mt-4">
+                  <h3 className="text-sm font-bold" style={{ color: 'var(--text)' }}>
+                    Your communities
+                  </h3>
+                  <ul className="mt-2 space-y-1.5">
+                    {communities.map((community) => (
+                      <li key={community.id}>
+                        <Link
+                          to={`/connect/c/${community.slug}`}
+                          className="text-sm underline-offset-4 hover:underline"
+                          style={{ color: 'var(--brand)' }}
+                        >
+                          {community.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               )}
             </div>
           </div>
