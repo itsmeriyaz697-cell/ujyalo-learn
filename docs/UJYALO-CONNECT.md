@@ -118,6 +118,26 @@ Two ways to move it:
   Edit → Remove**, then **Add** it again *without* a branch, and deploy once
   more.
 
+### Where it stands at `d04d40e`
+
+The last promoted deployment is still `dpl_ARizPcNXTyGbmeYGSVCvUm6J29Zu`
+(`47b5a28`, 22 October). Everything since then is built, ready, and **staged**:
+`dpl_8DwonDYqNHi1hNsDjNvSPFQ9VhT4` is the production build of `d04d40e` and it
+is what the team aliases serve —
+
+```
+ujyalo-learn-itsmeriyaz697-cells-projects.vercel.app   assets/index-WFrMRix4.js
+ujyalo-learn-git-main-itsmeriyaz697-cells-projects.vercel.app   same
+ujyalo-learn.vercel.app   assets/index-Bz6xqjyQ.js   ← promoted 22 Oct, stale
+```
+
+Re-adding the domain through the API is now refused with *“Cannot add
+ujyalo-learn.vercel.app since it's already assigned to another project”*, so
+the promote button in the dashboard is the only route left that does not
+involve deleting anything. Until it is pressed, `ujyalo-learn.vercel.app`
+serves a build from 22 October: no Connect routes, no quiz-arena rewrite, and
+`/api/health` reporting the AI provider as unconfigured.
+
 Do **not** attach the production domain to a Git branch. A branch-linked domain
 serves the latest deployment of that branch as a preview, and this project
 protects preview deployments with Vercel Authentication — visitors are then met
