@@ -2,11 +2,11 @@
   "pages": [
     {
       "path": "/",
-      "title": "Ujyalo Learn — AI Tutor for Grades 1–12 & SEE in Nepal",
-      "description": "Free AI tutor for Nepal: Grades 1–12 and SEE preparation. Ask in English or Nepali, take quizzes, save notes and follow a study plan that adapts.",
+      "title": "Ujyalo Learn — a free study companion for Grades 1–12 in Nepal",
+      "description": "Ask a question, get an explanation you can follow, then practise it. Free tutor, quizzes and notes for Nepali school students, on any phone.",
       "priority": "1.0",
       "changefreq": "weekly",
-      "h1": "Smart learning. Brighter future."
+      "h1": "Namaste. What are you studying today?"
     },
     {
       "path": "/features",

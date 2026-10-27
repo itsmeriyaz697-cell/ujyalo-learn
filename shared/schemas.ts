@@ -26,7 +26,10 @@ export const studentContextSchema = z.object({
 export const tutorRequestSchema = z.object({
   mode: z.enum(TUTOR_MODE_IDS).default('explain-simply'),
   messages: z.array(chatMessageSchema).min(1).max(LIMITS.maxMessages),
-  context: studentContextSchema.default({}),
+  // zod 4: .default() short-circuits parsing, so an object default skips the
+  // inner defaults and leaves grade/curriculum undefined. .prefault() runs the
+  // value through the schema, which is what we mean here.
+  context: studentContextSchema.prefault({}),
   stream: z.boolean().default(true),
   subjectId: z.string().max(48).optional(),
 });

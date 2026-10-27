@@ -6,6 +6,7 @@ import {
   InvalidBodyError,
   handleOptions,
   methodNotAllowed,
+  rejectCrossOrigin,
   readJsonBody,
   sendError,
   sendJson,
@@ -29,6 +30,7 @@ Each card tests exactly one idea and must be answerable from the deck topic alon
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'OPTIONS') return handleOptions(res);
   if (req.method !== 'POST') return methodNotAllowed(res, ['POST']);
+  if (rejectCrossOrigin(req, res)) return;
 
   const aiConfig = readAiConfig();
   const guard = await guardAiRequest(req, res, aiConfig);

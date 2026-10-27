@@ -53,7 +53,7 @@ export function Logo({ size = 36, withText = true, className, textClassName }: L
             Ujyalo <span style={{ color: 'var(--primary)' }}>Learn</span>
           </span>
           <span className="mt-1 hidden text-[10px] font-medium uppercase tracking-[0.16em] sm:block" style={{ color: 'var(--muted)' }}>
-            Learn Smarter. Shine Brighter.
+            Grades 1–12 · Nepal
           </span>
         </span>
       )}

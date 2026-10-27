@@ -62,7 +62,11 @@ export default function ArenaHomePage() {
       setHome(data);
       if (!data.configured) setLocal(loadLocalProfile());
     } catch (err) {
-      setError((err as Error).message);
+      // "storage is not configured" is not a failure a visitor caused, and a red
+      // alert saying "the Arena could not complete that request" reads as a bug
+      // on a first visit. The demo notice already explains the state.
+      const message = (err as Error).message;
+      setError(/not configured/i.test(message) ? null : message);
     } finally {
       setLoading(false);
     }

@@ -36,13 +36,20 @@ export default function AiTutorPage() {
               quick, or in Nepali.
             </p>
 
-            <div className="mt-6 flex flex-wrap gap-2">
-              <Button asChild>
-                <Link to="/app/tutor">
-                  Open the tutor <ArrowRight className="ml-1 h-4 w-4" aria-hidden="true" />
-                </Link>
-              </Button>
-              <StartLearningButton variant="secondary" to="/app/tutor">Open the tutor</StartLearningButton>
+            <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3">
+              <StartLearningButton
+                to="/app/tutor"
+                iconRight={<ArrowRight className="h-4 w-4" aria-hidden="true" />}
+              >
+                Open the tutor
+              </StartLearningButton>
+              <Link
+                to="/global-quiz"
+                className="text-sm font-medium underline decoration-1 underline-offset-4"
+                style={{ color: 'var(--text-soft)' }}
+              >
+                Or see the quiz arena
+              </Link>
             </div>
 
             {health && !health.configured && (

@@ -401,7 +401,9 @@ try {
     await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(2500);
 
-    const start = page.getByRole('button', { name: /start learning free/i }).first();
+    // The label is copy, not contract: match either wording so a rewrite of the
+    // hero does not silently break this proof.
+    const start = page.getByRole('button', { name: /start studying|start learning free/i }).first();
     check('the home page offers a one-click start', await start.isVisible().catch(() => false));
 
     await start.click();

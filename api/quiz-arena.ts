@@ -18,7 +18,7 @@
  * Scoring happens here, never in the browser. See api/_lib/arena/service.ts.
  */
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { handleOptions, methodNotAllowed, sendError, sendJson } from './_lib/http.js';
+import { handleOptions, methodNotAllowed, rejectCrossOrigin, sendError, sendJson } from './_lib/http.js';
 import { arenaDb, arenaEnv, arenaStatus, verifyCaller, type Caller } from './_lib/arena/store.js';
 import {
   ArenaError,
@@ -101,6 +101,7 @@ async function myDashboard(db: FirebaseFirestore.Firestore, uid: string) {
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'OPTIONS') return handleOptions(res);
+  if (req.method === 'POST' && rejectCrossOrigin(req, res)) return;
   limited(res);
 
   const env = arenaEnv();

@@ -6,6 +6,7 @@ import {
   InvalidBodyError,
   handleOptions,
   methodNotAllowed,
+  rejectCrossOrigin,
   readJsonBody,
   sendError,
   sendJson,
@@ -25,6 +26,7 @@ Never claim a question is from an official examination, past paper, or textbook.
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'OPTIONS') return handleOptions(res);
   if (req.method !== 'POST') return methodNotAllowed(res, ['POST']);
+  if (rejectCrossOrigin(req, res)) return;
 
   const aiConfig = readAiConfig();
   const guard = await guardAiRequest(req, res, aiConfig);

@@ -45,6 +45,12 @@ jobs:
       - name: Check no secrets are committed
         run: npm run check:secrets
 
+      # Dependencies that actually ship. Build-only tooling is excluded: an
+      # advisory in a bundler's dev dependency cannot reach a visitor, and
+      # blocking on it would train us to ignore this gate.
+      - name: Audit shipped dependencies
+        run: npm audit --omit=dev --audit-level=moderate
+
   build:
     name: Production build
     runs-on: ubuntu-latest

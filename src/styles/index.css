@@ -4,12 +4,12 @@
 
 /* ─────────────────────────  Design tokens  ───────────────────────── */
 :root {
-  --bg: #f6f8fc;
+  --bg: #faf8f3;
   --surface: #ffffff;
-  --surface-2: #f2f5fb;
-  --surface-3: #e9eefa;
-  --border: #dde5f2;
-  --border-strong: #c6d3e8;
+  --surface-2: #f6f3ec;
+  --surface-3: #efeae0;
+  --border: #e4ddce;
+  --border-strong: #cfc5b2;
   --text: #0b1b3a;
   --text-soft: #33425f;
   --muted: #5b6b8c;
@@ -27,6 +27,7 @@
   --danger: #b42318;
   --danger-soft: #fee9e7;
   --ring: #2947d6;
+  --font-display: ui-serif, 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman', serif;
 }
 
 .dark {
@@ -109,15 +110,15 @@
   }
 
   .card {
-    @apply surface rounded-2xl;
-    box-shadow: 0 1px 2px rgba(11, 27, 58, 0.04);
+    @apply surface rounded-xl;
+    box-shadow: none;
   }
 
   .card-hover {
     @apply transition-shadow duration-200;
   }
   .card-hover:hover {
-    box-shadow: 0 12px 30px -18px rgba(11, 27, 58, 0.45);
+    box-shadow: 0 10px 26px -22px rgba(11, 27, 58, 0.55);
     border-color: var(--border-strong);
   }
 
@@ -261,11 +262,26 @@
   }
 
   .section-title {
-    @apply text-2xl font-bold tracking-tight sm:text-3xl;
+    @apply text-[1.7rem] font-semibold leading-[1.15] sm:text-[2.05rem];
+    font-family: var(--font-display);
+    letter-spacing: -0.015em;
+  }
+  .display {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
   }
   .eyebrow {
-    @apply text-xs font-semibold uppercase tracking-[0.14em];
-    color: var(--primary);
+    @apply text-[11px] font-semibold uppercase tracking-[0.18em];
+    color: var(--muted);
+  }
+  /* A short gold rule above a section label, used instead of an icon tile. */
+  .rule-gold::before {
+    content: '';
+    display: block;
+    width: 2rem;
+    height: 2px;
+    margin-bottom: 0.9rem;
+    background: var(--accent);
   }
 
   .divider {

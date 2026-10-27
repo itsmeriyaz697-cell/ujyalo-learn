@@ -289,6 +289,25 @@ async function main() {
   const getTutor = await fetch(`${API_BASE}/api/tutor`);
   check('GET /api/tutor is method-not-allowed', getTutor.status === 405);
 
+  // 14. Cross-origin writes
+  // A browser attaches Origin to every cross-site POST, so a request carrying
+  // somebody else's origin must be refused before any work is done. A POST
+  // from the site itself, and one with no Origin at all (server-to-server and
+  // the suites), must still go through.
+  const foreign = await post(
+    API_BASE,
+    '/api/tutor',
+    { messages: [{ role: 'user', content: 'Hello' }] },
+    { Origin: 'https://evil.example' },
+  );
+  check('a cross-origin POST to the tutor is refused', foreign.status === 403, String(foreign.status));
+  const foreignBody = await foreign.json().catch(() => ({}));
+  check('the refusal is a structured error, not a leak', foreignBody?.error?.code === 'cross_origin');
+
+  const sameOrigin = await post(API_BASE, '/api/health', {}, { Origin: API_BASE });
+  check('a same-origin POST is not blocked by the guard', sameOrigin.status !== 403, String(sameOrigin.status));
+  await sameOrigin.text();
+
   const passed = results.filter((result) => result.passed).length;
   console.log(`\n${passed}/${results.length} smoke checks passed.\n`);
 

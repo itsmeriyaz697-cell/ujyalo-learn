@@ -64,8 +64,8 @@ export function AnalyticsConsent() {
         <div className="flex items-start gap-2.5">
           <BarChart3 className="mt-0.5 h-4 w-4 shrink-0" style={{ color: 'var(--primary)' }} aria-hidden="true" />
           <p className="text-[12px] leading-snug sm:text-[13px] sm:leading-relaxed" style={{ color: 'var(--text-soft)' }}>
-            May we count page views with Google Analytics? It shows which lessons help and which confuse. No names,
-            emails or answers are sent — and everything still works if you say no.{' '}
+            Count page views with Google Analytics? No names, emails or answers are sent, and everything works if
+            you say no.{' '}
             <Link to="/privacy" className="underline" style={{ color: 'var(--primary)' }}>
               Privacy policy
             </Link>

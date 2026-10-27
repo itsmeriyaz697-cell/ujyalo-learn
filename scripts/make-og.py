@@ -44,7 +44,7 @@ td.line([(52, 80), (52, 95)], fill=(41, 71, 214, 255), width=2)
 img.paste(tile, (80, 70), tile)
 
 d.text((210, 84), "Ujyalo Learn", font=f_logo, fill="#FFFFFF")
-d.text((212, 136), "Learn smarter. Shine brighter.", font=f_sub, fill="#92B0FF")
+d.text((212, 136), "Grades 1–12 · Nepal", font=f_sub, fill="#92B0FF")
 
 # ── Hero art on the right, in the same rounded card as the home page ─────────
 hero = Image.open("public/hero-student.png").convert("RGB")
@@ -64,19 +64,19 @@ od.rounded_rectangle([0, 0, card_w - 1, card_h - 1], radius=26, outline=(255, 25
 img.paste(overlay, (card_x, card_y), overlay)
 
 d = ImageDraw.Draw(img)
-pill = "AI-powered learning"
+pill = "Grades 1–12 · Nepal"
 pw = d.textlength(pill, font=f_tiny)
 px, py = card_x + card_w - pw - 46, card_y + 22
 d.rounded_rectangle([px, py, px + pw + 28, py + 34], radius=17, fill="#F7B733")
 d.text((px + 14, py + 9), pill, font=f_tiny, fill="#3B2A00")
 
 # ── Headline ────────────────────────────────────────────────────────────────
-d.text((80, 236), "Smart learning.", font=f_h1, fill="#FFFFFF")
-d.text((80, 316), "Brighter future.", font=f_h1, fill="#F7B733")
+d.text((80, 236), "Namaste. What are", font=f_h1, fill="#FFFFFF")
+d.text((80, 316), "you studying today?", font=ImageFont.truetype(F, 58), fill="#FFFFFF")
 d.rounded_rectangle([80, 396, 396, 403], radius=3, fill="#F7B733")
 
-d.text((80, 428), "An AI tutor, practice quizzes and a study plan —", font=f_body, fill="#B8C4E0")
-d.text((80, 464), "free for Grades 1–12 and SEE in Nepal.", font=f_body, fill="#B8C4E0")
+d.text((80, 428), "A free study companion for school in Nepal —", font=f_body, fill="#B8C4E0")
+d.text((80, 464), "ask, practise, keep it. Grades 1–12.", font=f_body, fill="#B8C4E0")
 
 items = ["AI tutoring", "Quizzes", "Notes & flashcards", "Study planner"]
 x = 80

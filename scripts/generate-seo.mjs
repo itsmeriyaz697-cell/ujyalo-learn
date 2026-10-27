@@ -238,14 +238,15 @@ const PRERENDER_CSS = `
 
 /* Hero — same scale and rhythm as the real home page. */
 .pr-hero{position:relative;overflow:hidden;border-bottom:1px solid var(--border);padding:3rem 0 2.5rem}
-.pr-hero-bg{position:absolute;inset:0;pointer-events:none;background:radial-gradient(70% 60% at 80% 0%,color-mix(in srgb,var(--primary) 14%,transparent),transparent 70%),radial-gradient(50% 50% at 0% 10%,color-mix(in srgb,var(--accent) 12%,transparent),transparent 70%)}
+.pr-hero-bg{display:none}
 .pr-hero .pr-c{position:relative}
 @media (min-width:640px){.pr-hero{padding:4rem 0 3rem}}
-.pr-badge{display:inline-flex;align-items:center;gap:.375rem;border-radius:9999px;background:var(--primary-soft);color:var(--primary);padding:.3rem .7rem;font-size:.75rem;font-weight:600}
-.pr h1{margin:1rem 0 0;font-size:2.35rem;line-height:1.05;letter-spacing:-.025em;font-weight:800;max-width:22ch;color:var(--text)}
-@media (min-width:640px){.pr h1{font-size:3.2rem}}
-@media (min-width:1024px){.pr h1{font-size:3.6rem}}
-.pr h1 .hl{color:var(--primary)}
+.pr-badge{display:block;color:var(--muted);font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase}
+.pr-badge::before{content:"";display:block;width:2rem;height:2px;margin-bottom:.9rem;background:var(--accent)}
+.pr h1{margin:1rem 0 0;font-size:2.6rem;line-height:1.03;letter-spacing:-.03em;font-weight:600;max-width:22ch;color:var(--text);font-family:ui-serif,'Iowan Old Style','Palatino Linotype',Palatino,Georgia,'Times New Roman',serif}
+@media (min-width:640px){.pr h1{font-size:3.4rem}}
+@media (min-width:1024px){.pr h1{font-size:3.75rem}}
+.pr h1 .hl{color:var(--text)}
 .pr-ul{position:relative;display:inline-block}
 .pr-ul::after{content:"";position:absolute;left:0;right:0;bottom:-.35rem;height:.28rem;border-radius:9999px;background:var(--accent)}
 .dark .pr-ul::after{opacity:.85}
@@ -564,24 +565,24 @@ function renderStaticContent(page) {
   // The hero text is the app's own copy, verbatim: a first paint that says one
   // thing and a mounted page that says another is the flash being fixed here.
   const HERO_LEAD =
-    'Ujyalo Learn brings an AI tutor, practice quizzes, SEE preparation and a personal study plan together in ' +
-    'one place. Understand the topic — don’t just copy the answer.';
+    'Ujyalo Learn is a free study companion for school in Nepal. Ask a question and get an explanation you can ' +
+    'follow. Practise it with a quiz, keep what matters in notes, and come back tomorrow to what is left.';
 
   const body = isHome
     ? `<section class="pr-hero">
     <div class="pr-hero-bg" aria-hidden="true"></div>
     <div class="pr-c">
-      <span class="pr-badge">✦ AI-powered learning for Grades 1–12</span>
-      ${isHome && secondLine ? `<h1>${escapeHtml(firstLine)}<br><span class="hl pr-ul">${escapeHtml(secondLine)}</span></h1>` : `<h1>${headline}</h1>`}
+      <span class="pr-badge">Nepal · Grades 1–12 · Free to start</span>
+      <h1>${headline}</h1>
       <p class="pr-lead">${HERO_LEAD}</p>
       <div class="pr-cta">
-        <a class="pr-btn pr-btn-p" href="/app">Start learning free</a>
-        <a class="pr-btn pr-btn-s" href="/features">Explore features</a>
+        <a class="pr-btn pr-btn-p" href="/app">Start studying</a>
+        <a class="pr-btn pr-btn-s" href="/global-quiz">Try a quiz without an account</a>
       </div>
       <ul class="pr-trust">
-        <li>No credit card</li>
+        <li>No card needed</li>
         <li>English &amp; Nepali</li>
-        <li>Private by default</li>
+        <li>Grades 1–12</li>
       </ul>
     </div>
   </section>`
@@ -619,7 +620,7 @@ function renderStaticContent(page) {
         ${PRERENDER_LOGO}
         <span class="pr-bt">
           <span class="pr-bn">Ujyalo <span>Learn</span></span>
-          <span class="pr-bs">Learn Smarter. Shine Brighter.</span>
+          <span class="pr-bs">Grades 1–12 · Nepal</span>
         </span>
       </a>
       <nav class="pr-n" aria-label="Main">${SITE_NAV.map(
@@ -712,7 +713,7 @@ const structuredData = [
     '@context': 'https://schema.org',
     '@type': ['EducationalOrganization', 'Organization'],
     name: SITE_NAME,
-    alternateName: 'Ujyalo Learn — Learn Smarter. Shine Brighter.',
+    alternateName: 'Ujyalo Learn — study companion for Grades 1–12 in Nepal',
     ...(origin ? { url: `${origin}/`, logo: `${origin}/icons/icon-512.png` } : {}),
     description:
       'AI-powered learning and tutoring platform for students in Nepal: Grades 1–12, SEE preparation, practice quizzes, notes, flashcards and a study planner.',

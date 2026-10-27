@@ -23,7 +23,7 @@
  * `id` field, fetched with the access token this server obtained.
  */
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { sendError, sendJson } from './_lib/http.js';
+import { rejectCrossOrigin, sendError, sendJson } from './_lib/http.js';
 import { checkAndConsume, hashClient } from './_lib/rateLimit.js';
 import {
   authorizeUrl,
@@ -118,6 +118,10 @@ function siteUrl(req: VercelRequest): string {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // Join, leave and logout all change state on the server, so a request a
+  // browser sent from another origin is refused outright. The OAuth callback
+  // is a GET redirect from Discord and is unaffected.
+  if (req.method === 'POST' && rejectCrossOrigin(req, res)) return;
   // The action arrives as a query parameter because this project is a Vite
   // app, not Next.js: /api/connect/<action> is rewritten in vercel.json to
   // /api/connect?action=<action>. Local dev does the same through

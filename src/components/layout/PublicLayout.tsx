@@ -212,7 +212,7 @@ export function PublicLayout() {
               © {new Date().getFullYear()} Ujyalo Learn — Built by{' '}
               <strong style={{ color: 'var(--text-soft)' }}>Riyaz Chalise</strong>.
             </p>
-            <p>Learn Smarter. Shine Brighter.</p>
+            <p>Grades 1–12 · Nepal · Free to start</p>
           </div>
         </div>
       </footer>

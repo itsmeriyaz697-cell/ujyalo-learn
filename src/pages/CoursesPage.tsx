@@ -104,7 +104,7 @@ export default function CoursesPage() {
           <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
             <span className="inline-flex items-center gap-1.5" style={{ color: 'var(--muted)' }}>
               <Filter className="h-3.5 w-3.5" aria-hidden="true" />
-              {filtered.length} of {courses.length} courses
+              {loading ? 'Loading courses…' : `${filtered.length} of ${courses.length} courses`}
             </span>
             {activeFilters > 0 && (
               <button

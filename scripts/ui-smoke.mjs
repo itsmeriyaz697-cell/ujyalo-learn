@@ -58,7 +58,7 @@ async function visit(pathname) {
 
 // ─── Public pages ────────────────────────────────────────────────────────────
 const publicPages = [
-  ['/', 'Smart learning.'],
+  ['/', 'Namaste.'],
   ['/features', null],
   ['/subjects', null],
   ['/pricing', null],
@@ -342,7 +342,13 @@ await page.getByRole('button', { name: /Reset to default/ }).click();
 await page.waitForTimeout(700);
 await visit('/');
 await page.waitForTimeout(500);
-check('resetting restores the default title', /AI Tutor for Grades/i.test(await page.title()), await page.title());
+// The default title is whatever shared/seo-pages.json declares for "/" — the
+// point of this check is that an owner override was discarded, not the wording.
+check(
+  'resetting restores the default title',
+  /study companion for Grades/i.test(await page.title()),
+  await page.title(),
+);
 
 
 // 404

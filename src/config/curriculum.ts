@@ -333,7 +333,7 @@ export const PRICING_TIERS = [
 
 export const SITE = {
   name: 'Ujyalo Learn',
-  tagline: 'Learn Smarter. Shine Brighter.',
+  tagline: 'Built in Kathmandu for Grades 1-12.',
   description:
     'Ujyalo Learn is an AI-powered learning and tutoring platform for students in Nepal and beyond. Understand difficult concepts, practise questions and prepare for exams with a patient personal AI tutor.',
   founder: 'Riyaz Chalise',

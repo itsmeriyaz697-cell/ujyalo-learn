@@ -6,6 +6,7 @@ import {
   InvalidBodyError,
   handleOptions,
   methodNotAllowed,
+  rejectCrossOrigin,
   readJsonBody,
   sendError,
 } from './_lib/http.js';
@@ -19,6 +20,7 @@ export const config = { maxDuration: 60 };
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'OPTIONS') return handleOptions(res);
   if (req.method !== 'POST') return methodNotAllowed(res, ['POST']);
+  if (rejectCrossOrigin(req, res)) return;
 
   const aiConfig = readAiConfig();
   const guard = await guardAiRequest(req, res, aiConfig);

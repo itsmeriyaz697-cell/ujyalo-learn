@@ -209,7 +209,10 @@ try {
   // --- Browsing without an account -----------------------------------------
   await page.goto(`${BASE}/connect`, { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('#main h1', { timeout: 30000 });
-  await page.waitForTimeout(1200);
+  // The list is fetched after the shell paints, so wait for it rather than for
+  // a fixed delay: a slow machine must not be able to fail a correctness check.
+  await page.getByText('SEE 2026').first().waitFor({ timeout: 20000 }).catch(() => {});
+  await page.waitForTimeout(300);
   const hub = await page.locator('body').innerText();
   check('the Connect hub opens with no account', /Study together, not alone/i.test(hub));
   check('the community list is public', /SEE 2026/i.test(hub), hub.slice(0, 120).replace(/\n/g, ' '));
