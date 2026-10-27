@@ -38,6 +38,10 @@ export default function ArenaPlayPage() {
   const [attemptId, setAttemptId] = useState<string | null>(null);
   const [demo, setDemo] = useState(false);
   const [practice, setPractice] = useState(false);
+  // A practice round played without an account is a guest round: same quiz,
+  // nothing written anywhere. Derived, never stored, so it cannot go stale.
+  const guest = practice && !user;
+
   const [localAttempt, setLocalAttempt] = useState<LocalAttempt | null>(null);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [index, setIndex] = useState(0);
@@ -52,13 +56,13 @@ export default function ArenaPlayPage() {
     setPhase('loading');
     setError(null);
     try {
-      // Practice, or signed out: score locally. No account, no points.
+      // Practice, or a signed-out visitor: the quiz runs, scored locally.
+      //
+      // A visitor who pressed Play on a real challenge asked for a real quiz,
+      // and they get one. What they cannot get without an account is the
+      // *saving* of it — points, streak, rank — so that is the only thing held
+      // back, and the results screen offers it at the point it matters.
       if (isPractice || !user) {
-        if (!user && !isPractice) {
-          const next = `/global-quiz/play?${params.toString()}`;
-          navigate(`/login?next=${encodeURIComponent(next)}`, { replace: true });
-          return;
-        }
         const attempt = startPractice(category, length, isDaily);
         setLocalAttempt(attempt);
         setPractice(true);
@@ -201,6 +205,8 @@ export default function ArenaPlayPage() {
         result={result}
         demo={demo}
         practice={practice}
+        guest={guest}
+        returnTo={`/global-quiz/play?${params.toString()}`}
         category={quizCategory}
         categoryLabel={CATEGORY_META[quizCategory].label}
       />
@@ -216,7 +222,9 @@ export default function ArenaPlayPage() {
           <DemoNotice>
             {demo
               ? 'This deployment has no Arena database, so this quiz is running in local demo mode. Points stay in this browser and are not part of any global ranking.'
-              : 'Practice quiz: the questions and explanations are real, but no points or rank are recorded.'}
+              : guest
+                ? 'Guest round: the questions and explanations are real. Nothing is saved until you have an account — you can decide that when you see your score.'
+                : 'Practice quiz: the questions and explanations are real, but no points or rank are recorded.'}
           </DemoNotice>
         </div>
       )}
@@ -350,12 +358,16 @@ function ResultsView({
   result,
   demo,
   practice,
+  guest,
+  returnTo,
   category,
   categoryLabel,
 }: {
   result: SubmitResult;
   demo: boolean;
   practice: boolean;
+  guest: boolean;
+  returnTo: string;
   category: ArenaCategory;
   categoryLabel: string;
 }) {
@@ -397,12 +409,37 @@ function ResultsView({
           </p>
         )}
 
-        {(practice || demo) && (
+        {(practice || demo) && !guest && (
           <p className="mt-4 text-[13px]" style={{ color: 'var(--muted)' }}>
             {demo
               ? 'Demo mode: this score was kept in this browser only and is not on any leaderboard.'
-              : 'Practice mode: nothing was saved. Create a free account to keep your points and rank.'}
+              : 'Practice mode: nothing was saved.'}
           </p>
+        )}
+
+        {guest && (
+          <div
+            className="mt-4 rounded-xl border p-4 text-left"
+            style={{ borderColor: 'var(--border)', background: 'var(--surface-2)' }}
+          >
+            <p className="text-[13px] font-semibold" style={{ color: 'var(--text)' }}>
+              You scored {result.correct}/{result.total} as a guest
+            </p>
+            <p className="mt-1 text-[13px] leading-relaxed" style={{ color: 'var(--text-soft)' }}>
+              That score is not saved anywhere and will be gone if you close this tab. A free account keeps it, along
+              with your streak, badges and place on the board — and brings you back to this quiz.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Link to={`/signup?next=${encodeURIComponent(returnTo)}`}>
+                <Button size="sm">Keep this score</Button>
+              </Link>
+              <Link to={`/login?next=${encodeURIComponent(returnTo)}`}>
+                <Button size="sm" variant="secondary">
+                  I already have an account
+                </Button>
+              </Link>
+            </div>
+          </div>
         )}
 
         {result.newBadges.length > 0 && (

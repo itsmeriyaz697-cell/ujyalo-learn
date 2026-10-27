@@ -83,6 +83,27 @@ try {
     (await page.locator('footer').innerText()).includes('Built by'),
   );
 
+  // --------------------------------------------------- no wall for guests
+  // Clicking "Start a quiz" as a signed-out visitor must never bounce to
+  // /login or /signup; it has to start the quiz right here (round 20 rule).
+  const beforeStart = page.url();
+  await page.getByRole('button', { name: 'Start a quiz' }).first().click();
+  await page.waitForTimeout(1200);
+  const afterStart = page.url();
+  check(
+    'clicking Start a quiz does not send a guest to login or signup',
+    !/\/(login|signup)/.test(afterStart),
+    afterStart,
+  );
+  check(
+    'clicking Start a quiz starts a round immediately',
+    new URL(afterStart).pathname === '/global-quiz/play',
+    afterStart,
+  );
+  // Back to the lobby so the practice-link path below still starts clean.
+  await page.goto(beforeStart, { waitUntil: 'domcontentloaded' });
+  await settle(page);
+
   // ------------------------------------------------------------ play quiz
   await page.getByRole('link', { name: 'Try one free, no account' }).first().click();
   await page.waitForURL(/\/global-quiz\/play/, { timeout: 15000 }).catch(() => {});
@@ -126,8 +147,8 @@ try {
   const explanations = await page.locator('ol li').count();
   check('every question is explained after submission', explanations >= 4, String(explanations));
   check(
-    'practice mode says nothing was saved',
-    (await page.locator('body').innerText()).includes('Practice mode'),
+    'a practice round says the score was not saved',
+    /Practice mode: nothing was saved|not saved anywhere/.test(await page.locator('body').innerText()),
   );
   check('the correct answer is revealed', (await page.locator('body').innerText()).includes('Correct answer'));
 

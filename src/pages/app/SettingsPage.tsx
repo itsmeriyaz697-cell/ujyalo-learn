@@ -6,6 +6,7 @@ import {
   Database,
   Download,
   LogOut,
+  MessagesSquare,
   Moon,
   Save,
   Server,
@@ -329,6 +330,29 @@ export default function SettingsPage() {
                     Log out
                   </Button>
                 </div>
+              </div>
+            </CardBody>
+          </Card>
+
+          <Card>
+            <CardHeader
+              title="Ujyalo Connect"
+              description="Communities and study groups — a separate identity from this account."
+              icon={<MessagesSquare className="h-4 w-4" />}
+            />
+            <CardBody>
+              <p className="text-[13px] leading-relaxed" style={{ color: 'var(--text-soft)' }}>
+                Connect is Ujyalo Learn&apos;s own community space: its own groups, channels and messages, stored here.
+                Signing in there uses Discord, so the profile you have here is not the same account as the one there —
+                nothing done in one changes the other.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button asChild variant="secondary">
+                  <Link to="/connect/me">Your Connect profile</Link>
+                </Button>
+                <Button asChild variant="ghost">
+                  <Link to="/connect">Browse communities</Link>
+                </Button>
               </div>
             </CardBody>
           </Card>

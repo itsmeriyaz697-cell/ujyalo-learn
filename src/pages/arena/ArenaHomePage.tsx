@@ -88,12 +88,16 @@ export default function ArenaHomePage() {
     [category, difficulty, length],
   );
 
+  /**
+   * Starting a quiz never sends anyone to a sign-up form.
+   *
+   * A visitor who presses Play has already decided what they want; interrupting
+   * them to ask for an account is the wall round 20 removed. They play the quiz
+   * they asked for, as a guest round, and are told at the end — once the score
+   * exists and there is something real to save — that an account keeps it.
+   */
   const handleStart = () => {
-    if (!signedIn) {
-      navigate(`/signup?next=${encodeURIComponent(startHref)}`);
-      return;
-    }
-    if (needsProfile) {
+    if (signedIn && needsProfile) {
       document.getElementById('arena-setup')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       toast('Pick a username first — it is how you appear on the leaderboard.', 'info');
       return;
