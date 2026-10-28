@@ -43,6 +43,11 @@ Still missing (you must add these — I will not put keys in a repository or inv
 | `AI_REQUIRE_AUTH` | `true` once Firebase is configured (recommended) |
 | `FIREBASE_PROJECT_ID`, `FIREBASE_WEB_API_KEY` | needed for server-side token checks |
 
+Add `AI_API_KEY` directly in **Vercel → Project → Settings → Environment
+Variables**. Never paste it into chat, source files, or a `VITE_*` variable. If
+a key has appeared in chat or Git, revoke it in the provider console and create
+a replacement before deploying.
+
 If you switch to OpenAI, change `AI_API_BASE_URL` to `https://api.openai.com/v1`, `AI_MODEL` to `gpt-4o-mini`, `AI_PROVIDER_NAME` to `openai`, and `AI_ALLOWED_HOSTS` to `api.openai.com`.
 
 ---
@@ -97,9 +102,12 @@ vercel --prod
 
 The CLI uploads the working directory (respecting `.gitignore`), which is exactly what this sandbox cannot do.
 
-## Option C — let me deploy from here
+## Option C — use an authenticated deployment integration
 
-If you create a Vercel access token (<https://vercel.com/account/tokens>, scope: your team) and paste it in the chat, I can run the CLI in this workspace and finish the deployment myself. Treat the token as disposable: revoke it afterwards.
+Connect Vercel through your coding environment's authenticated integration and
+let it deploy the project. Do not paste a Vercel access token into chat. If a
+token was previously shared, revoke it at <https://vercel.com/account/tokens>
+and use the integration or Vercel dashboard instead.
 
 ---
 

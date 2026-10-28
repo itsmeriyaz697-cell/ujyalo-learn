@@ -82,6 +82,39 @@ for (const route of routes) {
   }
 }
 
+// A branded search should find a clear, consistent homepage entity. The title,
+// visible H1 and description all name the project, and the WebPage node points
+// at the same WebSite and Organization ids used by the rest of the schema.
+if (routes.includes('/')) {
+  const html = fs.readFileSync(fileFor('/'), 'utf8');
+  const title = html.match(/<title>([^<]*)<\/title>/)?.[1] ?? '';
+  const h1 = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/)?.[1]?.replace(/<[^>]+>/g, '') ?? '';
+  const description = html.match(/<meta name="description" content="([^"]*)"/)?.[1] ?? '';
+  if (!title.includes('Ujyalo Learn')) fail('/: homepage <title> does not name Ujyalo Learn');
+  if (!h1.includes('Ujyalo Learn')) fail('/: visible homepage H1 does not name Ujyalo Learn');
+  if (!description.includes('Ujyalo Learn')) fail('/: homepage description does not name Ujyalo Learn');
+
+  const nodes = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
+    .map((match) => {
+      try {
+        return JSON.parse(match[1]);
+      } catch {
+        return null;
+      }
+    })
+    .filter(Boolean);
+  const website = nodes.find((node) => node['@type'] === 'WebSite');
+  const organization = nodes.find(
+    (node) => node['@type'] === 'Organization' || (Array.isArray(node['@type']) && node['@type'].includes('Organization')),
+  );
+  const webpage = nodes.find((node) => node['@type'] === 'WebPage');
+  if (!website || website.name !== 'Ujyalo Learn') fail('/: WebSite schema does not declare the Ujyalo Learn site name');
+  if (!website?.['@id'] || !organization?.['@id']) fail('/: WebSite and Organization schema need stable @id values');
+  if (!webpage) fail('/: homepage WebPage schema is missing');
+  if (webpage?.isPartOf?.['@id'] !== website?.['@id']) fail('/: homepage WebPage does not reference the WebSite @id');
+  if (webpage?.about?.['@id'] !== organization?.['@id']) fail('/: homepage WebPage does not reference the Organization @id');
+}
+
 // FAQPage must only appear where the questions are actually on the page.
 for (const route of routes) {
   const html = fs.readFileSync(fileFor(route), 'utf8');

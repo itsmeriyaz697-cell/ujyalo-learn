@@ -60,6 +60,35 @@ describe('paste-ready URL list (docs/urls-to-submit.txt)', () => {
   });
 });
 
+describe('homepage brand search signals', () => {
+  const pages = JSON.parse(readFileSync(path.resolve(process.cwd(), 'shared/seo-pages.json'), 'utf8')) as {
+    pages: Array<{ path: string; title: string; description: string; h1?: string }>;
+  };
+  const home = pages.pages.find((page) => page.path === '/');
+
+  it('leads with the exact brand in the title, description and visible H1', () => {
+    expect(home).toBeTruthy();
+    expect(home?.title.startsWith('Ujyalo Learn')).toBe(true);
+    expect(home?.description).toContain('Ujyalo Learn');
+    expect(home?.h1).toContain('Ujyalo Learn');
+    expect((home?.description.length ?? 0) <= 160).toBe(true);
+  });
+
+  it('uses the same H1 in React and in the crawler-prerendered page', () => {
+    const source = readFileSync(path.resolve(process.cwd(), 'src/pages/HomePage.tsx'), 'utf8');
+    expect(home?.h1).toBeTruthy();
+    expect(source).toContain(home?.h1 as string);
+  });
+
+  it('ships matching brand metadata before the post-build prerender runs', () => {
+    const shell = readFileSync(path.resolve(process.cwd(), 'index.html'), 'utf8');
+    expect(shell).toContain(`<title>${home?.title}</title>`);
+    const description = shell.match(/<meta\s+name="description"\s+content="([^"]*)">/)?.[1];
+    expect(description).toBe(home?.description);
+    expect(shell).toContain('<meta name="application-name" content="Ujyalo Learn">');
+  });
+});
+
 describe('sitemap and robots configuration', () => {
   it('never invents a domain when VITE_SITE_URL is absent', () => {
     const script = readFileSync(path.resolve(process.cwd(), 'scripts/generate-seo.mjs'), 'utf8');

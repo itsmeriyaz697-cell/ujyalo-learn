@@ -58,7 +58,7 @@ async function visit(pathname) {
 
 // ─── Public pages ────────────────────────────────────────────────────────────
 const publicPages = [
-  ['/', 'Namaste.'],
+  ['/', 'Ujyalo Learn — your personal AI tutor'],
   ['/features', null],
   ['/subjects', null],
   ['/pricing', null],

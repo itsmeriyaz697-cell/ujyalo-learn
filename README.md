@@ -430,9 +430,13 @@ Search engines get real HTML, not an empty `<div id="root">`.
   each with its own `<title>`, description, canonical, Open Graph, Twitter card,
   a `<noscript>` summary and breadcrumb JSON-LD. Deep links return real content
   with a 200, and the SPA hydrates over it.
+- **Brand-search consistency.** The homepage title, description and visible H1
+  all name **Ujyalo Learn**. A build-time check keeps the React and prerendered
+  versions aligned for the exact brand query.
 - **Structured data.** `EducationalOrganization` (founder, area served,
-  languages), `WebSite`, `FAQPage` (the six homepage questions) and a
-  `BreadcrumbList` per page. All facts are true; nothing is invented.
+  languages), `WebSite`, a linked homepage `WebPage`, `FAQPage` (the six
+  homepage questions) and a `BreadcrumbList` per page. Stable entity ids connect
+  the homepage, website and publisher. All facts are true; nothing is invented.
 - **Private routes are excluded.** `/app/*`, `/api/*` and the auth screens are
   `Disallow`ed in `robots.txt` and never appear in `sitemap.xml`.
 - **No invented domain.** Canonical URLs, `og:url`, `og:image` and the sitemap

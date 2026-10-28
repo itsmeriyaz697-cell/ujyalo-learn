@@ -81,6 +81,23 @@ invented domain.
 - Expect days to weeks before meaningful impressions. Nothing here guarantees
   ranking.
 
+### 1e. Branded search: “Ujyalo Learn”
+
+The homepage is the search landing page, not `/app`. The dashboard stays
+`noindex` and disallowed in `robots.txt` because it contains each learner's own
+workspace. A visitor can use the homepage's **Start studying** button to enter
+it.
+
+For the exact brand query, the homepage now has matching `Ujyalo Learn` signals
+in its title, meta description and visible H1. Its `WebPage` JSON-LD references
+stable `WebSite` and `Organization` ids, and the build fails if those signals
+disappear or stop matching.
+
+After deploying a change to these tags, use Search Console → **URL Inspection**
+on `https://ujyalo-learn.vercel.app/` → **Request indexing**. This asks Google
+to recrawl; it does not force a position, a particular snippet, or immediate
+indexing.
+
 ---
 
 ## 2. Bing Webmaster Tools

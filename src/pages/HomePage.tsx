@@ -104,7 +104,7 @@ export function HomePage() {
                 className="mt-4 max-w-[15ch] text-[2.6rem] font-semibold leading-[1.02] sm:text-[3.4rem] lg:text-[3.75rem]"
                 style={{ color: 'var(--text)', fontFamily: 'var(--font-display)', letterSpacing: '-0.03em' }}
               >
-                Namaste. What are you studying today?
+                Ujyalo Learn — your personal AI tutor
               </h1>
 
               <p className="mt-6 max-w-[46ch] text-[16px] leading-relaxed sm:text-[17px]" style={{ color: 'var(--text-soft)' }}>

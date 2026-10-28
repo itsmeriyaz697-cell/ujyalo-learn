@@ -2,11 +2,11 @@
   "pages": [
     {
       "path": "/",
-      "title": "Ujyalo Learn — a free study companion for Grades 1–12 in Nepal",
-      "description": "Ask a question, get an explanation you can follow, then practise it. Free tutor, quizzes and notes for Nepali school students, on any phone.",
+      "title": "Ujyalo Learn — Free AI Tutor for Grades 1–12 in Nepal",
+      "description": "Ujyalo Learn is a free study companion for Nepali school students. Ask questions, get clear explanations, practise quizzes and keep notes on any phone.",
       "priority": "1.0",
       "changefreq": "weekly",
-      "h1": "Namaste. What are you studying today?"
+      "h1": "Ujyalo Learn — your personal AI tutor"
     },
     {
       "path": "/features",

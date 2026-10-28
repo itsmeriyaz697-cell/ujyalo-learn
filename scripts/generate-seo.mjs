@@ -714,7 +714,9 @@ const structuredData = [
     '@type': ['EducationalOrganization', 'Organization'],
     name: SITE_NAME,
     alternateName: 'Ujyalo Learn — study companion for Grades 1–12 in Nepal',
-    ...(origin ? { url: `${origin}/`, logo: `${origin}/icons/icon-512.png` } : {}),
+    ...(origin
+      ? { '@id': `${origin}/#organization`, url: `${origin}/`, logo: `${origin}/icons/icon-512.png` }
+      : {}),
     description:
       'AI-powered learning and tutoring platform for students in Nepal: Grades 1–12, SEE preparation, practice quizzes, notes, flashcards and a study planner.',
     founder: { '@type': 'Person', name: 'Riyaz Chalise' },
@@ -726,10 +728,12 @@ const structuredData = [
         {
           '@context': 'https://schema.org',
           '@type': 'WebSite',
+          '@id': `${origin}/#website`,
           name: SITE_NAME,
           url: `${origin}/`,
+          description: 'Free AI tutoring, practice quizzes and study tools for Grades 1–12 and SEE preparation in Nepal.',
           inLanguage: 'en',
-          publisher: { '@type': 'Organization', name: SITE_NAME },
+          publisher: { '@id': `${origin}/#organization` },
         },
       ]
     : []),
@@ -813,6 +817,7 @@ function renderPage(page) {
   html = upsertMeta(html, { name: 'twitter:title' }, page.title);
   html = upsertMeta(html, { name: 'twitter:description' }, page.description);
   html = upsertMeta(html, { name: 'twitter:image' }, image);
+  html = upsertMeta(html, { name: 'twitter:image:alt' }, 'Ujyalo Learn — an AI tutor for students in Nepal');
 
   if (origin) {
     html = upsertLink(html, 'canonical', url);
@@ -861,7 +866,27 @@ function renderPage(page) {
   const pageStructuredData = structuredData.filter(
     (node) => node['@type'] !== 'FAQPage' || page.path === '/' || page.path === '/faq',
   );
-  const ldNodes = [...pageStructuredData, breadcrumb, ...article];
+  // Connect the homepage to the same site and organisation entities. Stable
+  // @id references help search engines reconcile the brand instead of treating
+  // each prerendered page as an unrelated organisation and website.
+  const homePageSchema =
+    page.path === '/' && origin
+      ? [
+          {
+            '@context': 'https://schema.org',
+            '@type': 'WebPage',
+            '@id': `${origin}/#webpage`,
+            name: page.title,
+            url,
+            description: page.description,
+            isPartOf: { '@id': `${origin}/#website` },
+            about: { '@id': `${origin}/#organization` },
+            primaryImageOfPage: { '@type': 'ImageObject', url: image },
+            inLanguage: 'en',
+          },
+        ]
+      : [];
+  const ldNodes = [...pageStructuredData, ...homePageSchema, breadcrumb, ...article];
   const ldTags = ldNodes
     .map((node) => {
       const json = JSON.stringify(node).replace(/</g, '\\u003c');
