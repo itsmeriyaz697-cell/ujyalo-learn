@@ -1,0 +1,93 @@
+name: Promote the newest production build
+
+# Vercel has this project set to "autoAssignCustomDomains: false", so every new
+# build lands as STAGED and the public domain keeps serving an older deployment.
+# Nothing in vercel.json can change that, and the promote step needs a click or
+# an API token. This workflow is the token route: run it from the Actions tab
+# and it points the production domain at the newest READY production build,
+# then turns automatic assignment back on so it does not have to be done again.
+#
+# One-time setup:
+#   1. vercel.com/account/tokens -> Create Token -> copy it
+#   2. GitHub repo -> Settings -> Secrets and variables -> Actions
+#      -> New repository secret -> name: VERCEL_TOKEN -> paste the token
+#
+# Then: Actions tab -> "Promote the newest production build" -> Run workflow.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  VERCEL_TEAM: team_8aSlMHA5REps8m9O4Wv9c7AF
+  VERCEL_PROJECT_ID: prj_47vCu0YYG9Ia5LH2jX2ilVCmIsDD
+  SITE: https://ujyalo-learn.vercel.app
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check that VERCEL_TOKEN exists
+        env:
+          TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          if [ -z "${TOKEN}" ]; then
+            echo "::error::No VERCEL_TOKEN secret. Settings -> Secrets and variables -> Actions -> New repository secret, name it VERCEL_TOKEN."
+            exit 1
+          fi
+
+      - name: Find the newest READY production deployment
+        id: find
+        env:
+          TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          set -euo pipefail
+          id=$(curl -sS -f \
+            -H "Authorization: Bearer ${TOKEN}" \
+            "https://api.vercel.com/v6/deployments?projectId=${VERCEL_PROJECT_ID}&target=production&state=READY&limit=1&teamId=${VERCEL_TEAM}" \
+            | python3 -c 'import json,sys; print(json.load(sys.stdin)["deployments"][0]["uid"])')
+          echo "deployment=${id}" >> "$GITHUB_OUTPUT"
+          echo "Newest READY production deployment: ${id}"
+
+      - name: Promote it to production
+        env:
+          TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          DEPLOYMENT: ${{ steps.find.outputs.deployment }}
+        run: |
+          set -uo pipefail
+          code=$(curl -sS -o /tmp/out.json -w '%{http_code}' -X POST \
+            -H "Authorization: Bearer ${TOKEN}" \
+            "https://api.vercel.com/v10/projects/${VERCEL_PROJECT_ID}/promote/${DEPLOYMENT}?teamId=${VERCEL_TEAM}")
+          echo "promote -> HTTP ${code}"
+          cat /tmp/out.json || true
+          # 409 means it is already the production deployment: not an error here.
+          if [ "${code}" != "200" ] && [ "${code}" != "201" ] && [ "${code}" != "409" ]; then
+            echo "::error::Promote failed with HTTP ${code}"
+            exit 1
+          fi
+
+      - name: Turn automatic domain assignment back on
+        env:
+          TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          set -uo pipefail
+          code=$(curl -sS -o /tmp/patch.json -w '%{http_code}' -X PATCH \
+            -H "Authorization: Bearer ${TOKEN}" -H "Content-Type: application/json" \
+            "https://api.vercel.com/v9/projects/${VERCEL_PROJECT_ID}?teamId=${VERCEL_TEAM}" \
+            -d '{"autoAssignCustomDomains": true}')
+          echo "autoAssignCustomDomains -> HTTP ${code}"
+          if [ "${code}" != "200" ]; then
+            echo "::warning::Could not re-enable auto-assign; future builds will stay staged."
+          fi
+
+      - name: Confirm what the public domain now serves
+        run: |
+          set -uo pipefail
+          sleep 15
+          for path in / /courses /connect /api/health; do
+            printf '%-14s %s\n' "${path}" "$(curl -sS -o /dev/null -w '%{http_code}' "${SITE}${path}")"
+          done
+          echo "--- bundle ---"
+          curl -sS "${SITE}/" | grep -o 'assets/index-[A-Za-z0-9_-]*\.js' | head -1 || echo "(no bundle found)"
