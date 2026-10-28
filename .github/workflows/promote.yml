@@ -16,6 +16,9 @@ name: Promote the newest production build
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - arena/0000651c-ujyalo-learn
 
 permissions:
   contents: read
