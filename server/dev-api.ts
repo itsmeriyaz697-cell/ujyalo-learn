@@ -50,6 +50,8 @@ const ROUTES: Record<string, string> = {
   '/api/quiz-arena': 'api/quiz-arena.ts',
   '/api/flashcards': 'api/flashcards.ts',
   '/api/health': 'api/health.ts',
+  '/api/everest': 'api/everest.ts',
+  '/api/everest-health': 'api/everest-health.ts',
 };
 
 /**

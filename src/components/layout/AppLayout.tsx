@@ -15,6 +15,7 @@ import {
   Settings,
   ShieldCheck,
   Sparkles,
+  Mountain,
   TrendingUp,
   UserRoundPlus,
   Wrench,
@@ -41,6 +42,7 @@ interface NavItem {
 
 const NAV: NavItem[] = [
   { to: '/app', label: 'Dashboard', icon: LayoutDashboard, end: true },
+  { to: '/app/everest', label: 'Everest AI', icon: Mountain },
   { to: '/app/tutor', label: 'AI Tutor', icon: BrainCircuit },
   { to: '/app/quizzes', label: 'Quizzes', icon: ClipboardList },
   { to: '/app/notes', label: 'Notes', icon: BookOpen },
@@ -52,6 +54,7 @@ const NAV: NavItem[] = [
 
 const MOBILE_NAV: NavItem[] = [
   { to: '/app', label: 'Home', icon: LayoutDashboard, end: true },
+  { to: '/app/everest', label: 'Everest', icon: Mountain },
   { to: '/app/tutor', label: 'Tutor', icon: Sparkles },
   { to: '/app/quizzes', label: 'Quiz', icon: ClipboardList },
   { to: '/app/notes', label: 'Notes', icon: BookOpen },

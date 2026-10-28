@@ -59,6 +59,9 @@ const ForgotPasswordPage = lazy(() => import('@/pages/auth/ForgotPasswordPage'))
 const VerifyEmailPage = lazy(() => import('@/pages/auth/VerifyEmailPage'));
 const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
 
+const EverestLandingPage = lazy(() => import('@/pages/EverestLandingPage'));
+const EverestChatPage = lazy(() => import('@/pages/app/EverestChatPage'));
+
 const DashboardPage = lazy(() => import('@/pages/app/DashboardPage'));
 const TutorPage = lazy(() => import('@/pages/app/TutorPage'));
 const QuizzesPage = lazy(() => import('@/pages/app/QuizzesPage'));
@@ -131,6 +134,7 @@ export function App() {
             <Route path="grades/:grade" element={<GradePage />} />
             <Route path="see-preparation" element={<SeePrepPage />} />
             <Route path="ai-tutor" element={<AiTutorPage />} />
+            <Route path="everest" element={<EverestLandingPage />} />
             {/* Ujyalo Connect: communities are public to browse; posting is not. */}
             <Route path="connect" element={<ConnectHubPage />} />
             <Route path="connect/auth" element={<ConnectAuthPage />} />
@@ -207,6 +211,7 @@ export function App() {
             }
           >
             <Route index element={<DashboardPage />} />
+            <Route path="everest" element={<EverestChatPage />} />
             <Route path="tutor" element={<TutorPage />} />
             <Route path="tutor/:conversationId" element={<TutorPage />} />
             <Route path="quizzes" element={<QuizzesPage />} />

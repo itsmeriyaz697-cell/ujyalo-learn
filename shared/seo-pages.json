@@ -141,6 +141,14 @@
       "priority": "0.9",
       "changefreq": "monthly",
       "h1": "A patient tutor that shows its working"
+    },
+    {
+      "path": "/everest",
+      "title": "Everest AI — ultra-fast Groq chat like ChatGPT & Gemini | Ujyalo Learn",
+      "description": "Everest AI by Ujyalo Learn: ChatGPT-like streaming chat, 4 Groq models, 7 personas, code & maths, Nepali & English — free.",
+      "priority": "0.95",
+      "changefreq": "weekly",
+      "h1": "Everest AI — Reach the summit of knowledge"
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
-  "name": "Ujyalo Learn — Your Personal AI Tutor",
+  "name": "Ujyalo Learn \u2014 Your Personal AI Tutor",
   "short_name": "Ujyalo Learn",
-  "description": "Understand difficult concepts, practise questions and prepare for exams with a patient personal AI tutor.",
+  "description": "Understand difficult concepts, practise questions and prepare for exams with a patient AI tutor. Now with Everest AI \u2014 Groq ultra-fast chat.",
   "id": "/",
   "start_url": "/app",
   "scope": "/",
@@ -11,7 +11,10 @@
   "theme_color": "#15245F",
   "lang": "en",
   "dir": "ltr",
-  "categories": ["education", "productivity"],
+  "categories": [
+    "education",
+    "productivity"
+  ],
   "icons": [
     {
       "src": "/icons/icon-192.png",
@@ -33,6 +36,12 @@
     }
   ],
   "shortcuts": [
+    {
+      "name": "Everest AI \u2014 Groq Chat",
+      "short_name": "Everest AI",
+      "url": "/app/everest",
+      "description": "Chat with Everest AI \u2014 ultra-fast Groq-powered assistant"
+    },
     {
       "name": "Ask the AI tutor",
       "short_name": "AI Tutor",

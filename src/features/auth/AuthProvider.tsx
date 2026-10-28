@@ -22,6 +22,7 @@ import {
   rememberGuest,
 } from './guestSession';
 import { registerTokenProvider } from '@/services/ai/client';
+import { registerEverestTokenProvider } from '@/services/ai/everestClient';
 import { friendlyAuthError } from '@/lib/errors';
 import type { StudentPreferences, StudentProfile } from '@/types/domain';
 
@@ -85,8 +86,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const profileLoading = user !== null && profileLoadedFor !== user.uid;
 
   useEffect(() => {
-    registerTokenProvider({ getIdToken: () => authService.getIdToken() });
-    return () => registerTokenProvider(null);
+    const provider = { getIdToken: () => authService.getIdToken() };
+    registerTokenProvider(provider);
+    registerEverestTokenProvider(provider);
+    return () => {
+      registerTokenProvider(null);
+      registerEverestTokenProvider(null);
+    };
   }, []);
 
   useEffect(() => {

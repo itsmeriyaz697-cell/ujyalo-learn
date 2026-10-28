@@ -52,6 +52,12 @@ const FAQ_ITEMS = [
  */
 const TOOLS = [
   {
+    name: 'Everest AI — ChatGPT-like, Groq-fast',
+    body: 'Ultra-fast chat (500–1000 tok/s), 4 models, 7 personas, code & maths, streaming, Nepali & English — like ChatGPT & Gemini, tuned for Nepal.',
+    to: '/everest',
+    link: 'Open Everest AI',
+  },
+  {
     name: 'AI tutor',
     body: 'Ask in English or Nepali. The answer is pitched at your grade and shows the steps, not just the result.',
     to: '/ai-tutor',
@@ -62,12 +68,6 @@ const TOOLS = [
     body: 'Four question types. Every question is explained after you answer it, including the ones you got right.',
     to: '/global-quiz',
     link: 'Try a quiz',
-  },
-  {
-    name: 'Notes, flashcards and a planner',
-    body: 'Save an explanation, turn it into cards, and let the planner carry what is left to tomorrow.',
-    to: '/features',
-    link: 'See how they fit together',
   },
 ];
 
