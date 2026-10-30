@@ -70,7 +70,7 @@ const GROUPS: Group[] = [
       },
       {
         q: 'Is my child safe using this?',
-        a: 'Accounts for minors should be created with a parent or guardian. We show no advertising and there is no chat between students. The practice arena is the one public surface: if a student chooses to enter it, the username they pick, their country flag and their quiz scores are visible on the leaderboard. A real name and an email address are never shown there. Everything else — notes, conversations, progress — stays private to the account.',
+        a: 'Accounts for minors should be created with a parent or guardian. We show no advertising and there is no chat between students. The practice arena is the one place anything can be seen by others: when the shared leaderboard is switched on, the username a student picked, their country flag and their quiz scores appear there. A real name and an email address are never shown on it. When the Arena runs in demo mode, practice scores stay in the browser and nothing is shared. Everything else — notes, conversations, progress — stays private to the account.',
       },
     ],
   },
