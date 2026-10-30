@@ -125,7 +125,7 @@ export default function CoursesPage() {
       </Section>
 
       <Section tone="surface" className="!pt-2">
-        {error && (
+        {error && filtered.length === 0 && (
           <div className="mb-6">
             <InlineAlert tone="warning">{error}</InlineAlert>
           </div>

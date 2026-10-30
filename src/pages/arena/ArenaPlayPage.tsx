@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { ArenaApiError, startQuiz, submitQuiz } from '@/features/arena/api';
 import {
+  SECONDS_PER_QUESTION,
   applyToLocalProfile,
   loadLocalProfile,
   startPractice,
@@ -31,6 +32,8 @@ export default function ArenaPlayPage() {
   const category = (params.get('category') ?? 'mathematics') as ArenaCategory;
   const difficulty = (params.get('difficulty') ?? 'medium') as Difficulty;
   const length = Number(params.get('length') ?? 5);
+  /** What the link asked for, kept so the round can report a shortfall honestly. */
+  const requestedLength = length;
 
   const [phase, setPhase] = useState<Phase>('loading');
   const [error, setError] = useState<string | null>(null);
@@ -68,7 +71,7 @@ export default function ArenaPlayPage() {
         setPractice(true);
         setQuestions(toQuizQuestions(attempt));
         setQuizCategory(attempt.category);
-        setSecondsLeft(Math.min(length, 4) * 45);
+        setSecondsLeft(attempt.questions.length * SECONDS_PER_QUESTION);
         setPhase('playing');
         return;
       }
@@ -86,7 +89,7 @@ export default function ArenaPlayPage() {
         setDemo(true);
         setQuestions(toQuizQuestions(attempt));
         setQuizCategory(attempt.category);
-        setSecondsLeft(Math.min(length, 4) * 45);
+        setSecondsLeft(attempt.questions.length * SECONDS_PER_QUESTION);
         setPhase('playing');
         return;
       }
@@ -238,6 +241,15 @@ export default function ArenaPlayPage() {
           <p className="text-[13px]" style={{ color: 'var(--text-soft)' }}>
             Question {index + 1} of {questions.length} · {answeredCount} answered
           </p>
+          {/* If the bank could not fill the requested round, say so once, at the
+              top, rather than quietly delivering a shorter quiz than the link
+              promised. */}
+          {questions.length < requestedLength && (
+            <p className="mt-1 text-[12px]" style={{ color: 'var(--muted)' }}>
+              This set has {questions.length} questions, so this round is {questions.length} rather than{' '}
+              {requestedLength}.
+            </p>
+          )}
         </div>
         <div
           className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-semibold tabular-nums"

@@ -103,9 +103,18 @@ export function clearLocalProfile(): void {
   }
 }
 
-/** A practice quiz: real questions, no points claimed. */
+/**
+ * A practice quiz: real questions, no points claimed.
+ *
+ * `length` used to be capped at 4 here, which meant asking for a five-question
+ * round delivered "Question 1 of 4". The cap is gone; the only limit now is how
+ * many questions the category actually holds, and the caller reports the real
+ * number back to the student instead of silently shortening the round.
+ */
+export const SECONDS_PER_QUESTION = 45;
+
 export function startPractice(category: ArenaCategory, length: number, daily = false): LocalAttempt {
-  const questions = practiceFor(category, Math.min(length, 4));
+  const questions = practiceFor(category, length);
   return {
     // Prefixed so it can never be mistaken for a server attempt id.
     id: `practice_${Date.now().toString(36)}`,

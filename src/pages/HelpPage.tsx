@@ -67,7 +67,7 @@ export default function HelpPage() {
       <Section className="!py-6">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            { icon: BookOpen, title: 'Get started', body: 'Create an account, pick your grade and subjects, then ask your first question.', to: '/signup', cta: 'Create account' },
+            { icon: BookOpen, title: 'Get started', body: 'Ask a question right away — no account needed. Signing up is only for saving your work.', to: '/ai-tutor', cta: 'Open the study helper' },
             { icon: Settings2, title: 'Preferences', body: 'Change grade, language, subjects and explanation style from Settings.', to: '/app/settings', cta: 'Open settings' },
             { icon: AlertTriangle, title: 'AI limits', body: 'Usage limits protect the service. Notes, planner and past quizzes keep working.', to: '/pricing', cta: 'See limits' },
             { icon: MessageSquareWarning, title: 'Report content', body: 'Tell us about an incorrect or inappropriate AI answer or quiz.', to: '/contact?topic=report', cta: 'Report a problem' },

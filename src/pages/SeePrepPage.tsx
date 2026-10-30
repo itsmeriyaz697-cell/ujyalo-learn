@@ -112,7 +112,10 @@ export default function SeePrepPage() {
         <h2 className="text-xl font-bold tracking-tight sm:text-2xl">SEE courses</h2>
         {seeCourses.length === 0 ? (
           <div className="mt-4">
-            <InlineAlert tone="info">SEE courses are not published yet. The tutor and quizzes still work on any topic.</InlineAlert>
+            <InlineAlert tone="info">
+              No SEE-specific course is published yet, but the library does cover SEE topics. Start from the
+              subject guides below, or ask the study helper any question.
+            </InlineAlert>
           </div>
         ) : (
           <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -140,6 +143,66 @@ export default function SeePrepPage() {
             <Link to="/app/tutor?mode=socratic">Start with questions</Link>
           </Button>
         </div>
+      </Section>
+
+      {/* Sources. A page that tells students what the SEE exams cover should
+          say where that comes from and when it was checked. These are the two
+          bodies that publish the syllabus and the exam notices; both links were
+          opened and confirmed on the date shown. We link to them rather than
+          restating them, because a restated syllabus goes stale and a link to
+          the authority does not. */}
+      <Section tone="surface">
+        <SectionHeading
+          eyebrow="Sources"
+          title="Where the syllabus information comes from"
+          description="Ujyalo Learn is independent of both bodies. We summarise and link, we do not replace their documents."
+        />
+        <ul className="mt-6 grid gap-3">
+          <li>
+            <a
+              href="https://moecdc.gov.np/"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="card card-hover flex items-start gap-3 p-4"
+            >
+              <FileQuestion className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" style={{ color: 'var(--accent-text)' }} />
+              <span>
+                <span className="block font-semibold">Curriculum Development Centre (CDC)</span>
+                <span className="mt-1 block text-sm text-soft">
+                  Publishes the national curriculum and the subject specification grids that set the marks and
+                  question types for each subject.
+                </span>
+                <span className="mt-1 block text-xs" style={{ color: 'var(--muted)' }}>
+                  moecdc.gov.np · link opened and checked 30 October 2026
+                </span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://neb.gov.np/"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="card card-hover flex items-start gap-3 p-4"
+            >
+              <CalendarCheck className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" style={{ color: 'var(--accent-text)' }} />
+              <span>
+                <span className="block font-semibold">National Examination Board (NEB)</span>
+                <span className="mt-1 block text-sm text-soft">
+                  The body that runs the SEE and publishes the exam routine, model questions and results notices.
+                  Always take dates and rules from here rather than from a third party.
+                </span>
+                <span className="mt-1 block text-xs" style={{ color: 'var(--muted)' }}>
+                  neb.gov.np · link opened and checked 30 October 2026
+                </span>
+              </span>
+            </a>
+          </li>
+        </ul>
+        <p className="mt-4 text-xs leading-relaxed" style={{ color: 'var(--muted)' }}>
+          Practice questions on this site are written for study and are not official exam questions. Where a page
+          states a rule or a date, the NEB notice is the authority, not us.
+        </p>
       </Section>
     </>
   );

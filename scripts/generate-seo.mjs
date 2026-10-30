@@ -571,7 +571,7 @@ function renderStaticContent(page) {
     ? `<section class="pr-hero">
     <div class="pr-hero-bg" aria-hidden="true"></div>
     <div class="pr-c">
-      <span class="pr-badge">Ujyalo Learn · Nepal</span>
+      <span class="pr-badge">Free study help · Grades 1–12 · SEE</span>
       <h1>${headline}</h1>
       <p class="pr-lead">${HERO_LEAD}</p>
       <div class="pr-cta">
@@ -952,15 +952,31 @@ function renderPage(page) {
 fs.writeFileSync(path.join(DIST, 'robots.txt'), robotsBase);
 
 if (origin) {
-  const today = new Date().toISOString().slice(0, 10);
-  const urls = PAGES.map(
-    (page) => `  <url>
-    <loc>${origin}${page.path === '/' ? '/' : page.path}</loc>
-    <lastmod>${today}</lastmod>
+  // lastmod used to be stamped with the build date on every URL, which tells a
+  // crawler that all 44 pages changed today, every deploy. That is exactly the
+  // signal Google's guidance says to distrust. Now each URL carries a real date,
+  // or none at all:
+  //   - a course or guide uses its own updatedAt from the content store
+  //   - a static page uses the optional `lastmod` in shared/seo-pages.json
+  //   - anything else omits the element rather than inventing one
+  const toIsoDay = (value) => {
+    if (!value) return null;
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString().slice(0, 10);
+  };
+  const urls = PAGES.map((page) => {
+    const lastmod = toIsoDay(page.updated ?? page.lastmod);
+    return `  <url>
+    <loc>${origin}${page.path === '/' ? '/' : page.path}</loc>${
+      lastmod
+        ? `
+    <lastmod>${lastmod}</lastmod>`
+        : ''
+    }
     <changefreq>${page.changefreq}</changefreq>
     <priority>${page.priority}</priority>
-  </url>`,
-  ).join('\n');
+  </url>`;
+  }).join('\n');
 
   fs.writeFileSync(
     path.join(DIST, 'sitemap.xml'),

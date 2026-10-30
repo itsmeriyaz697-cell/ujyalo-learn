@@ -136,8 +136,9 @@ export default function ArenaHomePage() {
               </p>
               <h1 className="section-title mt-2">Welcome to Global Quiz Arena</h1>
               <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-muted">
-                Challenge yourself. Earn points. Become a champion. Fifteen subjects, three difficulty levels, and a
-                leaderboard that runs from Kathmandu to the rest of the world.
+                Fifteen subjects, three difficulty levels, and a global leaderboard once you have an account. Until
+                then every round is a practice round: the questions and explanations are real, and the score stays
+                on your device.
               </p>
 
               <div className="mt-6 flex flex-wrap items-center gap-3">

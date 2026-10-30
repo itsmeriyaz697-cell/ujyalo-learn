@@ -130,14 +130,6 @@
       "destination": "/app-shell.html"
     },
     {
-      "source": "/courses/(.*)",
-      "destination": "/app-shell.html"
-    },
-    {
-      "source": "/resources/(.*)",
-      "destination": "/app-shell.html"
-    },
-    {
       "source": "/global-quiz/(.*)",
       "destination": "/app-shell.html"
     },

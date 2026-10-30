@@ -120,7 +120,7 @@ export function HomePage() {
           <div className="lg:col-span-6">
             <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: 'var(--accent-text)' }}>
               <span className="inline-block h-[2px] w-6" style={{ background: 'var(--accent)' }} aria-hidden="true" />
-              Ujyalo Learn · Nepal
+              Free study help · Grades 1–12 · SEE
             </p>
             <h1
               className="mt-5 text-[2.1rem] font-extrabold leading-[1.08] tracking-[-0.025em] sm:text-[2.9rem] lg:text-[3.15rem]"

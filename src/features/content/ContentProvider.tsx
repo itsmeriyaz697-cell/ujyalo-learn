@@ -16,7 +16,7 @@ import { firestoreContentStore } from './firestoreContentStore';
 import { localContentStore } from './localContentStore';
 import type { AdminRole, ContentStore } from './store';
 import type { AuditAction, AuditEvent, Course, Resource, SeoOverride, SiteSettings } from './types';
-import { DEFAULT_SETTINGS } from './seed';
+import { DEFAULT_SETTINGS, SEED_COURSES, SEED_RESOURCES } from './seed';
 import { setSeoOverrides as publishSeoOverrides } from './seoOverrides';
 
 export const contentStore: ContentStore = isFirebaseConfigured ? firestoreContentStore : localContentStore;
@@ -37,6 +37,13 @@ interface ContentContextValue {
   audit: AuditEvent[];
   loading: boolean;
   error: string | null;
+  /**
+   * Where the visible library came from. `seed` means the database has no
+   * published content yet and the bundled starter library is being shown —
+   * the same content the static pages were prerendered from, so the first
+   * paint and the hydrated page agree.
+   */
+  librarySource: 'firestore' | 'seed';
   reload: () => Promise<void>;
   reloadAudit: () => Promise<void>;
   saveCourse: (course: Course) => Promise<void>;
@@ -71,6 +78,9 @@ export function ContentProvider({ children }: { children: ReactNode }) {
   const [roleLoading, setRoleLoading] = useState(isFirebaseConfigured);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [librarySource, setLibrarySource] = useState<'firestore' | 'seed'>(
+    isFirebaseConfigured ? 'firestore' : 'seed',
+  );
   const mounted = useRef(true);
 
   useEffect(() => {
@@ -92,8 +102,21 @@ export function ContentProvider({ children }: { children: ReactNode }) {
         contentStore.hasStoredSettings().catch(() => false),
       ]);
       if (!mounted.current) return;
-      setCourses(nextCourses);
-      setResources(nextResources);
+
+      // Nothing published in the database yet? Serve the bundled starter
+      // library. It is the same content the prerendered pages were built
+      // from, so a visitor sees one library rather than a page that promises
+      // guides and an app that reports zero.
+      //
+      // A published database always wins: this is a fallback for "empty",
+      // not an override.
+      const hasDbCourses = nextCourses.length > 0;
+      const hasDbResources = nextResources.length > 0;
+      const useSeed = (isFirebaseConfigured && !hasDbCourses && !hasDbResources) || !isFirebaseConfigured;
+
+      setCourses(hasDbCourses ? nextCourses : useSeed ? SEED_COURSES : nextCourses);
+      setResources(hasDbResources ? nextResources : useSeed ? SEED_RESOURCES : nextResources);
+      setLibrarySource(isFirebaseConfigured && (hasDbCourses || hasDbResources) ? 'firestore' : 'seed');
       setSettings(nextSettings);
       setSettingsStored(nextSettingsStored);
       const registry = nextSeo.reduce<Record<string, SeoOverride>>((acc, item) => {
@@ -104,8 +127,14 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       publishSeoOverrides(registry);
       setError(null);
     } catch {
+      // A failed read still shows the bundled library, because a student who
+      // clicked "Learning library" should get the library. The failure is
+      // recorded so the admin screens can report it honestly.
       if (mounted.current) {
-        setError('The learning library could not be loaded. Check your connection and try again.');
+        setCourses((current) => (current.length ? current : SEED_COURSES));
+        setResources((current) => (current.length ? current : SEED_RESOURCES));
+        setLibrarySource('seed');
+        setError('The learning library could not be loaded. Showing the bundled starter library.');
       }
     } finally {
       if (mounted.current) setLoading(false);
@@ -278,6 +307,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     audit,
     loading,
     error,
+    librarySource,
     reload,
     reloadAudit,
     saveCourse,

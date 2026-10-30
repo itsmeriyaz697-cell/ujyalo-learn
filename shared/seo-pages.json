@@ -2,11 +2,12 @@
   "pages": [
     {
       "path": "/",
-      "title": "Ujyalo Learn — Learn today. Lead tomorrow.",
-      "description": "Free lessons, practice questions, timed mock exams and a directory of verified educational opportunities for students in Nepal, Grades 1–12.",
+      "title": "Ujyalo Learn — Free study help and SEE prep for Grades 1–12 in Nepal",
+      "description": "Free lessons, practice questions, timed mock exams and verified opportunities for students in Nepal. SEE preparation, Grades 1–12, no account needed to start.",
       "priority": "1.0",
       "changefreq": "weekly",
-      "h1": "Your next big achievement starts with one lesson."
+      "h1": "Your next big achievement starts with one lesson.",
+      "lastmod": "2026-10-30"
     },
     {
       "path": "/features",
@@ -45,7 +46,8 @@
       "description": "How to create an account, ask the tutor a question, generate a quiz, plan study time and fix common problems, plus a setup guide for the site owner.",
       "priority": "0.7",
       "changefreq": "monthly",
-      "h1": "How can we help?"
+      "h1": "How can we help?",
+      "lastmod": "2026-10-30"
     },
     {
       "path": "/about",
@@ -85,7 +87,8 @@
       "description": "Guided learning paths for Grades 1–12 and SEE: short sessions, worked examples and practice, each linked to the free AI tutor.",
       "priority": "0.9",
       "changefreq": "weekly",
-      "h1": "Learning paths, not just links"
+      "h1": "Learning paths, not just links",
+      "lastmod": "2026-10-30"
     },
     {
       "path": "/resources",
@@ -93,7 +96,8 @@
       "description": "Original study guides on revision, active recall, showing working and checking sources — written for students in Nepal.",
       "priority": "0.8",
       "changefreq": "weekly",
-      "h1": "Guides written to be used, not skimmed"
+      "h1": "Guides written to be used, not skimmed",
+      "lastmod": "2026-10-30"
     },
     {
       "path": "/opportunities",
@@ -101,7 +105,8 @@
       "description": "A directory of educational opportunities for students in Nepal, each with the provider, the official link, any deadline and the date it was last checked.",
       "priority": "0.8",
       "changefreq": "weekly",
-      "h1": "Opportunities worth the application"
+      "h1": "Opportunities worth the application",
+      "lastmod": "2026-10-30"
     },
     {
       "path": "/see-preparation",
@@ -109,14 +114,16 @@
       "description": "How to prepare for SEE in Nepal without cramming: timed practice, a mistake log, a four-week plan and honest notes on what is and is not official exam material.",
       "priority": "0.9",
       "changefreq": "monthly",
-      "h1": "Prepare for SEE without panic-cramming"
+      "h1": "Prepare for SEE without panic-cramming",
+      "lastmod": "2026-10-30"
     },
     {
       "path": "/global-quiz",
-      "title": "Global Quiz Arena — free subject quizzes with a world leaderboard | Ujyalo Learn",
-      "description": "Play free quizzes in 15 subjects on the Global Quiz Arena. Earn points, build a daily streak, collect badges and see where you rank in Nepal and worldwide.",
+      "title": "Free practice quizzes for school subjects | Ujyalo Learn",
+      "description": "Practise Maths, Science, English and Computer Science with hand-checked questions and an explanation after every answer. Free to try.",
       "priority": "0.9",
-      "changefreq": "daily"
+      "changefreq": "daily",
+      "lastmod": "2026-10-30"
     },
     {
       "path": "/faq",
@@ -124,7 +131,8 @@
       "description": "Straight answers about Ujyalo Learn: cost, accuracy limits, whether it is official curriculum, data privacy, and what a parent should know.",
       "priority": "0.7",
       "changefreq": "monthly",
-      "h1": "Questions students and parents ask"
+      "h1": "Questions students and parents ask",
+      "lastmod": "2026-10-30"
     },
     {
       "path": "/content-policy",

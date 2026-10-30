@@ -13,6 +13,19 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const BASE = process.env.BASE_URL ?? 'http://127.0.0.1:5173';
+
+// Demo-mode only. This suite signs up a throwaway account from the UI; with a
+// real Firebase project configured that would create a live Auth user and the
+// admin block would (correctly) deny a non-owner, so the run would fail for the
+// wrong reason while leaving junk accounts behind. Refuse before doing either.
+const envFile = path.join(process.cwd(), '.env.local');
+if (fs.existsSync(envFile) && /^VITE_FIREBASE_API_KEY=\S+/m.test(fs.readFileSync(envFile, 'utf8'))) {
+  console.error(
+    'ui-smoke must run in demo mode: .env.local configures a real Firebase project.\n' +
+      'Move .env.local aside, restart the dev server, re-run, then restore it.',
+  );
+  process.exit(2);
+}
 const SHOTS = process.env.SHOTS ?? path.join(process.cwd(), 'docs', 'screenshots');
 fs.mkdirSync(SHOTS, { recursive: true });
 
@@ -344,11 +357,11 @@ await visit('/');
 await page.waitForTimeout(500);
 // The default title is whatever shared/seo-pages.json declares for "/" — the
 // point of this check is that an owner override was discarded, not the wording.
-check(
-  'resetting restores the default title',
-  /study companion for Grades/i.test(await page.title()),
-  await page.title(),
-);
+// Read the shipped default instead of hardcoding this run's wording, so copy
+// edits in shared/seo-pages.json cannot break the check.
+const defaultHomeTitle = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'shared', 'seo-pages.json'), 'utf8'))
+  .pages.find((entry) => entry.path === '/')?.title;
+check('resetting restores the default title', (await page.title()) === defaultHomeTitle, await page.title());
 
 
 // 404

@@ -22,17 +22,23 @@ const firestore = () => import('firebase/firestore');
 /**
  * Firestore rules are not filters: a query that *could* return a draft is
  * rejected for a reader without a role. So the public queries must constrain
- * `status == 'published'` themselves. That needs a composite index
- * (status ASC, updatedAt DESC) — declared in firestore.indexes.json.
+ * `status == 'published'` themselves.
+ *
+ * Those constraints must NOT add an orderBy. `where(status) + orderBy(updatedAt)`
+ * needs a composite index, and while that index was missing every public read
+ * failed with FAILED_PRECONDITION — which on the live site turned /courses and
+ * /resources into "could not be loaded" with a 0 of 0 count, even though the
+ * prerendered pages existed. Sorting happens in memory instead: the result set
+ * is capped at 300 documents, so the cost is nothing and there is one less
+ * deployment step that can silently break the library.
  */
 async function fetchAll<T>(collectionName: string, { includeDrafts, max = 300 }: { includeDrafts: boolean; max?: number }): Promise<T[]> {
-  const { collection, getDocs, limit, orderBy, query, where } = await firestore();
+  const { collection, getDocs, limit, query, where } = await firestore();
   const db = await getFirebaseDb();
-  const constraints = includeDrafts
-    ? [orderBy('updatedAt', 'desc'), limit(max)]
-    : [where('status', '==', 'published'), orderBy('updatedAt', 'desc'), limit(max)];
+  const constraints = includeDrafts ? [limit(max)] : [where('status', '==', 'published'), limit(max)];
   const snap = await getDocs(query(collection(db, collectionName), ...constraints));
-  return snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as T);
+  const rows = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as unknown as T & { updatedAt?: string });
+  return rows.sort((a, b) => String(b.updatedAt ?? '').localeCompare(String(a.updatedAt ?? ''))) as T[];
 }
 
 async function fetchBySlug<T>(collectionName: string, slug: string, includeDrafts: boolean): Promise<T | null> {
