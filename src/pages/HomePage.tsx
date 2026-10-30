@@ -1,348 +1,458 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, ArrowUpRight } from 'lucide-react';
+import {
+  ArrowRight,
+  ArrowUpRight,
+  BookOpen,
+  CalendarClock,
+  Code2,
+  FlaskConical,
+  Globe2,
+  Languages,
+  Sigma,
+  Timer,
+} from 'lucide-react';
 import { Seo } from '@/components/seo/Seo';
 import { seoFor } from '@/config/seoPages';
 import { Faq } from '@/components/marketing/Section';
 import { WorkedExample } from '@/components/marketing/WorkedExample';
+import { DailyQuestion } from '@/components/marketing/DailyQuestion';
 import { StartLearningButton } from '@/components/StartLearningButton';
-import { SITE, SUBJECTS, TUTOR_MODES } from '@/config/curriculum';
-import { GRADE_LEVELS } from '@/lib/grades';
+import { SITE } from '@/config/curriculum';
+import { useContent } from '@/features/content/ContentProvider';
+import { useAuth } from '@/features/auth/AuthProvider';
+import { OPPORTUNITIES, isExpired } from '@/features/opportunities/data';
 
 const FAQ_ITEMS = [
   {
     question: 'Is Ujyalo Learn free?',
     answer:
-      'Yes. The tutor, quizzes, notes, flashcards, planner and progress page are free, with a fair-use limit on AI requests so the bill stays payable. Paid plans are planned for later. Nothing on this site takes payment today.',
+      'Yes. Lessons, the practice library, the daily question and the opportunities directory are free and open without an account. A fair-use limit applies to AI study help so the bill stays payable. Nothing on this site takes payment today.',
   },
   {
-    question: 'Which grades and subjects does it cover?',
+    question: 'Which grades and subjects are covered?',
     answer:
-      'Grades 1 to 12, including SEE preparation. Mathematics, Science, English, Nepali, Social Studies, Computer Science, Optional Mathematics, Health and Physical Education, and Economics. The tutor matches its language and depth to the grade you pick.',
+      'Grades 1 to 12, including SEE preparation. Mathematics, Science, English, Nepali, Social Studies, Computer Science, Optional Mathematics, Health and Physical Education, and Economics.',
   },
   {
-    question: 'Can it explain in Nepali?',
+    question: 'Where do the opportunity listings come from?',
     answer:
-      'Yes. Choose Nepali during setup, or pick the Nepali Explanation mode for a single answer. You can also just ask in Nepali.',
+      'Each listing names the provider, links to the official application page and carries the date it was last checked. We do not list anything we could not verify, and expired listings are labelled rather than deleted.',
   },
   {
     question: 'Is this an official curriculum or exam service?',
     answer:
-      'No. Ujyalo Learn is independent of any board or school. Explanations are AI-generated, not textbook or exam material. Check anything important against your book or teacher.',
+      'No. Ujyalo Learn is independent of any board or school. Explanations and practice questions are written for study, not as official exam material. Check anything important against your textbook or teacher.',
   },
   {
-    question: 'Will it just do my homework?',
+    question: 'Who can see my work?',
     answer:
-      'It will show the steps and say why each one is needed, so you can repeat the method yourself. If you ask for a bare answer it will still explain the reasoning.',
-  },
-  {
-    question: 'Who can see my notes and conversations?',
-    answer:
-      'Only your account, enforced by database rules rather than by a promise. You can delete a single item or everything at once from Settings. Details are in the Privacy Policy.',
-  },
-  {
-    question: 'Does it work on a cheap phone?',
-    answer:
-      'Pages load only when needed, animations respect reduced-motion settings, and the layout works from 360px up. Saved notes and your planner can be read offline once the app is cached. The tutor needs a connection.',
+      'Only your account, enforced by database rules rather than by a promise. You can delete a single item or everything at once from Settings. Details are in the privacy policy.',
   },
 ];
 
-/**
- * What the product genuinely does. One line each, because a list of six icon
- * cards in a 2×3 grid is the shape every generated landing page has.
- */
-const TOOLS = [
+/** The six subjects a visitor can actually start with, each with its own shape. */
+const SUBJECT_CARDS = [
   {
-    name: 'AI tutor',
-    body: 'Ask in English or Nepali. The answer is pitched at your grade and shows the steps, not just the result.',
-    to: '/ai-tutor',
-    link: 'Open the tutor',
+    id: 'mathematics',
+    name: 'Mathematics',
+    icon: Sigma,
+    line: 'Arithmetic to calculus — worked step by step, never just the answer.',
+    grades: 'Grades 1–12',
+    to: '/subjects#mathematics',
   },
   {
-    name: 'Quizzes with explanations',
-    body: 'Four question types. Every question is explained after you answer it, including the ones you got right.',
-    to: '/global-quiz',
-    link: 'Try a quiz',
+    id: 'science',
+    name: 'Science',
+    icon: FlaskConical,
+    line: 'Physics, chemistry and biology explained with things you can see.',
+    grades: 'Grades 1–12',
+    to: '/subjects#science',
   },
   {
-    name: 'Notes, flashcards and a planner',
-    body: 'Save an explanation, turn it into cards, and let the planner carry what is left to tomorrow.',
-    to: '/features',
-    link: 'See how they fit together',
-  },
-];
-
-const PROMISES = [
-  {
-    title: 'Your work is yours',
-    body: 'Conversations, notes and quiz history are readable by your account only. That is a database rule, not a setting we can toggle off.',
+    id: 'english',
+    name: 'English',
+    icon: BookOpen,
+    line: 'Grammar, comprehension and writing you can defend in an exam.',
+    grades: 'Grades 1–12',
+    to: '/subjects#english',
   },
   {
-    title: 'The AI is labelled',
-    body: 'Every generated answer says so and warns that it can be wrong. Nothing here pretends to be an official marking scheme.',
+    id: 'nepali',
+    name: 'Nepali',
+    icon: Languages,
+    line: 'व्याकरण, पठन र लेखन — explained in the language you study in.',
+    grades: 'Grades 1–12',
+    to: '/subjects#nepali',
   },
   {
-    title: 'No invented numbers',
-    body: 'This site does not publish user counts, testimonials or pass rates, because we have none worth showing yet.',
+    id: 'social-studies',
+    name: 'Social Studies',
+    icon: Globe2,
+    line: 'Nepal, its neighbours and the systems that shape both.',
+    grades: 'Grades 6–12',
+    to: '/subjects#social-studies',
+  },
+  {
+    id: 'computer-science',
+    name: 'Computer Science',
+    icon: Code2,
+    line: 'How computers think — from variables to loops to simple programs.',
+    grades: 'Grades 6–12',
+    to: '/subjects#computer-science',
   },
 ];
 
 export function HomePage() {
+  const { publishedCourses, publishedResources } = useContent();
+  const { user } = useAuth();
+
+  const featured = publishedCourses.slice(0, 3);
+  const reading = publishedResources.slice(0, 3);
+  const opportunities = OPPORTUNITIES.filter((item) => !isExpired(item)).slice(0, 3);
+
   return (
     <>
       <Seo {...seoFor('/')} />
 
-      {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden border-b" style={{ borderColor: 'var(--border)' }}>
-        <div className="container-page relative pb-14 pt-12 sm:pb-20 sm:pt-16">
-          <div className="grid items-start gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
-            <div className="min-w-0">
-              <p className="rule-gold text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: 'var(--muted)' }}>
-                Nepal · Grades 1–12 · Free to start
-              </p>
-
-              <h1
-                className="mt-4 max-w-[15ch] text-[2.6rem] font-semibold leading-[1.02] sm:text-[3.4rem] lg:text-[3.75rem]"
-                style={{ color: 'var(--text)', fontFamily: 'var(--font-display)', letterSpacing: '-0.03em' }}
+      {/* ── Hero ───────────────────────────────────────────────────────── */}
+      <section className="hero-grid">
+        <div className="container-page grid items-center gap-10 py-14 sm:py-16 lg:grid-cols-12 lg:gap-12 lg:py-20">
+          <div className="lg:col-span-6">
+            <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: 'var(--accent-text)' }}>
+              <span className="inline-block h-[2px] w-6" style={{ background: 'var(--accent)' }} aria-hidden="true" />
+              Ujyalo Learn · Nepal
+            </p>
+            <h1
+              className="mt-5 text-[2.1rem] font-extrabold leading-[1.08] tracking-[-0.025em] sm:text-[2.9rem] lg:text-[3.15rem]"
+              style={{ fontFamily: 'var(--font-display)', color: 'var(--text)' }}
+            >
+              Your next big achievement starts with one lesson.
+            </h1>
+            <p className="mt-5 max-w-xl text-[15px] leading-relaxed sm:text-base" style={{ color: 'var(--text-soft)' }}>
+              Discover better ways to learn, practice with purpose and build the confidence to achieve more.
+            </p>
+            <div className="mt-7 flex flex-wrap items-center gap-3">
+              <StartLearningButton size="lg" iconRight={<ArrowRight className="h-4 w-4" aria-hidden="true" />}>
+                Start learning
+              </StartLearningButton>
+              <Link
+                to="/subjects"
+                className="btn btn-secondary btn-lg"
+                style={{ color: 'var(--text)' }}
               >
-                Namaste. What are you studying today?
-              </h1>
-
-              <p className="mt-6 max-w-[46ch] text-[16px] leading-relaxed sm:text-[17px]" style={{ color: 'var(--text-soft)' }}>
-                Ujyalo Learn is a free study companion for school in Nepal. Ask a question and get an explanation you
-                can follow. Practise it with a quiz, keep what matters in notes, and come back tomorrow to what is
-                left.
-              </p>
-
-              <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-                <StartLearningButton size="lg" iconRight={<ArrowRight className="h-4 w-4" aria-hidden="true" />}>
-                  Start studying
-                </StartLearningButton>
-                <Link
-                  to="/global-quiz"
-                  className="inline-flex items-center gap-1.5 text-sm font-medium underline decoration-1 underline-offset-4"
-                  style={{ color: 'var(--text-soft)' }}
-                >
-                  Or try a quiz without an account
-                  <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-                </Link>
-              </div>
-
-              <p className="mt-8 max-w-[52ch] border-t pt-5 text-[13px] leading-relaxed" style={{ borderColor: 'var(--border)', color: 'var(--muted)' }}>
-                No card, no email needed to look around. You only sign in when you want your streak, notes and scores
-                to follow you to another device.
-              </p>
+                Explore subjects
+              </Link>
             </div>
+            <ul className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs" style={{ color: 'var(--on-sage-muted)' }}>
+              <li>Free to use</li>
+              <li aria-hidden="true">·</li>
+              <li>No account needed to browse</li>
+              <li aria-hidden="true">·</li>
+              <li>Built for a 360px screen</li>
+            </ul>
+          </div>
 
+          <div className="lg:col-span-6">
             <WorkedExample />
           </div>
         </div>
       </section>
 
-      {/* ── What is in it ────────────────────────────────────────────────── */}
-      <section className="py-14 sm:py-20">
-        <div className="container-page">
-          <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+      {/* ── Subjects ───────────────────────────────────────────────────── */}
+      <section className="container-page py-14 sm:py-16" aria-labelledby="subjects-heading">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="eyebrow">Start where you are</p>
+            <h2 id="subjects-heading" className="section-title mt-2">
+              Six subjects, one honest way of teaching them
+            </h2>
+          </div>
+          <Link to="/subjects" className="inline-flex items-center gap-1 text-sm font-semibold" style={{ color: 'var(--text)' }}>
+            All subjects and grades
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
+        </div>
+
+        <ul className="mt-8 grid gap-px overflow-hidden rounded-lg border sm:grid-cols-2 lg:grid-cols-3" style={{ borderColor: 'var(--border)', background: 'var(--border)' }}>
+          {SUBJECT_CARDS.map((subject) => {
+            const Icon = subject.icon;
+            return (
+              <li key={subject.id} style={{ background: 'var(--surface)' }}>
+                <Link
+                  to={subject.to}
+                  className="group flex h-full flex-col p-6 transition-colors hover:bg-[var(--surface-2)]"
+                >
+                  <div className="flex items-center justify-between">
+                    <Icon className="h-5 w-5" style={{ color: 'var(--accent-text)' }} aria-hidden="true" />
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.12em]" style={{ color: 'var(--muted)' }}>
+                      {subject.grades}
+                    </span>
+                  </div>
+                  <h3
+                    className="mt-4 text-lg font-bold tracking-[-0.01em]"
+                    style={{ fontFamily: 'var(--font-display)', color: 'var(--text)' }}
+                  >
+                    {subject.name}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--muted)' }}>
+                    {subject.line}
+                  </p>
+                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold" style={{ color: 'var(--text)' }}>
+                    Open
+                    <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+
+      {/* ── Continue learning / start here ─────────────────────────────── */}
+      <section className="container-page pb-14 sm:pb-16" aria-labelledby="continue-heading">
+        <div className="rounded-lg border p-6 sm:p-8" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
+          <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="rule-gold eyebrow">What is inside</p>
-              <h2 className="section-title mt-1 max-w-[18ch]">Three tools, and they share what they learn.</h2>
-              <p className="mt-4 max-w-[40ch] text-[15px] leading-relaxed" style={{ color: 'var(--muted)' }}>
-                Ask something, then practise it, then keep it. Each part uses what the others already know about
-                your grade and subjects, so you are not reintroducing yourself five times.
+              <p className="eyebrow">{user ? 'Continue learning' : 'New here?'}</p>
+              <h2 id="continue-heading" className="section-title mt-2">
+                {user ? 'Pick up where you left off' : 'Three ways to begin today'}
+              </h2>
+            </div>
+            {user && (
+              <Link to="/app" className="btn btn-secondary btn-sm">
+                Open dashboard
+              </Link>
+            )}
+          </div>
+
+          {featured.length > 0 ? (
+            <ul className="mt-6 grid gap-4 sm:grid-cols-3">
+              {featured.map((course) => {
+                const minutes = course.lessons.reduce((total, lesson) => total + lesson.minutes, 0);
+                return (
+                  <li key={course.id}>
+                    <Link
+                      to={`/courses/${course.slug}`}
+                      className="group flex h-full flex-col rounded-md border p-4 transition-colors hover:bg-[var(--surface-2)]"
+                      style={{ borderColor: 'var(--border)' }}
+                    >
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.12em]" style={{ color: 'var(--accent-text)' }}>
+                        {course.gradeMin === course.gradeMax
+                          ? `Grade ${course.gradeMin}`
+                          : `Grades ${course.gradeMin}–${course.gradeMax}`}
+                      </span>
+                      <span className="mt-2 font-semibold leading-snug" style={{ color: 'var(--text)' }}>
+                        {course.title}
+                      </span>
+                      <span className="mt-2 flex-1 text-sm leading-relaxed" style={{ color: 'var(--muted)' }}>
+                        {course.summary}
+                      </span>
+                      <span className="mt-3 inline-flex items-center gap-1.5 text-xs" style={{ color: 'var(--muted)' }}>
+                        <Timer className="h-3.5 w-3.5" aria-hidden="true" />
+                        about {Math.max(5, Math.round(minutes / 5) * 5)} minutes
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <ul className="mt-6 grid gap-4 sm:grid-cols-3">
+              {[
+                { to: '/global-quiz', title: 'Try a practice set', body: 'Multiple choice, instant explanations, no account needed.', icon: Timer },
+                { to: '/resources', title: 'Read a lesson', body: 'Short written guides with worked examples and practice.', icon: BookOpen },
+                { to: '/see-preparation', title: 'Prepare for SEE', body: 'Topic practice and timed mocks for the Class 10 exams.', icon: CalendarClock },
+              ].map((item) => {
+                const Icon = item.icon;
+                return (
+                  <li key={item.to}>
+                    <Link
+                      to={item.to}
+                      className="group flex h-full flex-col rounded-md border p-4 transition-colors hover:bg-[var(--surface-2)]"
+                      style={{ borderColor: 'var(--border)' }}
+                    >
+                      <Icon className="h-4 w-4" style={{ color: 'var(--accent-text)' }} aria-hidden="true" />
+                      <span className="mt-2 font-semibold" style={{ color: 'var(--text)' }}>
+                        {item.title}
+                      </span>
+                      <span className="mt-1 flex-1 text-sm leading-relaxed" style={{ color: 'var(--muted)' }}>
+                        {item.body}
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+      </section>
+
+      {/* ── Daily question ─────────────────────────────────────────────── */}
+      <section className="border-y" style={{ borderColor: 'var(--border)', background: 'var(--surface-2)' }}>
+        <div className="container-page grid items-center gap-8 py-14 sm:py-16 lg:grid-cols-12">
+          <div className="lg:col-span-5">
+            <p className="eyebrow">Free, every day</p>
+            <h2 className="section-title mt-2">One question. Thirty seconds. A new habit.</h2>
+            <p className="mt-4 text-sm leading-relaxed" style={{ color: 'var(--text-soft)' }}>
+              A different question appears each morning at midnight Nepal time, with an explanation that shows the
+              reasoning rather than just the answer. Answer it in your head, then check.
+            </p>
+            <p className="mt-3 text-xs leading-relaxed" style={{ color: 'var(--muted)' }}>
+              One answer per device per day. We do not publish a count of who got it right, because a number on a
+              page is easy to invent and we would rather show you nothing than something made up.
+            </p>
+          </div>
+          <div className="lg:col-span-7">
+            <DailyQuestion />
+          </div>
+        </div>
+      </section>
+
+      {/* ── Featured reading ───────────────────────────────────────────── */}
+      {reading.length > 0 && (
+        <section className="container-page py-14 sm:py-16" aria-labelledby="reading-heading">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="eyebrow">From the library</p>
+              <h2 id="reading-heading" className="section-title mt-2">
+                Read something useful
+              </h2>
+            </div>
+            <Link to="/resources" className="inline-flex items-center gap-1 text-sm font-semibold" style={{ color: 'var(--text)' }}>
+              All resources
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+          </div>
+
+          <ul className="mt-8 divide-y border-y" style={{ borderColor: 'var(--border)' }}>
+            {reading.map((resource) => (
+              <li key={resource.id} className="border-b last:border-b-0" style={{ borderColor: 'var(--border)' }}>
+                <Link to={`/resources/${resource.slug}`} className="group flex flex-col gap-1 py-5 sm:flex-row sm:items-baseline sm:gap-6">
+                  <span className="shrink-0 text-[11px] font-bold uppercase tracking-[0.14em] sm:w-28" style={{ color: 'var(--accent-text)' }}>
+                    {resource.type}
+                  </span>
+                  <span className="flex-1">
+                    <span className="block font-semibold leading-snug group-hover:underline" style={{ color: 'var(--text)' }}>
+                      {resource.title}
+                    </span>
+                    <span className="mt-1 block text-sm leading-relaxed" style={{ color: 'var(--muted)' }}>
+                      {resource.description}
+                    </span>
+                  </span>
+                  <span className="shrink-0 text-xs" style={{ color: 'var(--muted)' }}>
+                    {resource.grade ? `Grade ${resource.grade}` : 'All grades'} · {resource.source}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* ── Opportunities ──────────────────────────────────────────────── */}
+      <section className="border-t" style={{ borderColor: 'var(--border)', background: 'var(--sage)' }}>
+        <div className="container-page py-14 sm:py-16" aria-labelledby="opportunities-heading">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div className="max-w-2xl">
+              <p className="eyebrow" style={{ color: 'var(--on-sage-muted)' }}>
+                Opportunities
+              </p>
+              <h2 id="opportunities-heading" className="section-title mt-2">
+                Scholarships, competitions and free courses — checked, not copied
+              </h2>
+              <p className="mt-3 text-sm leading-relaxed" style={{ color: 'var(--text-soft)' }}>
+                Every listing names the organisation running it, links to their official page, and shows the date we
+                last checked it. If we cannot verify a deadline, we do not print one.
               </p>
             </div>
+            <Link
+              to="/opportunities"
+              className="btn btn-secondary btn-sm"
+              style={{ background: 'var(--surface)' }}
+            >
+              All opportunities
+              <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+          </div>
 
-            <ul className="border-t" style={{ borderColor: 'var(--border)' }}>
-              {TOOLS.map((tool) => (
-                <li key={tool.name} className="border-b py-6" style={{ borderColor: 'var(--border)' }}>
-                  <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
-                    <h3 className="text-[17px] font-semibold" style={{ color: 'var(--text)' }}>
-                      {tool.name}
-                    </h3>
-                    <Link
-                      to={tool.to}
-                      className="inline-flex items-center gap-1 text-[13px] font-medium hover:underline"
-                      style={{ color: 'var(--primary)' }}
-                    >
-                      {tool.link}
-                      <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-                    </Link>
-                  </div>
-                  <p className="mt-2 max-w-[52ch] text-[14px] leading-relaxed" style={{ color: 'var(--text-soft)' }}>
-                    {tool.body}
-                  </p>
+          {opportunities.length > 0 ? (
+            <ul className="mt-8 grid gap-4 md:grid-cols-3">
+              {opportunities.map((item) => (
+                <li key={item.id}>
+                  <a
+                    href={item.officialUrl}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="flex h-full flex-col rounded-md border p-5 transition-colors hover:bg-[var(--surface)]"
+                    style={{ borderColor: 'var(--border-strong)', background: 'color-mix(in srgb, var(--surface) 60%, transparent)' }}
+                  >
+                    <span className="text-[11px] font-bold uppercase tracking-[0.14em]" style={{ color: 'var(--accent-text)' }}>
+                      {item.category}
+                    </span>
+                    <span className="mt-2 font-semibold leading-snug" style={{ color: 'var(--text)' }}>
+                      {item.title}
+                    </span>
+                    <span className="mt-1 text-sm" style={{ color: 'var(--muted)' }}>
+                      {item.provider}
+                    </span>
+                    <span className="mt-auto pt-4 text-xs" style={{ color: 'var(--muted)' }}>
+                      {item.deadline ? `Deadline: ${item.deadline}` : 'Rolling — no fixed deadline'} · checked{' '}
+                      {item.lastVerified}
+                    </span>
+                  </a>
                 </li>
               ))}
             </ul>
-          </div>
+          ) : (
+            <p className="mt-6 text-sm" style={{ color: 'var(--text-soft)' }}>
+              Listings are being verified before they are published. Nothing is shown here until it has been checked
+              against the provider's own page.
+            </p>
+          )}
         </div>
       </section>
 
-      {/* ── Subjects, set as a list rather than as tiles ─────────────────── */}
-      <section className="border-y py-14 sm:py-20" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-        <div className="container-page">
-          <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
-            <div>
-              <p className="rule-gold eyebrow">Subjects</p>
-              <h2 className="section-title mt-1 max-w-[16ch]">The subjects you actually sit exams in.</h2>
-              <p className="mt-4 max-w-[38ch] text-[15px] leading-relaxed" style={{ color: 'var(--muted)' }}>
-                Nine subjects, written for the Nepali curriculum and the SEE. Other curricula are available at setup,
-                and the school can add its own later.
-              </p>
-              <Link
-                to="/subjects"
-                className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium hover:underline"
-                style={{ color: 'var(--primary)' }}
-              >
-                Browse subjects and grades
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+      {/* ── FAQ ────────────────────────────────────────────────────────── */}
+      <section className="container-page py-14 sm:py-16">
+        <div className="grid gap-8 lg:grid-cols-12">
+          <div className="lg:col-span-4">
+            <p className="eyebrow">Questions</p>
+            <h2 className="section-title mt-2">The things people ask first</h2>
+            <p className="mt-3 text-sm leading-relaxed" style={{ color: 'var(--muted)' }}>
+              More detail lives in the{' '}
+              <Link to="/faq" className="underline" style={{ color: 'var(--text)' }}>
+                full FAQ
               </Link>
-            </div>
-
-            <div>
-              <ul className="grid grid-cols-1 gap-x-8 gap-y-0 sm:grid-cols-2">
-                {SUBJECTS.slice(0, 8).map((subject, index) => (
-                  <li key={subject.id} className="border-b py-3" style={{ borderColor: 'var(--border)' }}>
-                    <Link to={`/subjects?subject=${subject.id}`} className="group flex items-baseline gap-3">
-                      <span className="w-5 shrink-0 text-[11px] tabular-nums" style={{ color: 'var(--muted)' }}>
-                        {String(index + 1).padStart(2, '0')}
-                      </span>
-                      <span className="text-[14.5px] font-medium group-hover:underline" style={{ color: 'var(--text)' }}>
-                        {subject.name}
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-
-              <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-[13px]" style={{ color: 'var(--muted)' }}>
-                <span>Grades</span>
-                {GRADE_LEVELS.map((grade) => (
-                  <Link key={grade} to="/subjects" className="hover:underline" style={{ color: 'var(--text-soft)' }}>
-                    {grade}
-                  </Link>
-                ))}
-              </div>
-            </div>
+              .
+            </p>
           </div>
-        </div>
-      </section>
-
-      {/* ── A note from the person who built it ──────────────────────────── */}
-      <section className="py-14 sm:py-20">
-        <div className="container-page">
-          <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16">
-            <div className="max-w-[58ch]">
-              <p className="rule-gold eyebrow">Why this exists</p>
-              <h2 className="section-title mt-1">Made by one student, for other students.</h2>
-              <div className="mt-5 space-y-4 text-[15px] leading-relaxed" style={{ color: 'var(--text-soft)' }}>
-                <p>
-                  I built Ujyalo Learn because getting a straight answer to “why is this step here?” was the hardest
-                  part of studying for me. Textbooks explain once, in one way. A teacher has forty other students.
-                  Video lessons go too fast to ask a question back.
-                </p>
-                <p>
-                  So this is the tool I wanted: it answers, shows its working, and then checks that the explanation
-                  landed. It is not finished, and some of it is still rough. Where something is missing, the site
-                  says so instead of covering it with a claim.
-                </p>
-                <p>
-                  {SITE.founder ? `Built by ${SITE.founder}, ` : ''}a student in Kathmandu. If a lesson is wrong or
-                  confusing,{' '}
-                  <Link to="/contact" className="font-medium underline" style={{ color: 'var(--primary)' }}>
-                    tell me
-                  </Link>{' '}
-                  and it gets fixed.
-                </p>
-              </div>
-              <p
-                className="mt-6 text-[19px]"
-                style={{ color: 'var(--text)', fontFamily: 'var(--font-display)', fontStyle: 'italic' }}
-              >
-                {SITE.founder}, Kathmandu
-              </p>
-            </div>
-
-            <div className="lg:pt-10">
-              <ul className="border-t" style={{ borderColor: 'var(--border)' }}>
-                {PROMISES.map((promise) => (
-                  <li key={promise.title} className="border-b py-5" style={{ borderColor: 'var(--border)' }}>
-                    <h3 className="text-[14px] font-semibold" style={{ color: 'var(--text)' }}>
-                      {promise.title}
-                    </h3>
-                    <p className="mt-1.5 text-[13.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
-                      {promise.body}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-4 text-[12.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
-                Read the <Link className="underline" to="/privacy">Privacy Policy</Link>, the{' '}
-                <Link className="underline" to="/content-policy">content policy</Link>, or{' '}
-                <Link className="underline" to="/about">more about the project</Link>.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Tutoring modes: a single quiet line of links ─────────────────── */}
-      <section className="border-y py-10" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-        <div className="container-page flex flex-wrap items-center gap-x-3 gap-y-2">
-          <span className="text-[12px] font-semibold uppercase tracking-[0.16em]" style={{ color: 'var(--muted)' }}>
-            Answer styles
-          </span>
-          {TUTOR_MODES.map((mode, index) => (
-            <span key={mode.id} className="inline-flex items-center gap-3">
-              <Link to={`/app/tutor?mode=${mode.id}`} className="text-[13.5px] hover:underline" style={{ color: 'var(--text-soft)' }}>
-                {mode.label}
-              </Link>
-              {index < TUTOR_MODES.length - 1 && (
-                <span aria-hidden="true" style={{ color: 'var(--border-strong)' }}>
-                  /
-                </span>
-              )}
-            </span>
-          ))}
-        </div>
-      </section>
-
-      {/* ── FAQ ──────────────────────────────────────────────────────────── */}
-      <section className="py-14 sm:py-20">
-        <div className="container-page">
-          <div className="grid gap-8 lg:grid-cols-[0.7fr_1.3fr] lg:gap-16">
-            <div>
-              <p className="rule-gold eyebrow">Questions</p>
-              <h2 className="section-title mt-1">Asked before signing up.</h2>
-              <p className="mt-4 text-[14px] leading-relaxed" style={{ color: 'var(--muted)' }}>
-                Still stuck?{' '}
-                <Link className="underline" to="/help">Read the help guide</Link> or{' '}
-                <Link className="underline" to="/contact">send a message</Link>.
-              </p>
-            </div>
+          <div className="lg:col-span-8">
             <Faq items={FAQ_ITEMS} />
           </div>
         </div>
       </section>
 
-      {/* ── Closing ──────────────────────────────────────────────────────── */}
-      <section className="border-t py-14 sm:py-16" style={{ borderColor: 'var(--border)' }}>
-        <div className="container-page">
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <h2 className="section-title max-w-[22ch]">Start with the question you are stuck on.</h2>
-              <p className="mt-3 max-w-[46ch] text-[14.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
-                It takes about a minute to set your grade and subjects. Leave whenever you like; nothing is saved
-                until you make an account.
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-3">
-              <StartLearningButton size="lg" iconRight={<ArrowRight className="h-4 w-4" aria-hidden="true" />}>
-                Start studying
-              </StartLearningButton>
-              <Link to="/signup" className="text-sm font-medium underline underline-offset-4" style={{ color: 'var(--text-soft)' }}>
-                Create an account
-              </Link>
-            </div>
+      {/* ── Closing ────────────────────────────────────────────────────── */}
+      <section className="border-t" style={{ borderColor: 'var(--border)' }}>
+        <div className="container-page flex flex-col items-start justify-between gap-6 py-12 sm:flex-row sm:items-center">
+          <div>
+            <p
+              className="text-2xl font-extrabold tracking-[-0.02em] sm:text-3xl"
+              style={{ fontFamily: 'var(--font-display)', color: 'var(--text)' }}
+            >
+              {SITE.tagline}
+            </p>
+            <p className="mt-2 text-sm" style={{ color: 'var(--muted)' }}>
+              Free lessons, real practice and verified opportunities. {SITE.foundedIn === 'Nepal' ? 'Built in Nepal.' : ''}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <StartLearningButton size="lg" iconRight={<ArrowRight className="h-4 w-4" aria-hidden="true" />}>
+              Start learning
+            </StartLearningButton>
+            <Link to="/signup" className="btn btn-secondary btn-lg">
+              Create an account
+            </Link>
           </div>
         </div>
       </section>

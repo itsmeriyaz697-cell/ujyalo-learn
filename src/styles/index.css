@@ -2,57 +2,101 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─────────────────────────  Design tokens  ───────────────────────── */
+/* ─────────────────────────  Ujyalo Learn 2.0  ─────────────────────────
+   Typography is self-hosted. Google's CDN would be one more third party
+   receiving a request from every student's browser, and the CSP we ship
+   deliberately allows font-src 'self' only. Two variable files cover the
+   whole scale: Manrope 500–800 (headings), DM Sans 400–700 (body).
+   Both are SIL OFL 1.1 — see public/fonts/LICENSE.txt.                     */
+@font-face {
+  font-family: 'Manrope';
+  src: url('/fonts/manrope-var.woff2') format('woff2');
+  font-weight: 500 800;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191,
+    U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'DM Sans';
+  src: url('/fonts/dm-sans-var.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191,
+    U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* ─────────────────────────  Design tokens  ─────────────────────────
+   Palette from the 2.0 brief, with two corrections that measurement forced:
+
+   1. #F49B45 (sunrise) reaches only 2.18:1 on white, so it is never text
+      on a light surface. It appears as rules, underlines, illustration
+      fills, and as a button background behind navy text (6.46:1).
+      --accent-text is the darkened variant used when orange must carry
+      meaning as text (6.06:1 on --accent-soft).
+   2. #687386 (brief's muted) measures 4.46:1 on #F8F7F2 — just under AA
+      for body text. --muted is #5F6B7E, which is 5.03:1 on paper. */
 :root {
-  --bg: #faf8f3;
+  --bg: #f8f7f2;
   --surface: #ffffff;
-  --surface-2: #f6f3ec;
-  --surface-3: #efeae0;
-  --border: #e4ddce;
-  --border-strong: #cfc5b2;
-  --text: #0b1b3a;
-  --text-soft: #33425f;
-  --muted: #5b6b8c;
-  --primary: #2947d6;
-  --primary-soft: #e8eeff;
+  --surface-2: #f3f2ec;
+  --surface-3: #eae8df;
+  --border: #e8e7e1;
+  /* 3.35:1 on paper — the 3:1 WCAG floor for form-control boundaries. */
+  --border-strong: #8b8779;
+  --text: #172b4d;
+  --text-soft: #2c3e5c;
+  --muted: #5f6b7e;
+  --primary: #172b4d;
+  --primary-soft: #e7ecf4;
   --primary-contrast: #ffffff;
-  --accent: #f7b733;
-  --accent-soft: #fff4d6;
-  /* Readable accent text on --accent-soft: 4.88:1 (WCAG AA). */
-  --accent-text: color-mix(in srgb, #f7b733 55%, black);
-  --success: #0e7a4f;
-  --success-soft: #e2f6ec;
-  /* Text/icons placed ON --success. */
+  --accent: #f49b45;
+  --accent-soft: #fdf0e3;
+  --accent-text: #8a4b10;
+  --sage: #dce9df;
+  --sage-deep: #c3d8c8;
+  /* Body text on the sage band. --muted is 4.31:1 there, under AA. */
+  --on-sage-muted: #4e5a6b;
+  --success: #0f6b45;
+  --success-soft: #e0f2e8;
   --success-contrast: #ffffff;
-  --danger: #b42318;
-  --danger-soft: #fee9e7;
-  --ring: #2947d6;
-  --font-display: ui-serif, 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman', serif;
+  --danger: #a4262c;
+  --danger-soft: #fdeaea;
+  --ring: #172b4d;
+  --font-display: 'Manrope', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-sans: 'DM Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
 .dark {
-  --bg: #081226;
-  --surface: #0e1c38;
-  --surface-2: #132446;
-  --surface-3: #1a2e55;
-  --border: #22355c;
-  --border-strong: #2f4675;
-  --text: #eef3ff;
-  --text-soft: #c9d5ee;
-  --muted: #94a6c8;
-  --primary: #8fb0ff;
-  --primary-soft: #1b2f63;
-  --primary-contrast: #081226;
-  --accent: #ffd05a;
-  --accent-soft: #3a2f12;
-  /* On a dark surface the accent text must go lighter, not darker. */
-  --accent-text: #ffd98f;
+  --bg: #0e1b2e;
+  --surface: #14243a;
+  --surface-2: #1a2c46;
+  --surface-3: #213553;
+  --border: #26394f;
+  --border-strong: #6b7c93;
+  --text: #e9eef6;
+  --text-soft: #c8d3e2;
+  --muted: #9aa7ba;
+  --primary: #e9eef6;
+  --primary-soft: #22354f;
+  --primary-contrast: #0e1b2e;
+  --accent: #f4a961;
+  --accent-soft: #3a2a17;
+  --accent-text: #ffc48a;
+  /* In dark mode sage becomes a tonal step of navy, not green: #1e3a33 read
+     as acid against #0e1b2e, which fought the calm the brief asks for. */
+  --sage: #16273e;
+  --sage-deep: #1d3149;
+  --on-sage-muted: #a7b4c6;
   --success: #6ee7b0;
-  --success-soft: #0d2f26;
-  --success-contrast: #081226;
+  --success-soft: #10352a;
+  --success-contrast: #0e1b2e;
   --danger: #ffb4ab;
   --danger-soft: #3d1614;
-  --ring: #8fb0ff;
+  --ring: #f4a961;
 }
 
 @layer base {
@@ -64,6 +108,7 @@
     @apply antialiased;
     background-color: var(--bg);
     color: var(--text);
+    font-family: var(--font-sans);
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
     min-height: 100dvh;
   }
@@ -80,6 +125,7 @@
   }
   h1, h2, h3, h4 {
     color: var(--text);
+    font-family: var(--font-display);
     text-wrap: balance;
   }
   p {
@@ -164,7 +210,7 @@
   }
   .btn-accent {
     background: var(--accent);
-    color: #2b1d00;
+    color: #172b4d;
   }
   .btn-accent:hover:not(:disabled) {
     background: color-mix(in srgb, var(--accent) 90%, black);
@@ -300,8 +346,9 @@
     color: var(--text);
   }
   .nav-link-active {
-    color: var(--primary);
-    background: var(--primary-soft);
+    color: var(--text);
+    background: transparent;
+    box-shadow: inset 0 -2px 0 var(--accent);
   }
 
   .skeleton {
@@ -416,10 +463,11 @@
     border-radius: 999px;
   }
 
+  /* Was two radial gradients behind the hero. A tinted band with a hairline
+     edge does the same job without the generated-landing-page look. */
   .hero-grid {
-    background-image:
-      radial-gradient(60% 55% at 78% 8%, color-mix(in srgb, var(--primary) 22%, transparent), transparent 70%),
-      radial-gradient(45% 45% at 10% 0%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%);
+    background: var(--sage);
+    border-bottom: 1px solid var(--border);
   }
 
   .app-shell {

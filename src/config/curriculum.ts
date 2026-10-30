@@ -333,10 +333,17 @@ export const PRICING_TIERS = [
 
 export const SITE = {
   name: 'Ujyalo Learn',
-  tagline: 'Built in Kathmandu for Grades 1-12.',
+  tagline: 'Learn today. Lead tomorrow.',
+  /**
+   * Positioning note: this used to describe an "AI-powered tutoring platform".
+   * AI is one tool inside the product, not the product, so the description now
+   * leads with lessons, practice and opportunities. Nothing here claims
+   * coverage the site does not have.
+   */
   description:
-    'Ujyalo Learn is an AI-powered learning and tutoring platform for students in Nepal and beyond. Understand difficult concepts, practise questions and prepare for exams with a patient personal AI tutor.',
+    'Ujyalo Learn is a free learning platform for students in Nepal: lessons, practice questions, timed mock exams and a directory of verified educational opportunities for Grades 1-12.',
   founder: 'Riyaz Chalise',
+  foundedIn: 'Nepal',
   /**
    * The owner supplies the real production domain through VITE_SITE_URL.
    * When it is missing we return an empty string and canonical/og:url tags are

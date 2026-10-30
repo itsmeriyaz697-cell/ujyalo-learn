@@ -30,6 +30,7 @@ const CoursesPage = lazy(() => import('@/pages/CoursesPage'));
 const CoursePage = lazy(() => import('@/pages/CoursePage'));
 const ResourcesPage = lazy(() => import('@/pages/ResourcesPage'));
 const ResourcePage = lazy(() => import('@/pages/ResourcePage'));
+const OpportunitiesPage = lazy(() => import('@/pages/OpportunitiesPage'));
 const GradePage = lazy(() => import('@/pages/GradePage'));
 const SeePrepPage = lazy(() => import('@/pages/SeePrepPage'));
 const AiTutorPage = lazy(() => import('@/pages/AiTutorPage'));
@@ -127,6 +128,7 @@ export function App() {
             <Route path="courses" element={<CoursesPage />} />
             <Route path="courses/:slug" element={<CoursePage />} />
             <Route path="resources" element={<ResourcesPage />} />
+            <Route path="opportunities" element={<OpportunitiesPage />} />
             <Route path="resources/:slug" element={<ResourcePage />} />
             <Route path="grades/:grade" element={<GradePage />} />
             <Route path="see-preparation" element={<SeePrepPage />} />

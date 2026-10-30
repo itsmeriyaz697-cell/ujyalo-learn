@@ -45,6 +45,11 @@ jobs:
       - name: Check no secrets are committed
         run: npm run check:secrets
 
+      # The opportunities directory is only worth having if every listing is
+      # real and dated, so its integrity is part of CI, not a convention.
+      - name: Check opportunities directory
+        run: npm run check:opportunities
+
       # Dependencies that actually ship. Build-only tooling is excluded: an
       # advisory in a bundler's dev dependency cannot reach a visitor, and
       # blocking on it would train us to ignore this gate.

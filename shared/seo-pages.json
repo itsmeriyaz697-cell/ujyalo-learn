@@ -2,11 +2,11 @@
   "pages": [
     {
       "path": "/",
-      "title": "Ujyalo Learn — a free study companion for Grades 1–12 in Nepal",
-      "description": "Ask a question, get an explanation you can follow, then practise it. Free tutor, quizzes and notes for Nepali school students, on any phone.",
+      "title": "Ujyalo Learn — Learn today. Lead tomorrow.",
+      "description": "Free lessons, practice questions, timed mock exams and a directory of verified educational opportunities for students in Nepal, Grades 1–12.",
       "priority": "1.0",
       "changefreq": "weekly",
-      "h1": "Namaste. What are you studying today?"
+      "h1": "Your next big achievement starts with one lesson."
     },
     {
       "path": "/features",
@@ -94,6 +94,14 @@
       "priority": "0.8",
       "changefreq": "weekly",
       "h1": "Guides written to be used, not skimmed"
+    },
+    {
+      "path": "/opportunities",
+      "title": "Opportunities for students — scholarships, courses and competitions",
+      "description": "A directory of educational opportunities for students in Nepal, each with the provider, the official link, any deadline and the date it was last checked.",
+      "priority": "0.8",
+      "changefreq": "weekly",
+      "h1": "Opportunities worth the application"
     },
     {
       "path": "/see-preparation",

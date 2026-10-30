@@ -63,7 +63,7 @@ async function run() {
   check(await page.getByRole('link', { name: 'Sign up' }).first().isVisible(), '1d. Sign up stays in the header');
 
   // 2. Click public features — each opens directly, with no auth screen.
-  const publicRoutes = ['/features', '/ai-tutor', '/see-preparation', '/subjects', '/courses', '/resources', '/global-quiz', '/pricing', '/help', '/about'];
+  const publicRoutes = ['/features', '/ai-tutor', '/see-preparation', '/subjects', '/courses', '/resources', '/opportunities', '/global-quiz', '/pricing', '/help', '/about'];
   for (const route of publicRoutes) {
     await page.goto(BASE + route, { waitUntil: 'load' });
     const h1 = await page.locator('#main h1').first().textContent({ timeout: 15000 });
@@ -175,11 +175,11 @@ async function run() {
     await mpage.waitForTimeout(300);
     const mobileLogin = mpage.getByRole('link', { name: /log in/i }).first();
     check(await mobileLogin.isVisible(), 'M3. Log in is reachable inside the mobile menu');
-    const navLink = mpage.locator('#mobile-nav a[href="/courses"]').first();
-    check(await navLink.isVisible(), 'M4. courses is reachable in the mobile menu');
+    const navLink = mpage.locator('#mobile-nav a[href="/subjects"]').first();
+    check(await navLink.isVisible(), 'M4. subjects is reachable in the mobile menu');
     await navLink.click();
-    await mpage.waitForURL(/\/courses/, { timeout: 15000 });
-    check(/\/courses/.test(mpage.url()), 'M5. a mobile menu link opens directly');
+    await mpage.waitForURL(/\/subjects/, { timeout: 15000 });
+    check(/\/subjects/.test(mpage.url()), 'M5. a mobile menu link opens directly');
   }
 
   await mpage.goto(BASE + '/app/tutor', { waitUntil: 'load' });

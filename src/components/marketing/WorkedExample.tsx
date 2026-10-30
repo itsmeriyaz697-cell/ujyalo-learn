@@ -28,7 +28,7 @@ export function WorkedExample() {
         />
 
         <div className="relative pl-10 pr-5 py-6 sm:pl-12 sm:pr-7">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: 'var(--muted)' }}>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: 'var(--on-sage-muted)' }}>
             Grade 9 · Mathematics
           </p>
 
@@ -86,7 +86,7 @@ export function WorkedExample() {
         </div>
       </div>
 
-      <figcaption className="mt-3 text-[11.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+      <figcaption className="mt-3 text-[11.5px] leading-relaxed" style={{ color: 'var(--on-sage-muted)' }}>
         A sample answer, not a recorded one. Real answers are labelled AI-generated, can be wrong, and are worth
         checking against your textbook.
       </figcaption>

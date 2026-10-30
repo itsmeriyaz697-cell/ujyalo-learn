@@ -58,7 +58,7 @@ async function visit(pathname) {
 
 // ─── Public pages ────────────────────────────────────────────────────────────
 const publicPages = [
-  ['/', 'Namaste.'],
+  ['/', 'Your next big achievement'],
   ['/features', null],
   ['/subjects', null],
   ['/pricing', null],

@@ -237,7 +237,7 @@ const PRERENDER_CSS = `
 @media (min-width:1280px){.pr-mn{display:none}}
 
 /* Hero — same scale and rhythm as the real home page. */
-.pr-hero{position:relative;overflow:hidden;border-bottom:1px solid var(--border);padding:3rem 0 2.5rem}
+.pr-hero{position:relative;overflow:hidden;background:var(--sage);border-bottom:1px solid var(--border);padding:3rem 0 2.5rem}
 .pr-hero-bg{display:none}
 .pr-hero .pr-c{position:relative}
 @media (min-width:640px){.pr-hero{padding:4rem 0 3rem}}
@@ -565,24 +565,23 @@ function renderStaticContent(page) {
   // The hero text is the app's own copy, verbatim: a first paint that says one
   // thing and a mounted page that says another is the flash being fixed here.
   const HERO_LEAD =
-    'Ujyalo Learn is a free study companion for school in Nepal. Ask a question and get an explanation you can ' +
-    'follow. Practise it with a quiz, keep what matters in notes, and come back tomorrow to what is left.';
+    'Discover better ways to learn, practice with purpose and build the confidence to achieve more.';
 
   const body = isHome
     ? `<section class="pr-hero">
     <div class="pr-hero-bg" aria-hidden="true"></div>
     <div class="pr-c">
-      <span class="pr-badge">Nepal · Grades 1–12 · Free to start</span>
+      <span class="pr-badge">Ujyalo Learn · Nepal</span>
       <h1>${headline}</h1>
       <p class="pr-lead">${HERO_LEAD}</p>
       <div class="pr-cta">
-        <a class="pr-btn pr-btn-p" href="/app">Start studying</a>
-        <a class="pr-btn pr-btn-s" href="/global-quiz">Try a quiz without an account</a>
+        <a class="pr-btn pr-btn-p" href="/app">Start learning</a>
+        <a class="pr-btn pr-btn-s" href="/subjects">Explore subjects</a>
       </div>
       <ul class="pr-trust">
-        <li>No card needed</li>
-        <li>English &amp; Nepali</li>
-        <li>Grades 1–12</li>
+        <li>Free to use</li>
+        <li>No account needed to browse</li>
+        <li>Built for a 360px screen</li>
       </ul>
     </div>
   </section>`
