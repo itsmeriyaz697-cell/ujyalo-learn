@@ -29,6 +29,7 @@ const PUBLIC_PAGES = [
   '/ai-tutor',
   '/faq',
   '/about',
+  '/riyaz',
   '/contact',
   '/privacy',
 ];

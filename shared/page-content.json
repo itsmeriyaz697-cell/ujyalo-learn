@@ -146,6 +146,51 @@
       ]
     },
     {
+      "path": "/riyaz",
+      "sections": [
+        {
+          "heading": "What I am building",
+          "body": [
+            "Ujyalo Learn is a free study site for students in Nepal, covering Grades 1–12 and SEE. It gives you a tutor that will explain the same idea as many times as you need, practice questions that explain why the right answer is right, and study tools that work on a cheap phone with a weak connection.",
+            "It started from a plain observation: the students who most need an explanation are the ones whose families can least afford private tuition, and the explanation itself is the cheapest thing in the world to give away once the software exists. That is the whole case for the site. There is no clever business model behind it."
+          ]
+        },
+        {
+          "heading": "The name on the artwork",
+          "body": [
+            "The banner at the top of this page is mine — BUILDZEN, with my name under it. I drew it before there was much behind it, because I wanted something of my own to point at. Ujyalo Learn is what ended up behind it.",
+            "The bar across my eyes is not a design accident. I am 14, this page can be found by anyone who searches my name, and a photograph of a child does not need to be part of that search result."
+          ]
+        },
+        {
+          "heading": "How this gets made",
+          "body": [
+            "I choose what gets built and what it says, and I check the result in a real browser before it goes out. I use AI tools to write a lot of the code, the way I use a calculator for arithmetic, and then I read what came back — a tool that is wrong sounds exactly as confident as one that is right.",
+            "Every release is tested rather than assumed: the links have to work, the pages have to be readable on a small phone, and no page is allowed to claim something the site cannot show. When something is broken, the fix goes in the changelog rather than quietly disappearing."
+          ]
+        },
+        {
+          "heading": "What I do not have",
+          "body": [
+            "No company, no investors, no team, no awards, no testimonials and no user numbers. Not yet — some of those may become true, and when they do they will appear here with a date attached.",
+            "Until then this page stays short, because the alternative is inventing things. If you have seen a number about this site somewhere that is not on this site, treat it as a guess."
+          ]
+        },
+        {
+          "heading": "What comes next",
+          "body": [
+            "The next work is content rather than features. Three things are queued: bring the Grade 9 hub up to the same standard as Grade 10, take the SEE subjects one at a time starting with Mathematics and Science and give each topic worked examples and practice, and find a teacher who is willing to review the material and put their name to it."
+          ]
+        },
+        {
+          "heading": "Say hello",
+          "body": [
+            "If something on the site is wrong, or you teach and want to help check it, the contact page reaches me directly. A correction with a source is the most useful message you can send."
+          ]
+        }
+      ]
+    },
+    {
       "path": "/pricing",
       "sections": [
         {

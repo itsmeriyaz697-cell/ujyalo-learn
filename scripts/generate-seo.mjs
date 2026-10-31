@@ -855,12 +855,33 @@ function renderPage(page) {
         ]
       : [];
 
+  // The founder page describes a person, so it carries a Person node. Emitted
+  // only there: a Person schema on a product page would be a claim the page
+  // does not support.
+  const person =
+    page.path === '/riyaz'
+      ? [
+          {
+            '@context': 'https://schema.org',
+            '@type': 'Person',
+            name: 'Riyaz Chalise',
+            ...(origin ? { url: url, mainEntityOfPage: url } : {}),
+            description:
+              'Teenage student in Nepal, founder and builder of Ujyalo Learn, a free study site for Grades 1-12 and SEE.',
+            jobTitle: 'Founder and builder',
+            address: { '@type': 'PostalAddress', addressCountry: 'NP' },
+            worksFor: { '@type': 'Organization', name: SITE_NAME, ...(origin ? { url: abs('/') } : {}) },
+            knowsAbout: ['Education technology', 'Study tools', 'Nepal SEE preparation'],
+          },
+        ]
+      : [];
+
   // FAQPage is only valid where those questions are visible on the page —
   // the home page and /faq — not on all 41 routes.
   const pageStructuredData = structuredData.filter(
     (node) => node['@type'] !== 'FAQPage' || page.path === '/' || page.path === '/faq',
   );
-  const ldNodes = [...pageStructuredData, breadcrumb, ...article];
+  const ldNodes = [...pageStructuredData, breadcrumb, ...article, ...person];
   const ldTags = ldNodes
     .map((node) => {
       const json = JSON.stringify(node).replace(/</g, '\\u003c');

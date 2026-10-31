@@ -227,7 +227,10 @@ export function PublicLayout() {
           <div className="container-page flex flex-col items-start justify-between gap-2 px-0 text-xs text-muted sm:flex-row sm:items-center">
             <p>
               © {new Date().getFullYear()} Ujyalo Learn — Built by{' '}
-              <strong style={{ color: 'var(--text-soft)' }}>Riyaz Chalise</strong> in Nepal.
+              <Link to="/riyaz" className="font-semibold hover:underline" style={{ color: 'var(--text-soft)' }}>
+                Riyaz Chalise
+              </Link>{' '}
+              in Nepal.
             </p>
             <p>Grades 1–12 · Free to start</p>
           </div>

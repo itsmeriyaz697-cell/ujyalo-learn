@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { BookOpen, HeartHandshake, Lightbulb, ShieldCheck, Target } from 'lucide-react';
+import { ArrowRight, BookOpen, HeartHandshake, Lightbulb, ShieldCheck, Target } from 'lucide-react';
 import { Seo } from '@/components/seo/Seo';
 import { seoFor } from '@/config/seoPages';
 import { Section, SectionHeading } from '@/components/marketing/Section';
@@ -119,6 +119,14 @@ export default function AboutPage() {
               family can pay for extra tuition. The platform is an independent education project, designed and developed
               with a focus on privacy, honesty and making the most of limited devices and bandwidth.
             </p>
+            <Link
+              to="/riyaz"
+              className="mt-4 inline-flex items-center gap-1 text-sm font-semibold underline-offset-4 hover:underline"
+              style={{ color: 'var(--primary)' }}
+            >
+              More about Riyaz
+              <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+            </Link>
             <div className="mt-4 rounded-xl p-3 text-[12px] leading-relaxed" style={{ background: 'var(--surface-2)', color: 'var(--muted)' }}>
               Have feedback, a subject request, or found something incorrect? Reach out through the{' '}
               <Link to="/contact" className="underline">

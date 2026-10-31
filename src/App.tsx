@@ -22,6 +22,7 @@ const SubjectsPage = lazy(() => import('@/pages/SubjectsPage'));
 const PricingPage = lazy(() => import('@/pages/PricingPage'));
 const HelpPage = lazy(() => import('@/pages/HelpPage'));
 const AboutPage = lazy(() => import('@/pages/AboutPage'));
+const RiyazPage = lazy(() => import('@/pages/RiyazPage'));
 const ContactPage = lazy(() => import('@/pages/ContactPage'));
 const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
 const TermsPage = lazy(() => import('@/pages/TermsPage'));
@@ -122,6 +123,7 @@ export function App() {
             <Route path="pricing" element={<PricingPage />} />
             <Route path="help" element={<HelpPage />} />
             <Route path="about" element={<AboutPage />} />
+            <Route path="riyaz" element={<RiyazPage />} />
             <Route path="contact" element={<ContactPage />} />
             <Route path="privacy" element={<PrivacyPage />} />
             <Route path="terms" element={<TermsPage />} />
